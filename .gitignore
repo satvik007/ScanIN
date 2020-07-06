@@ -121,7 +121,7 @@ output.json
 
 # Android Studio
 /*/build/
-/*/local.properties
+local.properties
 /*/out
 /*/*/build
 /*/*/production
