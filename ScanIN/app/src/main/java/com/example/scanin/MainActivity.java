@@ -1,5 +1,6 @@
 package com.example.scanin;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -7,6 +8,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -25,9 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private FloatingActionButton btnTakePicture;
     private Button btnSavePicture;
-    private ImageView imgPhoto;
+    private ImageView capturePreview;
 
     private static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
+
+    private Bitmap bitmap;
 
     private static String TAG="MainActivity";
     static {
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btnTakePicture = (FloatingActionButton) findViewById(R.id.fab);
         btnSavePicture = (Button) findViewById(R.id.saveBtn);
+        capturePreview = (ImageView) findViewById(R.id.capturePreview);
 
         btnTakePicture.setOnClickListener(MainActivity.this);
         btnSavePicture.setOnClickListener(MainActivity.this);
@@ -101,6 +106,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else if (view.getId() == R.id.saveBtn) {
 
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Toast.makeText(MainActivity.this,
+                "OnActivityResult is called",
+                Toast.LENGTH_SHORT);
+
+        if (requestCode == CAMERA_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
+
+            Bundle bundle = data.getExtras();
+
+            bitmap = (Bitmap) bundle.get("data");
+
+            capturePreview.setImageBitmap(bitmap);
+
+        }
+
     }
 
 
