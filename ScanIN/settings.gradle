@@ -1,5 +1,0 @@
-include ':app'
-rootProject.name = "ScanIN"
-
-include ':opencv'
-project(':opencv').projectDir = new File(opencvsdk + '/sdk')
