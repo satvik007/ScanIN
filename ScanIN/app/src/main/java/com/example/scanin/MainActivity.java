@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ImageView capturePreview;
 
     private static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
+    private static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 2000;
 
     private Bitmap bitmap;
 
@@ -97,13 +98,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 ActivityCompat.requestPermissions(MainActivity.this,
                         new String[]{Manifest.permission.CAMERA},
-                        1);     // request code , must be a unique value
-
-
+                        CAMERA_IMAGE_REQUEST_CODE);     // request code , must be a unique value
             }
 
 
         } else if (view.getId() == R.id.saveBtn) {
+
+            int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+
+                try {
+
+                    SaveFile.saveImage(MainActivity.this, bitmap);
+
+                    Toast.makeText(MainActivity.this,
+                            "The image is saved successfully to external storage.",
+                            Toast.LENGTH_SHORT).show();
+
+
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+
+                }
+
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        WRITE_EXTERNAL_STORAGE_REQUEST_CODE);
+            }
 
         }
     }
