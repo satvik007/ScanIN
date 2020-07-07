@@ -8,7 +8,7 @@ Extract the above zip file.
 
 Then open the `ScanIN/ScanIN` folder in Android Studio and change the following files:
 
-1. In file `local.properties` change the `sdk.dir` to the Android Sdk location on your system.
+1. ~~In file `local.pro perties` change the `sdk.dir` to the Android Sdk location on your system.~~
 
 2. If the `ScanIN/ScanIN/gradle.properties` doesn't exist create it. 
 
