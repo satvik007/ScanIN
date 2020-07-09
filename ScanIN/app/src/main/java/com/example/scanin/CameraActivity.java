@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -47,7 +46,7 @@ public class CameraActivity extends AppCompatActivity {
     private ImageAnalysis imageAnalyzer = null;
     private Camera camera = null;
     private ImageButton camera_capture_button;
-    private Button flash_button;
+    private ImageButton flash_button;
     private ImageView photo_preview;
     private Bitmap[] bitmaps = null;
     File currentFile = null;
@@ -91,8 +90,14 @@ public class CameraActivity extends AppCompatActivity {
                 if(imageCapture == null){
                     return;
                 }
-                if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF) imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
-                else imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
+                if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF) {
+                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
+                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_high_24);
+                }
+                else{
+                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
+                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_low_24);
+                }
             }
         });
     }
