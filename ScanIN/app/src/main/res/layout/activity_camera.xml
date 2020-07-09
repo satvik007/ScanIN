@@ -6,13 +6,14 @@
     android:layout_height="match_parent"
     tools:context=".CameraActivity">
 
-    <Button
+    <ImageButton
         android:id="@+id/camera_capture_button"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="50dp"
         android:scaleType="fitCenter"
-        android:text="Take Photo"
+        android:background="@android:color/transparent"
+        android:src = "@drawable/ic_camerabutton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
