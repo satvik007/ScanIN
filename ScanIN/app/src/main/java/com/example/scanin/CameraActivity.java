@@ -2,6 +2,7 @@ package com.example.scanin;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -94,6 +95,7 @@ public class CameraActivity extends AppCompatActivity {
                 else imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
             }
         });
+
     }
 
     //start camera
@@ -126,10 +128,16 @@ public class CameraActivity extends AppCompatActivity {
     private void takePhoto(){
         if(imageCapture == null) return;
         File photoFile = new File(
-                outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
-        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+                outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+                .format(System.currentTimeMillis()) + ".jpg");
+
+        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions
+                .Builder(photoFile).build();
+
         imageCapture.takePicture(
-                outputFileOptions, ContextCompat.getMainExecutor((Context)this), new ImageCapture.OnImageSavedCallback() {
+                outputFileOptions,
+                ContextCompat.getMainExecutor((Context)this),
+                new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
 
@@ -137,9 +145,16 @@ public class CameraActivity extends AppCompatActivity {
 //                        currentFile = photoFile;
 //                        Bitmap myBitmap = BitmapFactory.decodeFile(currentFile.getAbsolutePath());
 //                        photo_preview.setImageBitmap(myBitmap);
+
+
                         String msg = String.format("Photo capture succeeded: %s", savedUri);
                         Toast.makeText((Context)CameraActivity.this, msg, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, msg);
+
+                        Intent intent = new Intent();
+                        intent.putExtra("imageUri", savedUri.toString());
+                        setResult(RESULT_OK, intent);
+                        finish();
                     }
 
                     @Override
@@ -170,6 +185,9 @@ public class CameraActivity extends AppCompatActivity {
                 this.startCamera();
             } else {
                 Toast.makeText((Context) this, (CharSequence) "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent();
+                setResult(RESULT_CANCELED, intent);
                 this.finish();
             }
         }
