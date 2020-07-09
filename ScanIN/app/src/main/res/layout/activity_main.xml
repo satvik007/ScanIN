@@ -47,7 +47,7 @@
         android:layout_margin="16dp"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:backgroundTint="@color/orange"
+        app:backgroundTint="@color/colorPrimary"
         app:srcCompat="@drawable/ic_plus_24"
         />
 
