@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -45,7 +46,7 @@ public class CameraActivity extends AppCompatActivity {
     private ImageCapture imageCapture = null;
     private ImageAnalysis imageAnalyzer = null;
     private Camera camera = null;
-    private Button camera_capture_button;
+    private ImageButton camera_capture_button;
     private Button flash_button;
     private ImageView photo_preview;
     private Bitmap[] bitmaps = null;
