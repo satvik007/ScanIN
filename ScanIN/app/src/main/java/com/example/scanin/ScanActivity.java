@@ -29,8 +29,13 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
     @Override
     public void cameraFragmentCallback(int CALLBACK_CODE) {
         FragmentManager fragmentManager = getSupportFragmentManager();
+//        fragmentManager.beginTransaction()
+//                .replace(R.id.fragment_camera, imageGridFragment)
+//                .addToBackStack(null)
+//                .commit();
+
         fragmentManager.beginTransaction()
-                .replace(R.id.fragment_camera, imageGridFragment)
+                .add(R.id.fragment_camera, imageGridFragment)
                 .addToBackStack(null)
                 .commit();
     }

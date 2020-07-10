@@ -1,5 +1,6 @@
 package com.example.scanin;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -55,6 +57,7 @@ public class CameraFragment extends Fragment {
     File currentFile = null;
     public static int IMAGE_SAVED_CALLBACK_CODE = 10;
     public static int GRID_CLICKED_CALLBACK_CODE = 12;
+//    private View rootView = null;
 
     private File outputDirectory;
     private ExecutorService cameraExecutor;
@@ -126,6 +129,9 @@ public class CameraFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+//        Log.d("CameraFragment", "OnCreateViewCalled1");
+//        if(rootView != null) return rootView;
+//        Log.d("CameraFragment", "OnCreateViewCalled2");
         View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
         camera_capture_button = rootView.findViewById(R.id.camera_capture_button);
         flash_button = rootView.findViewById(R.id.flash_button);
@@ -158,16 +164,21 @@ public class CameraFragment extends Fragment {
     }
 
     //bind preview view to camera
+    @SuppressLint("RestrictedApi")
     public void bindPreview(@NonNull ProcessCameraProvider cameraProvider, View rootView){
         PreviewView previewView =(PreviewView)rootView.findViewById(R.id.viewFinder);
         if(imageCapture == null){
             preview = new Preview.Builder()
+                    .setTargetAspectRatio(AspectRatio.RATIO_4_3)
                     .build();
-            imageCapture = new ImageCapture.Builder().setTargetRotation(previewView.getDisplay().getRotation()).build();
+            imageCapture = new ImageCapture.Builder()
+                    .setTargetRotation(previewView.getDisplay().getRotation()).build();
         }
-        CameraSelector cameraSelector = new CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build();
+//        CameraSelector cameraSelector = new CameraSelector.Builder()
+//                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+//                .build();
+
+        CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
         preview.setSurfaceProvider(previewView.createSurfaceProvider());
         if(CameraFragment.this.camera == null){
             CameraFragment.this.camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview, imageCapture);
