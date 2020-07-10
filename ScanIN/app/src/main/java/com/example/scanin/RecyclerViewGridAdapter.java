@@ -1,6 +1,7 @@
 package com.example.scanin;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
@@ -8,26 +9,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-public class RecylerViewGridAdapter extends RecyclerView.Adapter<RecylerViewGridAdapter.GridViewHolder> {
+public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGridAdapter.GridViewHolder> {
 
-    private ArrayList<ImageData> mDataset = null;
+    private ArrayList<ImageData> mDataset = new ArrayList<ImageData>();
     public static class GridViewHolder extends RecyclerView.ViewHolder{
-        public TextView textView;
-        public GridViewHolder(TextView v){
-            super(v);
-            textView = v;
+        TextView textView;
+        public GridViewHolder(View view){
+            super(view);
+            textView =view.findViewById(R.id.uri_data);
         }
     }
 
-    public RecylerViewGridAdapter(ArrayList<ImageData> mDataset){
+    public RecyclerViewGridAdapter(ArrayList<ImageData> mDataset){
         this.mDataset = mDataset;
     }
 
-    public RecylerViewGridAdapter.GridViewHolder onCreateViewHolder(ViewGroup parent, int viewtype){
+    public RecyclerViewGridAdapter.GridViewHolder onCreateViewHolder(ViewGroup parent, int viewtype){
         // create a new view
-        TextView v = (TextView) LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.image_grid_item, parent, false);
-        GridViewHolder gridViewHolder = new GridViewHolder(v);
+        int layoutIdForImageAdapter =R.layout.image_grid_item;
+        LayoutInflater inflater =LayoutInflater.from(parent.getContext());
+        View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
+        GridViewHolder gridViewHolder = new GridViewHolder(view);
         return gridViewHolder;
     }
 
@@ -36,11 +38,15 @@ public class RecylerViewGridAdapter extends RecyclerView.Adapter<RecylerViewGrid
     public void onBindViewHolder(GridViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.textView.setText(mDataset.get(position).getFileName());
+        holder.textView.setText(mDataset.get(position).getFileName().toString());
     }
 
     @Override
     public int getItemCount() {
         return mDataset.size();
+    }
+
+    public void setmDataset(ArrayList<ImageData> mDataset){
+        this.mDataset = mDataset;
     }
 }

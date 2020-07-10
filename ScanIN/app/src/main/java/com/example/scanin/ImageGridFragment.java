@@ -1,13 +1,17 @@
 package com.example.scanin;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,8 +28,8 @@ public class ImageGridFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private String[] imagePathList;
-
+    private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
+    RecyclerViewGridAdapter mAdapter = null;
 
     public ImageGridFragment() {
         // Required empty public constructor
@@ -49,12 +53,31 @@ public class ImageGridFragment extends Fragment {
         return fragment;
     }
 
+    ImageGridFragmentCallback imageGridFragmentCallback;
+
+    public interface ImageGridFragmentCallback{
+        void onCreateGridCallback();
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        try {
+            imageGridFragmentCallback = (ImageGridFragmentCallback) context;
+        }
+        catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + "must implement imageGridFragmentCallback");
         }
     }
 
@@ -71,7 +94,14 @@ public class ImageGridFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         //set adapter
-        RecyclerView.Adapter mAdapter = new RecylerViewGridAdapter(imagePathList);
+        mAdapter = new RecyclerViewGridAdapter(imageData);
+        recyclerView.setAdapter(mAdapter);
+        imageGridFragmentCallback.onCreateGridCallback();
         return rootView;
+    }
+
+    public void setImagePathList(ArrayList<ImageData> imageData) {
+        this.imageData = imageData;
+        mAdapter.setmDataset(imageData);
     }
 }
