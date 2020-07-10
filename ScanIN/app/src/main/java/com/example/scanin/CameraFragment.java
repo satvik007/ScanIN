@@ -1,22 +1,20 @@
 package com.example.scanin;
 
-
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
@@ -24,6 +22,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.google.common.util.concurrent.ListenableFuture;
@@ -39,17 +38,20 @@ import java.util.concurrent.ExecutorService;
 import kotlin.collections.ArraysKt;
 import kotlin.jvm.internal.Intrinsics;
 
-
-public class CameraActivity extends AppCompatActivity {
-    private Preview preview = null;
-    private ListenableFuture<ProcessCameraProvider> cameraProviderFuture;
-    private ImageCapture imageCapture = null;
-    private ImageAnalysis imageAnalyzer = null;
-    private Camera camera = null;
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link CameraFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class CameraFragment extends Fragment {
     private ImageButton camera_capture_button;
     private ImageButton flash_button;
+    private ImageButton grid_button;
     private ImageView photo_preview;
+    private Camera camera = null;
     private Bitmap[] bitmaps = null;
+    Preview preview = null;
+    ImageCapture imageCapture = null;
     File currentFile = null;
 
     private File outputDirectory;
@@ -59,32 +61,83 @@ public class CameraActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"};
 
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public CameraFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment CameraFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static CameraFragment newInstance(String param1, String param2) {
+        CameraFragment fragment = new CameraFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    OnImageClickListener onImageClickListener;
+
+    public interface OnImageClickListener{
+        void startGridFragment();
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        try {
+            onImageClickListener = (OnImageClickListener)context;
+        }
+        catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + "must implement OnImageClickListener");
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_camera);
-//
-//        //get required views
-//        camera_capture_button = findViewById(R.id.camera_capture_button);
-//        flash_button = findViewById(R.id.flash_button);
-
-        //Check for permissions
-        if(allPermissionsGranted()){
-            startCamera();
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        else{
-            ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_camera, container, false);
+        camera_capture_button = rootView.findViewById(R.id.camera_capture_button);
+        flash_button = rootView.findViewById(R.id.flash_button);
+        grid_button = rootView.findViewById(R.id.grid_button);
+
+        if(imageCapture == null || imageCapture !=null){
+            if(allPermissionsGranted()){
+                startCamera(rootView);
+            }
+            else{
+                ActivityCompat.requestPermissions(getActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
+            }
+            outputDirectory = getOutputDirectory();
         }
 
-        outputDirectory = getOutputDirectory();
-
-//        camera_capture_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                takePhoto();
-//            }
-//        });
-//
 //        flash_button.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View view) {
@@ -101,46 +154,59 @@ public class CameraActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
+//
+//        camera_capture_button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(imageCapture == null){
+//                    return;
+//                }
+//                takePhoto(imageCapture);
+//            }
+//        });
+//
+//        grid_button.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                onImageClickListener.startGridFragment();
+//            }
+//        });
+        // Inflate the layout for this fragment
+        //get required views
 
+        //Check for permissions
+
+        return rootView;
     }
 
     //start camera
-    private void startCamera(){
-        cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
+    private void startCamera(View rootView){
+        final ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance((Context)getActivity());
         cameraProviderFuture.addListener(() ->{
             try{
                 ProcessCameraProvider cameraProvider = (ProcessCameraProvider) cameraProviderFuture.get();
-                bindPreview(cameraProvider);
+                bindPreview(cameraProvider, rootView);
             }catch (ExecutionException | InterruptedException e){
                 Log.e(TAG, "cameraProviderFuture.get() Failed", e);
             }
-        }, ContextCompat.getMainExecutor((Context)this));
+        }, ContextCompat.getMainExecutor((Context)getActivity()));
     }
 
     //bind preview view to camera
-    public void bindPreview(@NonNull ProcessCameraProvider cameraProvider){
-        preview = new Preview.Builder()
-                .build();
+    public void bindPreview(@NonNull ProcessCameraProvider cameraProvider, View rootView){
+        PreviewView previewView =(PreviewView)rootView.findViewById(R.id.viewFinder);
+        if(imageCapture == null){
+            preview = new Preview.Builder()
+                    .build();
+            imageCapture = new ImageCapture.Builder().setTargetRotation(previewView.getDisplay().getRotation()).build();
+        }
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(CameraSelector.LENS_FACING_BACK)
                 .build();
-
-        setContentView(R.layout.activity_camera);
-
-        //get required views
-        camera_capture_button = findViewById(R.id.camera_capture_button);
-        flash_button = findViewById(R.id.flash_button);
-        PreviewView previewView =(PreviewView)CameraActivity.this.findViewById(R.id.viewFinder);
-
-        imageCapture = new ImageCapture.Builder().setTargetRotation(previewView.getDisplay().getRotation()).build();
         preview.setSurfaceProvider(previewView.createSurfaceProvider());
-        CameraActivity.this.camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview, imageCapture);
-        camera_capture_button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                takePhoto();
-            }
-        });
+        if(CameraFragment.this.camera == null){
+            CameraFragment.this.camera = cameraProvider.bindToLifecycle((LifecycleOwner)this, cameraSelector, preview, imageCapture);
+        }
 
         flash_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,10 +224,28 @@ public class CameraActivity extends AppCompatActivity {
                 }
             }
         });
+
+        camera_capture_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(imageCapture == null){
+                    return;
+                }
+                takePhoto(imageCapture);
+            }
+        });
+
+        grid_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onImageClickListener.startGridFragment();
+            }
+        });
+
     }
 
     //take photo using camera
-    private void takePhoto(){
+    private void takePhoto(ImageCapture imageCapture){
         if(imageCapture == null) return;
         File photoFile = new File(
                 outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US)
@@ -172,7 +256,7 @@ public class CameraActivity extends AppCompatActivity {
 
         imageCapture.takePicture(
                 outputFileOptions,
-                ContextCompat.getMainExecutor((Context)this),
+                ContextCompat.getMainExecutor((Context)getActivity()),
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
@@ -184,13 +268,13 @@ public class CameraActivity extends AppCompatActivity {
 
 
                         String msg = String.format("Photo capture succeeded: %s", savedUri);
-                        Toast.makeText((Context)CameraActivity.this, msg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText((Context)getActivity(), msg, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, msg);
 
-                        Intent intent = new Intent();
-                        intent.putExtra("imageUri", savedUri.toString());
-                        setResult(RESULT_OK, intent);
-                        finish();
+//                        Intent intent = new Intent();
+//                        intent.putExtra("imageUri", savedUri.toString());
+//                        setResult(RESULT_OK, intent);
+//                        finish();
                     }
 
                     @Override
@@ -205,7 +289,7 @@ public class CameraActivity extends AppCompatActivity {
     private boolean allPermissionsGranted(){
         boolean allGranted = true;
         for (String requiredPermission : REQUIRED_PERMISSIONS) {
-            if (ContextCompat.checkSelfPermission(this.getBaseContext(), requiredPermission) != 0) {
+            if (ContextCompat.checkSelfPermission(getActivity().getBaseContext(), requiredPermission) != 0) {
                 allGranted = false;
                 break;
             }
@@ -218,13 +302,15 @@ public class CameraActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (this.allPermissionsGranted()) {
-                this.startCamera();
+//                this.startCamera();
+                return;
             } else {
-                Toast.makeText((Context) this, (CharSequence) "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent();
-                setResult(RESULT_CANCELED, intent);
-                this.finish();
+                Toast.makeText((Context) getActivity(), (CharSequence) "Permissions not granted by the user.", Toast.LENGTH_SHORT).show();
+
+//                Intent intent = new Intent();
+//                setResult(RESULT_CANCELED, intent);
+//                this.finish();
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -232,7 +318,7 @@ public class CameraActivity extends AppCompatActivity {
 
     @NotNull
     public File getOutputDirectory(){
-        File[] mediaDir = getExternalMediaDirs();
+        File[] mediaDir = getActivity().getExternalMediaDirs();
         Intrinsics.checkExpressionValueIsNotNull(mediaDir, "externalMediaDirs");
         File fileDir = (File) ArraysKt.firstOrNull(mediaDir);
         if(fileDir != null){
@@ -246,7 +332,7 @@ public class CameraActivity extends AppCompatActivity {
             return fileDir;
         }
         else{
-            File tempDir =this.getFilesDir();
+            File tempDir =getActivity().getFilesDir();
             Intrinsics.checkExpressionValueIsNotNull(tempDir, "fileDir");
             return tempDir;
         }

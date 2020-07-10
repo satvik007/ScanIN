@@ -19,7 +19,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 
 import java.io.InputStream;
@@ -79,9 +78,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void startCameraActivity(){
-        Intent intent = new Intent(this, CameraActivity.class);
-//        startActivity(intent);
-
+//        Intent intent = new Intent(this, CameraActivity.class);
+////        startActivity(intent);
+//
+//        startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+        Intent intent = new Intent(this, ScanActivity.class);
         startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
 
     }
