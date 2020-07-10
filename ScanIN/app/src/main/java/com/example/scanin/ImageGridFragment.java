@@ -24,6 +24,8 @@ public class ImageGridFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String[] imagePathList;
+
 
     public ImageGridFragment() {
         // Required empty public constructor
@@ -69,7 +71,7 @@ public class ImageGridFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         //set adapter
-        RecyclerView.Adapter mAdapter = new
+        RecyclerView.Adapter mAdapter = new RecylerViewGridAdapter(imagePathList);
         return rootView;
     }
 }
