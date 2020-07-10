@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,6 +60,16 @@ public class ImageGridFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_image_grid, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_image_grid, container, false);
+        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_grid);
+        recyclerView.setHasFixedSize(true);
+
+        //use a linear layout manage
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+        recyclerView.setLayoutManager(layoutManager);
+
+        //set adapter
+        RecyclerView.Adapter mAdapter = new
+        return rootView;
     }
 }
