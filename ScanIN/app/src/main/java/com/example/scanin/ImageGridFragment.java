@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * Use the {@link ImageGridFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ImageGridFragment extends Fragment {
+public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapter.GridAdapterOnClickHandler {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -94,7 +94,7 @@ public class ImageGridFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         //set adapter
-        mAdapter = new RecyclerViewGridAdapter(imageData);
+        mAdapter = new RecyclerViewGridAdapter(imageData, this);
         recyclerView.setAdapter(mAdapter);
         imageGridFragmentCallback.onCreateGridCallback();
         return rootView;
@@ -103,5 +103,16 @@ public class ImageGridFragment extends Fragment {
     public void setImagePathList(ArrayList<ImageData> imageData) {
         this.imageData = imageData;
         mAdapter.setmDataset(imageData);
+    }
+
+    @Override
+    public void onClick(int position) {
+        ScanActivity scanActivity = (ScanActivity)getActivity();
+        scanActivity.imageEditFragment.setImagePathList(imageData);
+        getActivity().getSupportFragmentManager()
+                .beginTransaction()
+                .add(R.id.fragment_camera, scanActivity.imageEditFragment)
+                .addToBackStack(null)
+                .commit();
     }
 }

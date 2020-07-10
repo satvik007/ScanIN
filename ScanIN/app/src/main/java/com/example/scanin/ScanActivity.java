@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class ScanActivity extends AppCompatActivity implements CameraFragment.OnImageClickListener, ImageGridFragment.ImageGridFragmentCallback{
     private ImageGridFragment imageGridFragment = null;
     private CameraFragment cameraFragment = null;
+    public ImageEditFragment imageEditFragment = null;
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
 //    public List<String> imageFiles = null;
     @Override
@@ -20,6 +21,7 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
         setContentView(R.layout.activity_scan);
         CameraFragment cameraFragment = new CameraFragment();
         imageGridFragment = new ImageGridFragment();
+        imageEditFragment = new ImageEditFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.fragment_camera, cameraFragment)
