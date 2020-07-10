@@ -1,7 +1,12 @@
 package com.example.scanin;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.provider.MediaStore;
+
+import java.io.IOException;
 
 public class ImageData {
     private Bitmap originalBitmap;
@@ -9,6 +14,7 @@ public class ImageData {
     private String filterName;
     private Uri fileName;
     private int[] cropPosition;
+    private int THUMBNAIL_SIZE = 64;
 
     ImageData(Uri fileName){
         this.originalBitmap = null;
@@ -56,5 +62,18 @@ public class ImageData {
 
     public void setCropPosition(int[] cropPosition) {
         this.cropPosition = cropPosition;
+    }
+
+    public void setOriginalBitmap(Context context) throws IOException {
+        try {
+            this.originalBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), fileName);
+        }catch (Exception e){
+            throw e;
+        }
+    }
+
+    public Bitmap getThumbnail(){
+        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        return thumbImage;
     }
 }
