@@ -53,6 +53,8 @@ public class CameraFragment extends Fragment {
     Preview preview = null;
     ImageCapture imageCapture = null;
     File currentFile = null;
+    public static int IMAGE_SAVED_CALLBACK_CODE = 10;
+    public static int GRID_CLICKED_CALLBACK_CODE = 12;
 
     private File outputDirectory;
     private ExecutorService cameraExecutor;
@@ -95,7 +97,8 @@ public class CameraFragment extends Fragment {
     OnImageClickListener onImageClickListener;
 
     public interface OnImageClickListener{
-        void startGridFragment();
+        void cameraFragmentCallback(int CALLBACK_CODE);
+        void cameraFragmentCallback(int CALLBACK_CODE, Uri[] file_uris);
     }
 
     @Override
@@ -137,44 +140,6 @@ public class CameraFragment extends Fragment {
             }
             outputDirectory = getOutputDirectory();
         }
-
-//        flash_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(imageCapture == null){
-//                    return;
-//                }
-//                if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF) {
-//                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
-//                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_high_24);
-//                }
-//                else{
-//                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
-//                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_low_24);
-//                }
-//            }
-//        });
-//
-//        camera_capture_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(imageCapture == null){
-//                    return;
-//                }
-//                takePhoto(imageCapture);
-//            }
-//        });
-//
-//        grid_button.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                onImageClickListener.startGridFragment();
-//            }
-//        });
-        // Inflate the layout for this fragment
-        //get required views
-
-        //Check for permissions
 
         return rootView;
     }
@@ -238,7 +203,7 @@ public class CameraFragment extends Fragment {
         grid_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onImageClickListener.startGridFragment();
+                onImageClickListener.cameraFragmentCallback(GRID_CLICKED_CALLBACK_CODE);
             }
         });
 
@@ -260,21 +225,13 @@ public class CameraFragment extends Fragment {
                 new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-
                         Uri savedUri = Uri.fromFile(photoFile);
-//                        currentFile = photoFile;
-//                        Bitmap myBitmap = BitmapFactory.decodeFile(currentFile.getAbsolutePath());
-//                        photo_preview.setImageBitmap(myBitmap);
-
 
                         String msg = String.format("Photo capture succeeded: %s", savedUri);
                         Toast.makeText((Context)getActivity(), msg, Toast.LENGTH_SHORT).show();
                         Log.d(TAG, msg);
-
-//                        Intent intent = new Intent();
-//                        intent.putExtra("imageUri", savedUri.toString());
-//                        setResult(RESULT_OK, intent);
-//                        finish();
+                        Uri[] filenames = {savedUri};
+                        onImageClickListener.cameraFragmentCallback(IMAGE_SAVED_CALLBACK_CODE, filenames);
                     }
 
                     @Override

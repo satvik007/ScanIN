@@ -6,9 +6,11 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 public class RecylerViewGridAdapter extends RecyclerView.Adapter<RecylerViewGridAdapter.GridViewHolder> {
 
-    private String[] mDataset;
+    private ArrayList<ImageData> mDataset = null;
     public static class GridViewHolder extends RecyclerView.ViewHolder{
         public TextView textView;
         public GridViewHolder(TextView v){
@@ -17,8 +19,8 @@ public class RecylerViewGridAdapter extends RecyclerView.Adapter<RecylerViewGrid
         }
     }
 
-    public RecylerViewGridAdapter(String[] myDataset){
-        mDataset = myDataset;
+    public RecylerViewGridAdapter(ArrayList<ImageData> mDataset){
+        this.mDataset = mDataset;
     }
 
     public RecylerViewGridAdapter.GridViewHolder onCreateViewHolder(ViewGroup parent, int viewtype){
@@ -34,11 +36,11 @@ public class RecylerViewGridAdapter extends RecyclerView.Adapter<RecylerViewGrid
     public void onBindViewHolder(GridViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.textView.setText(mDataset[position]);
+        holder.textView.setText(mDataset.get(position).getFileName());
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
 }
