@@ -1,12 +1,13 @@
 package com.example.scanin;
 
 import android.graphics.Bitmap;
+import android.net.Uri;
 
 public class ImageData {
     private Bitmap originalBitmap;
     private Bitmap currentBitmap;
     private String filterName;
-    private String fileName;
+    private Uri fileName;
     private int[] cropPosition;
 
     ImageData(){
@@ -17,7 +18,7 @@ public class ImageData {
         cropPosition = null;
     }
 
-    ImageData(String fileName){
+    ImageData(Uri fileName){
         this.originalBitmap = null;
         this.currentBitmap = null;
         this.filterName = null;
@@ -33,7 +34,7 @@ public class ImageData {
         return originalBitmap;
     }
 
-    public String getFileName() {
+    public Uri getFileName() {
         return fileName;
     }
 
@@ -57,7 +58,7 @@ public class ImageData {
         this.filterName = filterName;
     }
 
-    public void setFileName(String fileName) {
+    public void setFileName(Uri fileName) {
         this.fileName = fileName;
     }
 
