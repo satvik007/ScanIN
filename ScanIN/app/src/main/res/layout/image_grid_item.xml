@@ -8,11 +8,19 @@
     android:orientation="vertical">
 
     <!--This TextView holds the weather data for one particular day in the forecast-->
-    <TextView
-        android:id="@+id/uri_data"
-        style="@style/TextAppearance.AppCompat.Large"
+<!--    <TextView-->
+<!--        android:id="@+id/uri_data"-->
+<!--        style="@style/TextAppearance.AppCompat.Large"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:padding="16dp"/>-->
+
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="16dp"/>
+        android:minHeight="100dp"
+        android:minWidth="100dp"
+        android:background="@color/black"
+        android:id="@+id/image_thumbnail"/>
 
 </LinearLayout>

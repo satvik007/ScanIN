@@ -90,7 +90,7 @@ public class ImageGridFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         //use a linear layout manage
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
 
         //set adapter

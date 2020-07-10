@@ -3,20 +3,21 @@ package com.example.scanin;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGridAdapter.GridViewHolder> {
 
     private ArrayList<ImageData> mDataset = new ArrayList<ImageData>();
     public static class GridViewHolder extends RecyclerView.ViewHolder{
-        TextView textView;
+        ImageView imageView;
         public GridViewHolder(View view){
             super(view);
-            textView =view.findViewById(R.id.uri_data);
+            imageView =view.findViewById(R.id.image_thumbnail);
         }
     }
 
@@ -29,8 +30,8 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
         int layoutIdForImageAdapter =R.layout.image_grid_item;
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
-        int height = parent.getMeasuredHeight() / 4;
-        view.setMinimumHeight(height);
+//        int height = parent.getMeasuredHeight() / 4;
+//        view.setMinimumHeight(height);
         GridViewHolder gridViewHolder = new GridViewHolder(view);
         return gridViewHolder;
     }
@@ -40,7 +41,17 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     public void onBindViewHolder(GridViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.textView.setText(mDataset.get(position).getFileName().toString());
+        ImageData imageData = mDataset.get(position);
+        if(imageData.getOriginalBitmap() == null){
+            try {
+                imageData.setOriginalBitmap(holder.imageView.getContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+//        holder.textView.setText(mDataset.get(position).getFileName().toString());
+        holder.imageView.setImageBitmap(imageData.getThumbnail());
     }
 
     @Override
