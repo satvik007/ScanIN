@@ -29,6 +29,8 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
         int layoutIdForImageAdapter =R.layout.image_grid_item;
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
+        int height = parent.getMeasuredHeight() / 4;
+        view.setMinimumHeight(height);
         GridViewHolder gridViewHolder = new GridViewHolder(view);
         return gridViewHolder;
     }

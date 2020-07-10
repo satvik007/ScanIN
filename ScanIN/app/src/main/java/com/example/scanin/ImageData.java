@@ -10,14 +10,6 @@ public class ImageData {
     private Uri fileName;
     private int[] cropPosition;
 
-    ImageData(){
-        originalBitmap = null;
-        currentBitmap = null;
-        filterName = null;
-        fileName = null;
-        cropPosition = null;
-    }
-
     ImageData(Uri fileName){
         this.originalBitmap = null;
         this.currentBitmap = null;
