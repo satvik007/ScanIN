@@ -7,6 +7,8 @@
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
 
+#include "filters.hpp"
+
 using namespace cv;
 
 extern "C"
@@ -15,5 +17,8 @@ Java_com_example_scanin_ImageEditUtil_getTestGray(JNIEnv *env, jclass clazz, jlo
                                                   jlong gray_img_addr) {
     Mat& mGr  = *(Mat*)img_addr;
     Mat& cvtImg = *(Mat*)gray_img_addr;
-    cvtColor(mGr, cvtImg, COLOR_BGR2GRAY);
+
+    magic_filter(mGr, cvtImg);
+
+//    cvtColor(mGr, cvtImg, COLOR_BGR2GRAY);
 }

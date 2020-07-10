@@ -31,6 +31,13 @@ add_library(image-edit-util
         SHARED
         image-edit-util.cpp)
 
+
+include_directories(src/main/cpp)
+add_library(filters
+        SHARED
+        filters.cpp)
+
+
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
 # default, you only need to specify the name of the public NDK library
@@ -59,9 +66,18 @@ target_link_libraries( # Specifies the target library.
         )
 
 target_link_libraries(
+        filters
+
+        ${log-lib}
+
+        lib_opencv
+)
+
+target_link_libraries(
         image-edit-util
 
         ${log-lib}
 
         lib_opencv
+        filters
 )
