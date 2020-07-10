@@ -115,9 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Mat imgToProcess = new Mat();
                 Utils.bitmapToMat(bmp, imgToProcess);
 
-                Mat grayMat = new Mat();
+                // this will convert it to gray -- testing native call
+                Mat grayMat = new Mat();     // get cv::Mat from nativeObjectAddr
+                ImageEditUtil.getTestGray(imgToProcess.getNativeObjAddr(), grayMat.getNativeObjAddr());
 
-                Imgproc.cvtColor(imgToProcess, grayMat, Imgproc.COLOR_BGR2GRAY);
+//                Mat grayMat = new Mat();
+//                Imgproc.cvtColor(imgToProcess, grayMat, Imgproc.COLOR_BGR2GRAY);
 
                 Log.d("grayMat width", "" + grayMat.cols());
                 Log.d("grayMat height", "" + grayMat.rows());
