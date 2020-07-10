@@ -2,4 +2,6 @@
     <string name="app_name">ScanIN</string>
     <string name="app_desc">Document Scanner</string>
     <string name="made_in_india">Made with \u2665 in India</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
