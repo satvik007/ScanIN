@@ -15,19 +15,23 @@ import com.example.scanin.ImageDataModule.ImageData;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class ScanActivity extends AppCompatActivity implements CameraFragment.OnImageClickListener, ImageGridFragment.ImageGridFragmentCallback{
+public class ScanActivity extends AppCompatActivity implements CameraFragment.OnImageClickListener,
+        ImageGridFragment.ImageGridFragmentCallback, ImagePreviewFragment.ImagePreviewFragmentCallback{
     private ImageGridFragment imageGridFragment = null;
     private CameraFragment cameraFragment = null;
     public ImageEditFragment imageEditFragment = null;
+    private ImagePreviewFragment imagePreviewFragment = null;
+
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
     //    public List<String> imageFiles = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        CameraFragment cameraFragment = new CameraFragment();
+        cameraFragment = new CameraFragment();
         imageGridFragment = new ImageGridFragment();
         imageEditFragment = new ImageEditFragment();
+        imagePreviewFragment = new ImagePreviewFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.fragment_camera, cameraFragment)
@@ -48,12 +52,23 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
                 .commit();
     }
 
+    private void createImagePreviewFragment(){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .add(R.id.fragment_camera, imagePreviewFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     @Override
     public void cameraFragmentCallback(int CALLBACK_CODE, ImageProxy[] bitmaps) {
         for(ImageProxy bitmap:bitmaps){
             @SuppressLint("UnsafeExperimentalUsageError") Image image = bitmap.getImage();
             Bitmap temp = ImageProxyToBitmap(image);
-            imageData.add(new ImageData(temp));
+            ImageData currentItem = new ImageData(temp);
+            imageData.add(currentItem);
+            imagePreviewFragment.setBitmap(currentItem.getOriginalBitmap());
+            createImagePreviewFragment();
         }
     }
 
@@ -61,6 +76,19 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
     public void onCreateGridCallback() {
         Log.d("ScanActivity: ", "createGridCallback");
         imageGridFragment.setImagePathList(imageData);
+    }
+
+    @Override
+    public void onRemovePreviewCallback(int callback_code) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .remove(imagePreviewFragment)
+                .commit();
+        if(callback_code == ImagePreviewFragment.CONTINUE_CAPTURE_CALLBACK){
+            return;
+        }else if(callback_code == ImagePreviewFragment.RETRY_CAPTURE_CALLBACK){
+            imageData.remove(imageData.size() - 1);
+        }
     }
 
     public Bitmap ImageProxyToBitmap(Image image){
@@ -72,4 +100,5 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
 
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
+
 }

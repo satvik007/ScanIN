@@ -1,12 +1,15 @@
 package com.example.scanin;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 /**
@@ -21,6 +24,8 @@ public class ImagePreviewFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private Bitmap bitmap = null;
+    public static int RETRY_CAPTURE_CALLBACK = 10;
+    public static int CONTINUE_CAPTURE_CALLBACK = 12;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -28,6 +33,24 @@ public class ImagePreviewFragment extends Fragment {
 
     public ImagePreviewFragment() {
         // Required empty public constructor
+    }
+
+    ImagePreviewFragmentCallback imagePreviewFragmentCallback;
+    public interface ImagePreviewFragmentCallback{
+        void onRemovePreviewCallback(int callback_code);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        try {
+            imagePreviewFragmentCallback = (ImagePreviewFragment.ImagePreviewFragmentCallback) context;
+        }
+        catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + "must implement imagePreviewFragmentCallback");
+        }
     }
 
     /**
@@ -65,6 +88,21 @@ public class ImagePreviewFragment extends Fragment {
         ImageView imageView = rootView.findViewById(R.id.image_preview);
         if(bitmap != null) imageView.setImageBitmap(bitmap);
 
+        Button button_continue = rootView.findViewById(R.id.continue_capture);
+        button_continue.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imagePreviewFragmentCallback.onRemovePreviewCallback(CONTINUE_CAPTURE_CALLBACK);
+            }
+        });
+
+        Button button_retry = rootView.findViewById(R.id.retry_capture);
+        button_retry.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imagePreviewFragmentCallback.onRemovePreviewCallback(RETRY_CAPTURE_CALLBACK);
+            }
+        });
         return rootView;
     }
 
