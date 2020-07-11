@@ -3,7 +3,6 @@ package com.example.scanin;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +18,7 @@ import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
+import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import kotlin.collections.ArraysKt;
 import kotlin.jvm.internal.Intrinsics;
@@ -101,7 +102,7 @@ public class CameraFragment extends Fragment {
 
     public interface OnImageClickListener{
         void cameraFragmentCallback(int CALLBACK_CODE);
-        void cameraFragmentCallback(int CALLBACK_CODE, Uri[] file_uris);
+        void cameraFragmentCallback(int CALLBACK_CODE, ImageProxy[] bitmaps);
     }
 
     @Override
@@ -230,24 +231,46 @@ public class CameraFragment extends Fragment {
         ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions
                 .Builder(photoFile).build();
 
-        imageCapture.takePicture(
-                outputFileOptions,
-                ContextCompat.getMainExecutor((Context)getActivity()),
-                new ImageCapture.OnImageSavedCallback() {
+//        imageCapture.takePicture(
+//                outputFileOptions,
+//                ContextCompat.getMainExecutor((Context)getActivity()),
+//                new ImageCapture.OnImageSavedCallback() {
+//                    @Override
+//                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+//                        Uri savedUri = Uri.fromFile(photoFile);
+//
+//                        String msg = String.format("Photo capture succeeded: %s", savedUri);
+//                        Toast.makeText((Context)getActivity(), msg, Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG, msg);
+//                        Uri[] filenames = {savedUri};
+//                        onImageClickListener.cameraFragmentCallback(IMAGE_SAVED_CALLBACK_CODE, filenames);
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull ImageCaptureException exception) {
+//                        Log.e(TAG, "Photo capture failed: ${exc.message}", exception);
+//                    }
+//                }
+        imageCapture.takePicture(Executors.newSingleThreadExecutor(),
+                new ImageCapture.OnImageCapturedCallback() {
                     @Override
-                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                        Uri savedUri = Uri.fromFile(photoFile);
-
-                        String msg = String.format("Photo capture succeeded: %s", savedUri);
-                        Toast.makeText((Context)getActivity(), msg, Toast.LENGTH_SHORT).show();
-                        Log.d(TAG, msg);
-                        Uri[] filenames = {savedUri};
-                        onImageClickListener.cameraFragmentCallback(IMAGE_SAVED_CALLBACK_CODE, filenames);
+                    public void onCaptureSuccess(@NonNull ImageProxy image) {
+                        ImageProxy[] bitmaps = {image};
+                        onImageClickListener.cameraFragmentCallback(IMAGE_SAVED_CALLBACK_CODE, bitmaps);
+                        String msg = String.format("Photo capture succeeded");
+                        getActivity().runOnUiThread(new Runnable()
+                        {
+                            public void run()
+                            {
+                                Toast.makeText((Context)getActivity(), msg, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                        super.onCaptureSuccess(image);
                     }
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
-                        Log.e(TAG, "Photo capture failed: ${exc.message}", exception);
+                        super.onError(exception);
                     }
                 }
         );

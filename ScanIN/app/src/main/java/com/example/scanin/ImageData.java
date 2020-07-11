@@ -17,11 +17,11 @@ public class ImageData {
     private int[] cropPosition;
     private int THUMBNAIL_SIZE = 64;
 
-    ImageData(Uri fileName){
-        this.originalBitmap = null;
-        this.currentBitmap = null;
+    ImageData(Bitmap bitmap){
+        this.originalBitmap = bitmap;
+        this.currentBitmap = bitmap;
         this.filterName = null;
-        this.fileName = fileName;
+        this.fileName = null;
         this.cropPosition = null;
     }
 
