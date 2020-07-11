@@ -13,7 +13,7 @@ using namespace cv;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_example_scanin_ImageEditUtil_getTestGray(JNIEnv *env, jclass clazz, jlong img_addr,
+Java_com_example_scanin_ImageDataModule_ImageEditUtil_getTestGray(JNIEnv *env, jclass clazz, jlong img_addr,
                                                   jlong gray_img_addr) {
     Mat& mGr  = *(Mat*)img_addr;
     Mat& cvtImg = *(Mat*)gray_img_addr;

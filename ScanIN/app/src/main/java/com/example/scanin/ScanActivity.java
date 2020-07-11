@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageProxy;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.scanin.ImageDataModule.ImageData;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -47,12 +48,6 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
                 .commit();
     }
 
-    //    @Override
-//    public void cameraFragmentCallback(int CALLBACK_CODE, Uri[] file_uris) {
-//        for(Uri uri : file_uris){
-//            imageData.add(new ImageData(uri));
-//        }
-//    }
     @Override
     public void cameraFragmentCallback(int CALLBACK_CODE, ImageProxy[] bitmaps) {
         for(ImageProxy bitmap:bitmaps){

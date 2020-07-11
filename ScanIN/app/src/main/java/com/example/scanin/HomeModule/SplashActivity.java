@@ -1,10 +1,12 @@
-package com.example.scanin;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.scanin.HomeModule;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.scanin.R;
 
 public class SplashActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.scanin;
+package com.example.scanin.HomeModule;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,12 +14,14 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.scanin.ImageDataModule.ImageEditUtil;
+import com.example.scanin.R;
+import com.example.scanin.ScanActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.InputStream;
 
@@ -47,15 +49,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView textView=(TextView) findViewById(R.id.sample_text);
-        textView.setText(stringFromJNI());
+//        textView.setText(stringFromJNI());
 
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+//        tv.setText(stringFromJNI());
 
         if (OpenCVLoader.initDebug()) {
             textView.setText(textView.getText()+"\n OPENCV LOADED SUCCESSFULLY");
-            textView.setText(textView.getText()+"\n"+validate(500,500));
+//            textView.setText(textView.getText()+"\n"+validate(500,500));
 
         } else {
             Log.d(TAG, "OPENCV DİD NOT LOAD");
@@ -139,6 +141,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public native String stringFromJNI();
-    public native String validate(long madAddrGr,long matAddrRgba);
+//    public native String stringFromJNI();
+//    public native String validate(long madAddrGr,long matAddrRgba);
 }

@@ -1,4 +1,4 @@
-package com.example.scanin;
+package com.example.scanin.ImageDataModule;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,7 +17,7 @@ public class ImageData {
     private int[] cropPosition;
     private int THUMBNAIL_SIZE = 64;
 
-    ImageData(Bitmap bitmap){
+    public ImageData(Bitmap bitmap){
         this.originalBitmap = bitmap;
         this.currentBitmap = bitmap;
         this.filterName = null;

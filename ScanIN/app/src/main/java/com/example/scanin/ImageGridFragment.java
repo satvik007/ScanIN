@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scanin.ImageDataModule.ImageData;
+
 import java.util.ArrayList;
 
 /**
