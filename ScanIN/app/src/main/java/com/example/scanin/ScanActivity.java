@@ -11,8 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.ImageProxy;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.scanin.ImageData;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
