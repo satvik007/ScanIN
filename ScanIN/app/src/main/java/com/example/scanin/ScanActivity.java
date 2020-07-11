@@ -1,14 +1,19 @@
 package com.example.scanin;
 
-import android.net.Uri;
+import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.ImageProxy;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.scanin.ImageDataModule.ImageData;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class ScanActivity extends AppCompatActivity implements CameraFragment.OnImageClickListener, ImageGridFragment.ImageGridFragmentCallback{
@@ -44,10 +49,18 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
                 .commit();
     }
 
+//    @Override
+//    public void cameraFragmentCallback(int CALLBACK_CODE, Uri[] file_uris) {
+//        for(Uri uri : file_uris){
+//            imageData.add(new ImageData(uri));
+//        }
+//    }
     @Override
-    public void cameraFragmentCallback(int CALLBACK_CODE, Uri[] file_uris) {
-        for(Uri uri : file_uris){
-            imageData.add(new ImageData(uri));
+    public void cameraFragmentCallback(int CALLBACK_CODE, ImageProxy[] bitmaps) {
+        for(ImageProxy bitmap:bitmaps){
+            @SuppressLint("UnsafeExperimentalUsageError") Image image = bitmap.getImage();
+            Bitmap temp = ImageProxyToBitmap(image);
+            imageData.add(new ImageData(temp));
         }
     }
 
@@ -55,5 +68,15 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
     public void onCreateGridCallback() {
         Log.d("ScanActivity: ", "createGridCallback");
         imageGridFragment.setImagePathList(imageData);
+    }
+
+    public Bitmap ImageProxyToBitmap(Image image){
+        Image.Plane planes = image.getPlanes()[0];
+        ByteBuffer buffer = planes.getBuffer();
+        buffer.rewind();
+        byte[] bytes = new byte[buffer.capacity()];
+        buffer.get(bytes);
+
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 }

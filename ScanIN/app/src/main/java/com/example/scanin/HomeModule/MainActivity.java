@@ -49,15 +49,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView textView=(TextView) findViewById(R.id.sample_text);
-        textView.setText(stringFromJNI());
+//        textView.setText(stringFromJNI());
 
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
+//        tv.setText(stringFromJNI());
 
         if (OpenCVLoader.initDebug()) {
             textView.setText(textView.getText()+"\n OPENCV LOADED SUCCESSFULLY");
-            textView.setText(textView.getText()+"\n"+validate(500,500));
+//            textView.setText(textView.getText()+"\n"+validate(500,500));
 
         } else {
             Log.d(TAG, "OPENCV DİD NOT LOAD");
@@ -141,6 +141,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public native String stringFromJNI();
-    public native String validate(long madAddrGr,long matAddrRgba);
+//    public native String stringFromJNI();
+//    public native String validate(long madAddrGr,long matAddrRgba);
 }
