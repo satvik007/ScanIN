@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button btnSavePicture;
     private ImageView capturePreview;
 
-    private static final int CAMERA_ACTIVITY_REQUEST_CODE = 0;
-    private static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
-    private static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 2000;
+    public static final int CAMERA_ACTIVITY_REQUEST_CODE = 0;
+    public static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
+    public static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 2000;
 
     private Bitmap bitmap;
 
