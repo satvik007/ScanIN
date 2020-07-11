@@ -15,6 +15,7 @@
         android:paddingTop="0dp"
         android:adjustViewBounds="true"
         android:background="@color/orange"
+        android:src="@drawable/ic_splash"
         android:id="@+id/image_edit_item"/>
 
 </LinearLayout>

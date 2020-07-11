@@ -67,7 +67,7 @@ public class ImageData {
 
     public void setOriginalBitmap(Context context) throws IOException {
         try {
-            this.originalBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), fileName);
+            this.originalBitmap =  MediaStore.Images.Media.getBitmap(context.getContentResolver() , fileName);
             this.originalBitmap = ImageData.RotateBitmap(this.originalBitmap);
         }catch (Exception e){
             throw e;
@@ -84,6 +84,11 @@ public class ImageData {
 
     public Bitmap getThumbnail(){
         Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        return thumbImage;
+    }
+
+    public Bitmap getSmallImage(){
+        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, 480, 760);
         return thumbImage;
     }
 }
