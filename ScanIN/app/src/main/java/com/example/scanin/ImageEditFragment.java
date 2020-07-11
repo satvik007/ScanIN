@@ -70,9 +70,11 @@ public class ImageEditFragment extends Fragment {
         RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+//        SpeedyLinearLayoutManager layoutManager = new SpeedyLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewEditAdapter(imageData);
         recyclerView.setAdapter(mAdapter);
+//        LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
         PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
         mAdapter.setmDataset(imageData);

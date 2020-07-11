@@ -2,6 +2,7 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -67,9 +68,18 @@ public class ImageData {
     public void setOriginalBitmap(Context context) throws IOException {
         try {
             this.originalBitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), fileName);
+            this.originalBitmap = ImageData.RotateBitmap(this.originalBitmap);
         }catch (Exception e){
             throw e;
         }
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source)
+    {
+        float angle = 90.0f;
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
     public Bitmap getThumbnail(){

@@ -17,6 +17,7 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     public interface GridAdapterOnClickHandler{
         void onClick(int position);
     }
+
     public class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
         public GridViewHolder(View view){
