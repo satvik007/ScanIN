@@ -7,6 +7,8 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.scanin.ImageDataModule.ImageData;
+
 import java.util.ArrayList;
 
 public class ScanActivity extends AppCompatActivity implements CameraFragment.OnImageClickListener, ImageGridFragment.ImageGridFragmentCallback{

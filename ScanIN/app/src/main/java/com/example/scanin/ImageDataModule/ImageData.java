@@ -1,4 +1,4 @@
-package com.example.scanin;
+package com.example.scanin.ImageDataModule;
 
 import android.content.Context;
 import android.graphics.Bitmap;

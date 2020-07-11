@@ -1,4 +1,4 @@
-package com.example.scanin;
+package com.example.scanin.ImageDataModule;
 
 import java.util.Arrays;
 

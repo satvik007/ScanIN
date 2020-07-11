@@ -1,4 +1,4 @@
-package com.example.scanin;
+package com.example.scanin.HomeModule;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,12 +14,14 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.scanin.ImageDataModule.ImageEditUtil;
+import com.example.scanin.R;
+import com.example.scanin.ScanActivity;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
 
 import java.io.InputStream;
 

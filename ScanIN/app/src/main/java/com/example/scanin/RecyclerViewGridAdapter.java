@@ -7,6 +7,8 @@ import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scanin.ImageDataModule.ImageData;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
