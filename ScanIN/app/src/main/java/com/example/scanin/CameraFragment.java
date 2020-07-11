@@ -193,11 +193,11 @@ public class CameraFragment extends Fragment {
                 }
                 if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF) {
                     imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
-                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_high_24);
+                    flash_button.setImageResource(R.drawable.ic_flashon);
                 }
                 else{
                     imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
-                    flash_button.setImageResource(R.drawable.ic_baseline_brightness_low_24);
+                    flash_button.setImageResource(R.drawable.ic_flashoff);
                 }
             }
         });

@@ -34,12 +34,12 @@
 
     <ImageButton
         android:id="@+id/flash_button"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_marginTop="20dp"
         android:scaleType="fitCenter"
         android:background="@null"
-        android:src = "@drawable/ic_baseline_brightness_low_24"
+        android:src = "@drawable/ic_flashoff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
