@@ -85,8 +85,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //        startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
         Intent intent = new Intent(this, ScanActivity.class);
-        startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
+        startActivity(intent);
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d("Main-Activity", "OnDestroyCalled");
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        Log.d("Main-Activity", "OnStopCalled");
+        super.onStop();
     }
 
     @Override

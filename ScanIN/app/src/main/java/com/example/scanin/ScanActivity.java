@@ -12,6 +12,7 @@ import androidx.camera.core.ImageProxy;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.scanin.ImageDataModule.ImageData;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -28,14 +29,7 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
-        cameraFragment = new CameraFragment();
-        imageGridFragment = new ImageGridFragment();
-        imageEditFragment = new ImageEditFragment();
-        imagePreviewFragment = new ImagePreviewFragment();
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .add(R.id.fragment_camera, cameraFragment)
-                .commit();
+
     }
 
     @Override
@@ -56,7 +50,6 @@ public class ScanActivity extends AppCompatActivity implements CameraFragment.On
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction()
                 .add(R.id.fragment_camera, imagePreviewFragment)
-                .addToBackStack(null)
                 .commit();
     }
 
