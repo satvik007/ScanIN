@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -361,7 +363,8 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     protected void onPause() {
-        findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
+        if(CurrentMachineState == MachineStates.CAMERA) findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
+//        findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
         super.onPause();
     }
     protected void onStop() {
@@ -370,11 +373,18 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     protected void onRestart() {
+//        findViewById(R.id.fragment_camera).setVisibility(View.VISIBLE);
         super.onRestart();
     }
 
     @Override
     protected void onResume() {
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.fragment_camera).setVisibility(View.VISIBLE);
+            }
+        }, 600);
         super.onResume();
     }
 }
