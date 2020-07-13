@@ -32,10 +32,11 @@ add_library(image-edit-util
         image-edit-util.cpp)
 
 
-include_directories(src/main/cpp)
+include_directories(include)
+file (GLOB SOURCES "src/*.cpp")
 add_library(filters
-        SHARED
-        filters.cpp)
+        STATIC
+        ${SOURCES})
 
 
 # Searches for a specified prebuilt library and stores the path as a
