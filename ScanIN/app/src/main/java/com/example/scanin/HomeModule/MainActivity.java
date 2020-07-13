@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,7 +32,7 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FloatingActionButton btnTakePicture;
-    private Button btnSavePicture;
+    private ImageButton btnSavePicture;
     private ImageView capturePreview;
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 0;
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         btnTakePicture = (FloatingActionButton) findViewById(R.id.fab);
-        btnSavePicture = (Button) findViewById(R.id.open_doc);
+        btnSavePicture = (ImageButton) findViewById(R.id.open_doc);
         capturePreview = (ImageView) findViewById(R.id.capturePreview);
 
         btnTakePicture.setOnClickListener(MainActivity.this);
