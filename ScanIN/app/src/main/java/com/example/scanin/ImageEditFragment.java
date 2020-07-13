@@ -121,6 +121,7 @@ public class ImageEditFragment extends Fragment {
             }
         });
 
+        imageEditFragmentCallback.onCreateEditCallback();
         return rootView;
     }
 

@@ -1,6 +1,9 @@
 package com.example.scanin;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
@@ -13,7 +16,6 @@ import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureException;
-import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
@@ -27,8 +29,27 @@ import com.example.scanin.StateMachineModule.MachineStates;
 import com.example.scanin.StateMachineModule.StateMachine;
 import com.google.common.util.concurrent.ListenableFuture;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+
+import io.reactivex.Scheduler;
+import io.reactivex.Single;
+import io.reactivex.SingleEmitter;
+import io.reactivex.SingleOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+import kotlin.collections.ArraysKt;
+import kotlin.jvm.internal.Intrinsics;
 
 public class ScanActivity extends AppCompatActivity
         implements ImageGridFragment.ImageGridFragmentCallback, ImageEditFragment.ImageEditFragmentCallback {
@@ -38,12 +59,18 @@ public class ScanActivity extends AppCompatActivity
     private Preview preview;
     private String documentName = null;
     ImageCapture imageCapture = null;
+    private File outputDirectory;
     private Camera camera = null;
     public int CurrentMachineState = -1;
     PreviewView previewView;
+    private static final String FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS";
     FrameLayout fragment_cover;
     CameraSelector cameraSelector;
     String TAG = "Scan-Activity";
+
+    //Schedulers for Image and Database
+    private Scheduler preview_executor = Schedulers.newThread();
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
 
@@ -59,6 +86,7 @@ public class ScanActivity extends AppCompatActivity
         imageGridFragment = new ImageGridFragment();
         imageEditFragment = new ImageEditFragment();
         cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
+        outputDirectory = getOutputDirectory();
 
         if(action == MachineActions.HOME_ADD_SCAN){
             CurrentMachineState = MachineStates.CAMERA;
@@ -96,7 +124,7 @@ public class ScanActivity extends AppCompatActivity
                 if(imageCapture == null){
                     return;
                 }
-                takePhoto(imageCapture);
+                takePhoto();
             }
         });
     }
@@ -132,25 +160,81 @@ public class ScanActivity extends AppCompatActivity
         Log.d(TAG, "Camera bind done");
     }
 
-    private void takePhoto(ImageCapture imageCapture) {
-        imageCapture.takePicture(ContextCompat.getMainExecutor(this),
-                new ImageCapture.OnImageCapturedCallback() {
+//    private void takePhoto(){
+//        if(imageCapture == null) return;
+//        File photoFile = new File(
+//                outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
+//        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+//        imageCapture.takePicture(
+//                outputFileOptions, ContextCompat.getMainExecutor((Context)this), new ImageCapture.OnImageSavedCallback() {
+//                    @Override
+//                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+//
+//                        Uri savedUri = Uri.fromFile(photoFile);
+////                        currentFile = photoFile;
+////                        Bitmap myBitmap = BitmapFactory.decodeFile(currentFile.getAbsolutePath());
+////                        photo_preview.setImageBitmap(myBitmap);
+//                        Bitmap bitmap = readImageFromFile(savedUri);
+//                        String msg = String.format("Photo capture succeeded: %s", savedUri);
+//                        Toast.makeText((Context)ScanActivity.this, msg, Toast.LENGTH_SHORT).show();
+//                        Log.d(TAG, msg);
+//                    }
+//
+//                    @Override
+//                    public void onError(@NonNull ImageCaptureException exception) {
+//                        Log.e(TAG, "Photo capture failed: ${exc.message}", exception);
+//                    }
+//                }
+//        );
+//    }
+
+    private void takePhoto(){
+        if(imageCapture == null) return;
+        File photoFile = new File(
+                outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
+        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+        imageCapture.takePicture(
+                outputFileOptions, ContextCompat.getMainExecutor((Context)this), new ImageCapture.OnImageSavedCallback() {
                     @Override
-                    public void onCaptureSuccess(@NonNull ImageProxy image) {
-                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
-                        imageEditFragment.setCurrentMachineState(nextState);
-                        getSupportFragmentManager().beginTransaction()
-                                .add(R.id.fragment_edit, imageEditFragment)
-                                .commit();
-                        super.onCaptureSuccess(image);
+                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                        Uri savedUri = Uri.fromFile(photoFile);
+//                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
+//                        imageEditFragment.setCurrentMachineState(nextState);
+//                        FragmentManager fragmentManager = getSupportFragmentManager();
+//                        fragmentManager.beginTransaction()
+//                                .add(R.id.fragment_edit, imageEditFragment)
+//                                .commit();
+                        readImageFromFile(savedUri);
                     }
 
                     @Override
                     public void onError(@NonNull ImageCaptureException exception) {
-                        super.onError(exception);
+                        Log.e(TAG, "Photo capture failed: ${exc.message}", exception);
                     }
                 }
         );
+    }
+
+    @NotNull
+    public File getOutputDirectory() {
+        File[] mediaDir = getExternalMediaDirs();
+        Intrinsics.checkExpressionValueIsNotNull(mediaDir, "externalMediaDirs");
+        File fileDir = (File) ArraysKt.firstOrNull(mediaDir);
+        if(fileDir != null){
+            File tempDir =fileDir;
+            File tempDir1 = (new File(tempDir, String.valueOf(R.string.app_name)));
+            tempDir1.mkdirs();
+            fileDir = tempDir1;
+        }
+
+        if(fileDir != null && fileDir.exists()){
+            return fileDir;
+        }
+        else{
+            File tempDir =this.getFilesDir();
+            Intrinsics.checkExpressionValueIsNotNull(tempDir, "fileDir");
+            return tempDir;
+        }
     }
 
     @Override
@@ -172,31 +256,14 @@ public class ScanActivity extends AppCompatActivity
     }
 
     @Override
-    public void onClickGridCallback(int action) {
-        int nextState = StateMachine.getNextState(CurrentMachineState, action);
-        if(nextState == MachineStates.CAMERA){
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .commit();
-            setCamera(nextState);
-        }
-        else{
-            imageEditFragment.setCurrentMachineState(nextState);
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .add(R.id.fragment_edit, imageEditFragment)
-                    .commit();
-        }
-    }
-
-    @Override
     public void onCreateGridCallback() {
 
     }
 
     @Override
     public void onCreateEditCallback() {
-
+        Log.d("onCreateEdit", "Called");
+        imageEditFragment.setImagePathList(imageData);
     }
 
     @Override
@@ -219,14 +286,82 @@ public class ScanActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onClickGridCallback(int action) {
+        int nextState = StateMachine.getNextState(CurrentMachineState, action);
+        if(nextState == MachineStates.CAMERA){
+            getSupportFragmentManager().beginTransaction()
+                    .remove(imageGridFragment)
+                    .commit();
+            setCamera(nextState);
+        }
+        else{
+            imageEditFragment.setCurrentMachineState(nextState);
+            getSupportFragmentManager().beginTransaction()
+                    .remove(imageGridFragment)
+                    .add(R.id.fragment_edit, imageEditFragment)
+                    .commit();
+        }
+    }
+
     private void setCamera(int nextState){
         CurrentMachineState = nextState;
         findViewById(R.id.camera_capture_button).setClickable(true);
         findViewById(R.id.grid_button).setClickable(true);
     }
 
+    public void readImageFromFile(Uri uri){
+        disposable.add(Single.create(new SingleOnSubscribe<Bitmap>() {
+            @Override
+            public void subscribe(SingleEmitter<Bitmap> e) throws Exception {
+                File file = new File(Objects.requireNonNull(uri.getPath()));
+                if(!file.exists()) e.onSuccess(null);
+                e.onSuccess(BitmapFactory.decodeFile(file.getAbsolutePath()));
+            }
+        }).subscribeOn(preview_executor)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(new DisposableSingleObserver<Bitmap>() {
+                @Override
+                public void onSuccess(Bitmap bitmap) {
+                    imageData.add(new ImageData(bitmap));
+                    Log.d("onCreateEdit", "success");
+//                    imageEditFragment.setImagePathList(imageData);
+                    int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
+                    imageEditFragment.setCurrentMachineState(nextState);
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .add(R.id.fragment_edit, imageEditFragment)
+                            .commit();
+                }
+
+                @Override
+                public void onError(Throwable e) {
+
+                }
+            }));
+    }
+
+    public void updateImageInFile(Uri uri, Bitmap bitmap){
+        File file = new File(Objects.requireNonNull(uri.getPath()));
+        if(!file.exists()) return;
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean deleteImageFromFile(Uri uri, Bitmap bitmap){
+        File file = new File(Objects.requireNonNull(uri.getPath()));
+        if (file.exists()) {
+            return file.delete();
+        }
+        else return true;
+    }
+
     @Override
     protected void onPause() {
+        findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
         super.onPause();
     }
     protected void onStop() {

@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -88,6 +89,7 @@ public class ImageData {
     }
 
     public Bitmap getSmallImage(){
+        Log.d("onCreateEdit","getSmallImage");
         Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, 480, 760);
         return thumbImage;
     }

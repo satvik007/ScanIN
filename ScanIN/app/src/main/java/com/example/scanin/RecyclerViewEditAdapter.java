@@ -1,6 +1,7 @@
 package com.example.scanin;
 
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,6 +57,7 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 //        holder.imageView.setImageBitmap(
 //                decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
 //        holder.imageView.setImageBitmap(imageData.getOriginalBitmap());
+        Log.d("onCreateEdit", String.valueOf(imageData));
         holder.imageView.setImageBitmap(imageData.getSmallImage());
     }
 
@@ -64,7 +66,9 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
         return mDataset.size();
     }
 
-    public void setmDataset(ArrayList<ImageData> mDataset){
+    public void setmDataset(ArrayList<ImageData> mDataset)
+    {
         this.mDataset = mDataset;
+        this.notifyDataSetChanged();
     }
 }
