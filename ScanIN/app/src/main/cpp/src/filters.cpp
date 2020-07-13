@@ -1,37 +1,52 @@
+/**
+ * This document is part of the project ScanIN. See License for more details.
+ * This is implementation of all the filters of the app, it contains the following filters
+ *  - Magic
+ *  - Sepia
+ *  - Lighten
+ *  - Gray 
+ *  - Sharpen
+ * Author     : Satvik Choudhary
+ * Created on : 8 July 2020
+*/
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/core/base.hpp>
 #include <opencv2/imgproc.hpp>
 #include "filters.hpp"
+#include "img_enhance.hpp"
 #include <vector>
 
-/**This code resizes the image if its width is bigger than necessary.
+/**This code resizes the image if its width or height is bigger than necessary.
+ * The aspect ratio is preserved.
  * This is done mainly to boost performance of the algorithms.
- *
- * @param input
+ * 
+ * @param input 
  * The input image of type cv::Mat
- *
+ * 
+ * @param dst
+ * The output image of type cv::Mat
+ *  
  * @param dim
  * Maximum width of type int (1536 used by default)
- *
+ * 
  * @param interpolation
  * The interpolation algorithm type. Variable of type int.
  * interpolation – interpolation method:
  * – INTER_NEAREST - a nearest-neighbor interpolation
- * – INTER_LINEAR - a bilinear interpolation
+ * – INTER_LINEAR - a bilinear interpolation 
  * – INTER_AREA - resampling using pixel area relation. It may be a preferred method for
  *     image decimation, as it gives moire’-free results. But when the image is zoomed, it is
  *     similar to the INTER_NEAREST method. (used by default here)
  * – INTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhood
  * – INTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhood
 */
-void resize_image_if_bigger (cv::Mat &input, const int dim, const int interpolation) {
-    int maxdim = input.cols; //std::max(input.rows,input.cols);
-    if ( maxdim > dim )
+void resize_image_if_bigger (cv::Mat &input, cv::Mat &dst, const int dim, const int interpolation) {
+    int maxdim = std::max(input.rows,input.cols);
+    if (maxdim > dim)
     {
         double scale = (double)dim/(double)maxdim;
-        cv::Mat t;
-        cv::resize( input, t, cv::Size(), scale, scale, interpolation);
-        input = t;
+        cv::resize(input, dst, cv::Size(), scale, scale, interpolation);
     }
 }
 
@@ -39,22 +54,22 @@ void resize_image_if_bigger (cv::Mat &input, const int dim, const int interpolat
  *
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
- *
+ *  
  * @param kernel_size
  * Size of kernel used for Gaussian Blur. Type=cv::Size (default=(5, 5))
- *
+ * 
  * @param sigma
  * Gaussian kernel standard deviation. More sigma -> more blur, type=double (default=1.0)
- *
+ * 
  * @param amount
  * will increase sharpness, type=double (default=1.0)
- *
+ * 
  * @param threshold
  * take pixel from original image if (image - blurred) < threshold, type=int (default=0)
-*/
+*/ 
 void _unsharp_mask (cv::Mat &src, cv::Mat &dst, cv::Size kernel_size=cv::Size(5, 5), const double sigma=1.0, const double amount=1.0, const int threshold=0) {
     cv::Mat blur;
     cv::GaussianBlur (src, blur, kernel_size, sigma);
@@ -78,21 +93,21 @@ void _unsharp_mask (cv::Mat &src, cv::Mat &dst, cv::Size kernel_size=cv::Size(5,
 
 /**This code implements the magic filter which is based on sharpening of image followed by
  * increasing the brightness.
- *
+ * 
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
- *
+ * 
  * @param alpha
  * Constant multiplies by image to increase contrast, type double (default=1.5)
- *
+ * 
  * @param beta
  * Constant subtracted from the result of multiplying, type int (default=0)
- *
+ * 
  * @param threshold
- * For pixels with very low values, get the original value back if its less than threshold.
+ * For pixels with very low values, get the original value back if its less than threshold. 
  * Type int (default=0)
 */
 void magic_filter (cv::Mat &src, cv::Mat &dst, const double alpha, const int beta, const int threshold) {
@@ -109,10 +124,10 @@ void magic_filter (cv::Mat &src, cv::Mat &dst, const double alpha, const int bet
 /**This code implements sepia, a popular filter from instagram.
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
-*/
+*/ 
 void sepia_filter (cv::Mat &src, cv::Mat &dst) {
     std::vector <cv::Mat> bgr;
     cv::split(src, bgr);
@@ -126,10 +141,10 @@ void sepia_filter (cv::Mat &src, cv::Mat &dst) {
 /**This code implements lighten filter, which just increases the brightness of the image.
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
-*/
+*/ 
 void lighten_filter (cv::Mat &src, cv::Mat &dst) {
     src.convertTo (dst, -1, 1.0, 20);
 };
@@ -137,21 +152,33 @@ void lighten_filter (cv::Mat &src, cv::Mat &dst) {
 /**This code implements gray filter, which just converts the image to grayscale.
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
-*/
+*/ 
 void gray_filter (cv::Mat &src, cv::Mat &dst) {
     cv::cvtColor (src, dst, cv::COLOR_BGR2GRAY);
 };
 
+/**This code implements dark magic filter, which applies SOTA image restoration techniques
+ * to get a nice processed image in gray scale.
+ * @param src
+ * The input image of type cv::Mat
+ * 
+ * @param dst
+ * Destination image of type cv::Mat
+*/ 
+void dark_magic_filter (cv::Mat &src, cv::Mat &dst) {
+    dark_magic_filter_implementation (src, dst);
+}
+
 /**This code implements sharpen filter, which applies the _unsharp_mask to make the image sharper
  * @param src
  * The input image of type cv::Mat
- *
+ * 
  * @param dst
  * Destination image of type cv::Mat
-*/
+*/ 
 void sharpen_filter (cv::Mat &src, cv::Mat &dst, cv::Size kernel_size, const double sigma, const double amount, const int threshold) {
     _unsharp_mask (src, dst, kernel_size, sigma, amount, threshold);
 };
