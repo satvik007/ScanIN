@@ -11,44 +11,76 @@
         android:id="@+id/camera_capture_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:scaleType="fitCenter"
+        android:layout_marginBottom="0dp"
         android:background="@android:color/transparent"
-        android:src = "@drawable/ic_camerabutton"
+        android:elevation="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_camerabutton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:elevation="2dp" />
+        app:layout_constraintTop_toTopOf="@+id/horizontalGuidelineBottom" />
 
     <ImageButton
         android:id="@+id/grid_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="62dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
         android:background="@android:color/transparent"
-        android:src = "@drawable/ic_gridview"
-        app:layout_constraintRight_toRightOf="parent"
+        android:elevation="5dp"
+        android:src="@drawable/ic_gridview"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:elevation="2dp" />
+        app:layout_constraintRight_toRightOf="@+id/verticalGuidelineRight"
+        app:layout_constraintTop_toTopOf="@+id/horizontalGuidelineBottom" />
 
     <ImageButton
         android:id="@+id/flash_button"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="fitCenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
         android:background="@null"
-        android:src = "@drawable/ic_flashoff"
+        android:elevation="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_flashoff"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:elevation="2dp" />
+        app:layout_constraintTop_toTopOf="@+id/horizontalGuidelineTop" />
 
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toTopOf="@id/camera_capture_button"/>
+        app:layout_constraintBottom_toTopOf="@id/camera_capture_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontalGuidelineBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verticalGuidelineLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verticalGuidelineRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.9026764" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontalGuidelineTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.05" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
