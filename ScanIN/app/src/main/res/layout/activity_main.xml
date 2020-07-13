@@ -32,7 +32,7 @@
         app:layout_constraintTop_toBottomOf="@+id/capturePreview" />
 
     <Button
-        android:id="@+id/saveBtn"
+        android:id="@+id/open_doc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Save"

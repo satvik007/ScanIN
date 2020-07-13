@@ -3,26 +3,101 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/highlightRed"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
     tools:context=".ImageEditFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background= "#867979"/>
+        android:layout_height="match_parent">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:src="@drawable/ic_camerabutton"
+            android:layout_marginBottom="50dp"
+            android:contentDescription="edit_add_more"
+            android:id="@+id/edit_add_more"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="60dp"
-        android:background= "#e6f2ff"
-        android:orientation="vertical">
-        <!-- TODO: Update blank fragment layout -->
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/discard"
+            android:src="@drawable/ic_discard"/>
+
+        <ImageButton
+            android:id="@+id/reorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="62dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="reorder"
+            android:elevation="2dp"
+            android:src="@drawable/ic_gridview"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingRight="10dp"
+            android:paddingLeft="10dp"
+            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:scaleType="fitCenter"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:background="#90000000"
+            android:id="@+id/image_edit_tools"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/edit_add_more"
+            tools:layout_editor_absoluteX="0dp">
+
+            <ImageButton
+                android:id="@+id/crop"
+                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_crop" />
+
+            <ImageButton
+                android:id="@+id/rotate"
+                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_rotate" />
+
+            <ImageButton
+                android:id="@+id/brightness"
+                android:background="@android:color/transparent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_brightness_and_contrast" />
+
+            <ImageButton
+                android:id="@+id/filters"
+                android:layout_marginTop="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_filter" />
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview_image"
-            android:layout_width="wrap_content"
+            app:layout_constraintTop_toBottomOf="@+id/discard"
+            app:layout_constraintBottom_toTopOf="@+id/image_edit_tools"
+            android:padding="4dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>

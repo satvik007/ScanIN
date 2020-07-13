@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.R;
 import com.example.scanin.ScanActivity;
+import com.example.scanin.StateMachineModule.MachineActions;
+import com.example.scanin.StateMachineModule.MachineStates;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.opencv.android.OpenCVLoader;
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         btnTakePicture = (FloatingActionButton) findViewById(R.id.fab);
-        btnSavePicture = (Button) findViewById(R.id.saveBtn);
+        btnSavePicture = (Button) findViewById(R.id.open_doc);
         capturePreview = (ImageView) findViewById(R.id.capturePreview);
 
         btnTakePicture.setOnClickListener(MainActivity.this);
@@ -75,7 +77,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.fab) {
+            view.setClickable(false);
             startCameraActivity();
+        }
+        else if(view.getId()==R.id.open_doc){
+            Intent intent = new Intent(this, ScanActivity.class);
+            intent.putExtra("STATE", MachineStates.HOME);
+            intent.putExtra("ACTION", MachineActions.HOME_OPEN_DOC);
+            startActivity(intent);
         }
     }
 
@@ -85,8 +94,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //
 //        startActivityForResult(intent, CAMERA_ACTIVITY_REQUEST_CODE);
         Intent intent = new Intent(this, ScanActivity.class);
+        intent.putExtra("STATE", MachineStates.HOME);
+        intent.putExtra("ACTION", MachineActions.HOME_ADD_SCAN);
         startActivity(intent);
-
     }
 
     @Override
@@ -96,9 +106,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onPause() {
+        Log.d("Main-Activity", "OnPauseCalled");
+        super.onPause();
+    }
+
+    @Override
     protected void onStop() {
         Log.d("Main-Activity", "OnStopCalled");
         super.onStop();
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d("Main-Activity", "OnStartCalled");
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d("Main-Activity", "OnResumeCalled");
+        findViewById(R.id.fab).setClickable(true);
+        super.onResume();
     }
 
     @Override
@@ -153,6 +182,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-//    public native String stringFromJNI();
+    @Override
+    protected void onRestart() {
+        Log.d("Main-Activity", "OnRestartCalled");
+        super.onRestart();
+    }
+
+    //    public native String stringFromJNI();
 //    public native String validate(long madAddrGr,long matAddrRgba);
 }

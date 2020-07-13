@@ -2,6 +2,7 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.StateMachineModule.MachineActions;
 
 import java.util.ArrayList;
 
@@ -32,6 +34,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     private String mParam2;
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
     RecyclerViewGridAdapter mAdapter = null;
+    int CurrentMachineState = -1;
 
     public ImageGridFragment() {
         // Required empty public constructor
@@ -59,6 +62,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
 
     public interface ImageGridFragmentCallback{
         void onCreateGridCallback();
+        void onClickGridCallback(int action);
     }
 
     @Override
@@ -73,7 +77,6 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         try {
             imageGridFragmentCallback = (ImageGridFragmentCallback) context;
         }
@@ -88,18 +91,51 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_image_grid, container, false);
+        ((ScanActivity)getActivity()).CurrentMachineState = this.CurrentMachineState;
         RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_grid);
         recyclerView.setHasFixedSize(true);
 
-        //use a linear layout manage
+        //use a linear layout manager
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
-
         //set adapter
         mAdapter = new RecyclerViewGridAdapter(imageData, this);
         recyclerView.setAdapter(mAdapter);
-        imageGridFragmentCallback.onCreateGridCallback();
+
+        rootView.findViewById(R.id.temp).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rootView.setClickable(false);
+                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ADD_SCAN);
+            }
+        });
+
+        rootView.findViewById(R.id.temp_1).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rootView.setClickable(false);
+                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ON_CLICK);
+            }
+        });
+
         return rootView;
+    }
+
+    @Override
+    public void onClick(int position) {
+        ScanActivity scanActivity = (ScanActivity)getActivity();
+        scanActivity.imageEditFragment.setImagePathList(imageData);
+//        getActivity().getSupportFragmentManager()
+//                .beginTransaction()
+//                .add(R.id.fragment_camera, scanActivity.imageEditFragment)
+//                .addToBackStack(null)
+//                .commit();
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("Scan-Activity2", "imageFragmentDestroyed");
+        super.onDestroyView();
     }
 
     public void setImagePathList(ArrayList<ImageData> imageData) {
@@ -107,14 +143,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         mAdapter.setmDataset(imageData);
     }
 
-    @Override
-    public void onClick(int position) {
-        ScanActivity scanActivity = (ScanActivity)getActivity();
-        scanActivity.imageEditFragment.setImagePathList(imageData);
-        getActivity().getSupportFragmentManager()
-                .beginTransaction()
-                .add(R.id.fragment_camera, scanActivity.imageEditFragment)
-                .addToBackStack(null)
-                .commit();
+    public void setCurrentMachineState(int currentMachineState) {
+        this.CurrentMachineState = currentMachineState;
     }
 }

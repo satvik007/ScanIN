@@ -1,16 +1,19 @@
 package com.example.scanin;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.StateMachineModule.MachineActions;
 
 import java.util.ArrayList;
 
@@ -32,9 +35,29 @@ public class ImageEditFragment extends Fragment {
 
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
     RecyclerViewEditAdapter mAdapter = null;
+    int CurrentMachineState = -1;
 
     public ImageEditFragment() {
         // Required empty public constructor
+    }
+
+    ImageEditFragment.ImageEditFragmentCallback imageEditFragmentCallback;
+
+    public interface ImageEditFragmentCallback{
+        void onCreateEditCallback();
+        void onClickEditCallback(int action);
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        try {
+            imageEditFragmentCallback = (ImageEditFragment.ImageEditFragmentCallback) context;
+        }
+        catch (ClassCastException e){
+            throw new ClassCastException(context.toString()
+                    + "must implement imageEditFragmentCallback");
+        }
     }
 
     /**
@@ -69,6 +92,7 @@ public class ImageEditFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_image_edit, container, false);
+        ((ScanActivity)getActivity()).CurrentMachineState = this.CurrentMachineState;
         RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -80,11 +104,32 @@ public class ImageEditFragment extends Fragment {
         PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
         mAdapter.setmDataset(imageData);
+
+        rootView.findViewById(R.id.edit_add_more).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.setClickable(false);
+                imageEditFragmentCallback.onClickEditCallback(MachineActions.EDIT_ADD_MORE);
+            }
+        });
+
+        rootView.findViewById(R.id.reorder).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.setClickable(false);
+                imageEditFragmentCallback.onClickEditCallback(MachineActions.REORDER);
+            }
+        });
+
         return rootView;
     }
 
     public void setImagePathList(ArrayList<ImageData> imageData) {
         this.imageData = imageData;
-//        mAdapter.setmDataset(imageData);.
+        mAdapter.setmDataset(imageData);
+    }
+
+    public void setCurrentMachineState(int currentMachineState) {
+        this.CurrentMachineState = currentMachineState;
     }
 }
