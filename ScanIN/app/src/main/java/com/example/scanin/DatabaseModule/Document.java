@@ -12,6 +12,10 @@ public class Document {
     @ColumnInfo(name="document_name")
     private String documentName;
 
+    public Document(String documentName1){
+        documentName = documentName1;
+    }
+
     public Document(){
 
     }

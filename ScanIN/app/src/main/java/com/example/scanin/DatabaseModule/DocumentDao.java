@@ -9,7 +9,7 @@ import androidx.room.Update;
 @Dao
 public interface DocumentDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertDocument(Document document);
+    public long insertDocument(Document document);
 
     @Update
     public void updateDocument(Document document);
