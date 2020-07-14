@@ -62,7 +62,8 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
 //        }
 //        holder.imageView.setImageBitmap(imageData.getThumbnail());
         Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
-                .resize(100, 100).into(holder.imageView);
+                .placeholder(R.drawable.ic_rotate)
+                .resize(200, 100).into(holder.imageView);
         Log.d("GridAdapt-1", "imageLoaded");
     }
 

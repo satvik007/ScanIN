@@ -7,13 +7,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.R;
@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton btnTakePicture;
     private ImageButton btnSavePicture;
     private ImageView capturePreview;
+    private static final int REQUEST_CODE_PERMISSIONS = 10;
+    private static final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"};
 
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 0;
     public static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         TextView textView=(TextView) findViewById(R.id.sample_text);
+        ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
 //        textView.setText(stringFromJNI());
 
         // Example of a call to a native method

@@ -62,6 +62,7 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 
         ImageData imageData = mDataset.get(position);
         Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
+                .placeholder(R.drawable.ic_rotate)
                 .resize(400, 400).into(holder.imageView);
     }
 

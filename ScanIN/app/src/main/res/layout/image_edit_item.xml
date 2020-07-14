@@ -4,18 +4,16 @@
     android:layout_height="wrap_content"
     android:layout_margin="0dp"
     android:padding="0dp"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
         android:paddingBottom="0dp"
         android:paddingTop="0dp"
         android:adjustViewBounds="true"
-        android:background="@color/orange"
-        android:src="@drawable/ic_splash"
+        android:background="@color/white"
         android:id="@+id/image_edit_item"/>
 
 </LinearLayout>
