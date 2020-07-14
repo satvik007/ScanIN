@@ -101,6 +101,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         //set adapter
         mAdapter = new RecyclerViewGridAdapter(imageData, this);
         recyclerView.setAdapter(mAdapter);
+        imageGridFragmentCallback.onCreateGridCallback();
 
         rootView.findViewById(R.id.temp).setOnClickListener(new View.OnClickListener() {
             @Override

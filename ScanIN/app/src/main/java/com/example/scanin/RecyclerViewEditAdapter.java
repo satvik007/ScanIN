@@ -1,7 +1,6 @@
 package com.example.scanin;
 
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,7 @@ import android.widget.ImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.ImageDataModule.ImageData;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -53,12 +53,16 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 
     @Override
     public void onBindViewHolder(RecyclerViewEditAdapter.EditViewHolder holder, int position) {
+//        ImageData imageData = mDataset.get(position);
+////        holder.imageView.setImageBitmap(
+////                decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
+////        holder.imageView.setImageBitmap(imageData.getOriginalBitmap());
+//        Log.d("onCreateEdit", String.valueOf(imageData));
+//        holder.imageView.setImageBitmap(imageData.getSmallImage());
+
         ImageData imageData = mDataset.get(position);
-//        holder.imageView.setImageBitmap(
-//                decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
-//        holder.imageView.setImageBitmap(imageData.getOriginalBitmap());
-        Log.d("onCreateEdit", String.valueOf(imageData));
-        holder.imageView.setImageBitmap(imageData.getSmallImage());
+        Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
+                .resize(400, 400).into(holder.imageView);
     }
 
     @Override

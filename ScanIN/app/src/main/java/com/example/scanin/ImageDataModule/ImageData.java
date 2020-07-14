@@ -26,6 +26,14 @@ public class ImageData {
         this.cropPosition = null;
     }
 
+    public ImageData(Uri uri){
+        this.originalBitmap = null;
+        this.currentBitmap = null;
+        this.filterName = null;
+        this.fileName = uri;
+        this.cropPosition = null;
+    }
+
     public Bitmap getCurrentBitmap() {
         return currentBitmap;
     }

@@ -9,7 +9,7 @@ public class DocumentAndImageInfo {
     @Embedded public Document document;
     @Relation(
             parentColumn = "documentId",
-            entityColumn = "uri"
+            entityColumn = "document_id"
     )
     public List<ImageInfo> images;
 }

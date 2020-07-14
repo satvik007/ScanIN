@@ -32,4 +32,12 @@ public class Document {
     public String getDocumentName() {
         return documentName;
     }
+
+    public void setDocumentId(int documentId) {
+        this.documentId = documentId;
+    }
+
+    public void setDocumentName(String documentName) {
+        this.documentName = documentName;
+    }
 }

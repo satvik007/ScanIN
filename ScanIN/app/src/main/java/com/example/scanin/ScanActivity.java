@@ -2,7 +2,6 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,7 +45,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
-import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -71,7 +69,7 @@ public class ScanActivity extends AppCompatActivity
     CameraSelector cameraSelector;
     String TAG = "Scan-Activity";
 
-    private AppDatabase appDatabase = AppDatabase.getInstance(getApplication());
+    private AppDatabase appDatabase;
     private String documentName = null;
     private long current_document_id = -1;
 
@@ -94,6 +92,7 @@ public class ScanActivity extends AppCompatActivity
         imageEditFragment = new ImageEditFragment();
         cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
         outputDirectory = getOutputDirectory();
+        appDatabase = AppDatabase.getInstance(this);
 
         if(action == MachineActions.HOME_ADD_SCAN){
             CurrentMachineState = MachineStates.CAMERA;
@@ -124,15 +123,12 @@ public class ScanActivity extends AppCompatActivity
             }
         });
 
-        findViewById(R.id.camera_capture_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                view.setClickable(false);
-                if(imageCapture == null){
-                    return;
-                }
-                takePhoto();
+        findViewById(R.id.camera_capture_button).setOnClickListener(view -> {
+            view.setClickable(false);
+            if(imageCapture == null){
+                return;
             }
+            takePhoto();
         });
     }
 
@@ -167,34 +163,6 @@ public class ScanActivity extends AppCompatActivity
         Log.d(TAG, "Camera bind done");
     }
 
-//    private void takePhoto(){
-//        if(imageCapture == null) return;
-//        File photoFile = new File(
-//                outputDirectory, new SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis()) + ".jpg");
-//        ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
-//        imageCapture.takePicture(
-//                outputFileOptions, ContextCompat.getMainExecutor((Context)this), new ImageCapture.OnImageSavedCallback() {
-//                    @Override
-//                    public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-//
-//                        Uri savedUri = Uri.fromFile(photoFile);
-////                        currentFile = photoFile;
-////                        Bitmap myBitmap = BitmapFactory.decodeFile(currentFile.getAbsolutePath());
-////                        photo_preview.setImageBitmap(myBitmap);
-//                        Bitmap bitmap = readImageFromFile(savedUri);
-//                        String msg = String.format("Photo capture succeeded: %s", savedUri);
-//                        Toast.makeText((Context)ScanActivity.this, msg, Toast.LENGTH_SHORT).show();
-//                        Log.d(TAG, msg);
-//                    }
-//
-//                    @Override
-//                    public void onError(@NonNull ImageCaptureException exception) {
-//                        Log.e(TAG, "Photo capture failed: ${exc.message}", exception);
-//                    }
-//                }
-//        );
-//    }
-
     private void takePhoto(){
         if(imageCapture == null) return;
         File photoFile = new File(
@@ -212,7 +180,7 @@ public class ScanActivity extends AppCompatActivity
 //                        fragmentManager.beginTransaction()
 //                                .add(R.id.fragment_edit, imageEditFragment)
 //                                .commit();
-                        readImageFromFile(savedUri);
+//                        readImageFromFile(savedUri);
                     }
 
                     @Override
@@ -265,7 +233,8 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     public void onCreateGridCallback() {
-
+        Log.d("onCreateGrid", "Called");
+        imageGridFragment.setImagePathList(imageData);
     }
 
     @Override
@@ -320,45 +289,70 @@ public class ScanActivity extends AppCompatActivity
 
     public void readImageFromFile(Uri uri) {
         disposable.add(Single.create(e -> {
-            File file = new File(Objects.requireNonNull(uri.getPath()));
-            if (!file.exists()) e.onSuccess(null);
-            e.onSuccess(BitmapFactory.decodeFile(file.getAbsolutePath()));
+//            File file = new File(Objects.requireNonNull(uri.getPath()));
+//            if (!file.exists()) e.onSuccess(null);
+//            e.onSuccess(BitmapFactory.decodeFile(file.getAbsolutePath()));
+            e.onSuccess(null);
         })
-                .subscribeOn(preview_executor)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(s -> {
-                            imageData.add(new ImageData((Bitmap) s));
-                            int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
-                            imageEditFragment.setCurrentMachineState(nextState);
-                            FragmentManager fragmentManager = getSupportFragmentManager();
-                            fragmentManager.beginTransaction()
-                                    .add(R.id.fragment_edit, imageEditFragment)
-                                    .commit();
-                        },
-                        e -> {
-                        }));
+        .subscribeOn(preview_executor)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(s -> {
+//            imageData.add(new ImageData((Bitmap) s));
+            int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
+            imageEditFragment.setCurrentMachineState(nextState);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .add(R.id.fragment_edit, imageEditFragment)
+                    .commit();
+        },
+        e -> {
+        }));
     }
 
     public void saveImageInfo(Uri uri) {
         if (current_document_id != -1) {
-            disposable.add(Completable.create(s -> {
+            disposable.add(Single.create(s -> {
                 ImageInfo imageInfo = new ImageInfo(current_document_id, uri);
                 saveImageInfoHelper(imageInfo);
+                s.onSuccess(imageInfo);
             })
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe());
+            .subscribe(s->{
+                imageData.add(new ImageData(((ImageInfo)s).getUri()));
+
+                //
+                int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
+                imageEditFragment.setCurrentMachineState(nextState);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .add(R.id.fragment_edit, imageEditFragment)
+                        .commit();
+            }));
         }
         else{
             disposable.add(Single.create(s->{
                 long id = createDocument();
-                ImageInfo imageInfo = new ImageInfo(current_document_id, uri);
+                ImageInfo imageInfo = new ImageInfo(id, uri);
                 saveImageInfoHelper(imageInfo);
-                s.onSuccess(id);
+                s.onSuccess(imageInfo);
             })
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(s->{this.current_document_id = (long)s;}));
+            .subscribe(s->{
+                ImageInfo temp = (ImageInfo)s;
+                Log.d("CreateDoc:", String.valueOf(temp.getDocument_id()));
+                this.current_document_id = ((ImageInfo) s).getDocument_id();
+                imageData.add(new ImageData(temp.getUri()));
+
+                //
+                int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
+                imageEditFragment.setCurrentMachineState(nextState);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .add(R.id.fragment_edit, imageEditFragment)
+                        .commit();
+            }));
         }
     }
 

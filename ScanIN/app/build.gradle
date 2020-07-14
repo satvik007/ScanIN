@@ -104,4 +104,6 @@ dependencies {
 
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.5.2'
 }

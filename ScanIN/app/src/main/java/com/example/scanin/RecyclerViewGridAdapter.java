@@ -1,5 +1,6 @@
 package com.example.scanin;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,8 @@ import android.widget.ImageView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.ImageDataModule.ImageData;
+import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGridAdapter.GridViewHolder> {
@@ -50,15 +51,19 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(GridViewHolder holder, int position) {
+        Log.d("GridAdapt", "imageLoaded");
         ImageData imageData = mDataset.get(position);
-        if(imageData.getOriginalBitmap() == null){
-            try {
-                imageData.setOriginalBitmap(holder.imageView.getContext());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        holder.imageView.setImageBitmap(imageData.getThumbnail());
+//        if(imageData.getOriginalBitmap() == null){
+//            try {
+//                imageData.setOriginalBitmap(holder.imageView.getContext());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//        holder.imageView.setImageBitmap(imageData.getThumbnail());
+        Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
+                .resize(100, 100).into(holder.imageView);
+        Log.d("GridAdapt-1", "imageLoaded");
     }
 
     @Override
