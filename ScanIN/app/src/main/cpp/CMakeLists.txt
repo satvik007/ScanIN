@@ -27,6 +27,7 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              native-lib.cpp )
 
+include_directories(include)
 add_library(image-edit-util
         SHARED
         image-edit-util.cpp)

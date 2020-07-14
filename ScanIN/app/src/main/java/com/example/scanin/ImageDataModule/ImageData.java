@@ -8,38 +8,47 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import android.util.DisplayMetrics;
+import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
+import org.opencv.core.Size;
+import org.opencv.android.Utils;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import android.util.Pair;
+import java.util.ArrayList;
+
+import static java.lang.Math.min;
 
 public class ImageData {
     private Bitmap originalBitmap;
+    private Bitmap croppedBitmap;
     private Bitmap currentBitmap;
     private String filterName;
     private Uri fileName;
-    private int[] cropPosition;
+    private ArrayList <Point> cropPosition;
     private int THUMBNAIL_SIZE = 64;
+    private final double EPS = 1e-10;
 
-    public ImageData(Bitmap bitmap){
-        this.originalBitmap = bitmap;
-        this.currentBitmap = bitmap;
-        this.filterName = null;
-        this.fileName = null;
-        this.cropPosition = null;
-    }
-
-    public ImageData(Uri uri){
+    public ImageData(Uri uri) {
         this.originalBitmap = null;
+        this.croppedBitmap = null;
         this.currentBitmap = null;
         this.filterName = null;
         this.fileName = uri;
         this.cropPosition = null;
     }
 
-    public Bitmap getCurrentBitmap() {
-        return currentBitmap;
-    }
-
     public Bitmap getOriginalBitmap() {
         return originalBitmap;
+    }
+
+    public Bitmap getCroppedBitmap() {
+        return croppedBitmap;
+    }
+
+    public Bitmap getCurrentBitmap() {
+        return currentBitmap;
     }
 
     public Uri getFileName() {
@@ -50,12 +59,16 @@ public class ImageData {
         return filterName;
     }
 
-    public int[] getCropPosition() {
+    public ArrayList <Point> getCropPosition() {
         return cropPosition;
     }
 
     public void setOriginalBitmap(Bitmap originalBitmap) {
         this.originalBitmap = originalBitmap;
+    }
+
+    public void setCroppedBitmap(Bitmap croppedBitmap) {
+        this.croppedBitmap = croppedBitmap;
     }
 
     public void setCurrentBitmap(Bitmap currentBitmap) {
@@ -70,35 +83,100 @@ public class ImageData {
         this.fileName = fileName;
     }
 
-    public void setCropPosition(int[] cropPosition) {
+    public void setCropPosition(ArrayList <Point> cropPosition) {
         this.cropPosition = cropPosition;
     }
 
     public void setOriginalBitmap(Context context) throws IOException {
         try {
             this.originalBitmap =  MediaStore.Images.Media.getBitmap(context.getContentResolver() , fileName);
-            this.originalBitmap = ImageData.RotateBitmap(this.originalBitmap);
-        }catch (Exception e){
+            this.originalBitmap = ImageData.rotateBitmap(this.originalBitmap);
+        } catch (Exception e){
             throw e;
         }
     }
 
-    public static Bitmap RotateBitmap(Bitmap source)
-    {
+    public static Bitmap rotateBitmap(Bitmap source) {
         float angle = 90.0f;
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
-    public Bitmap getThumbnail(){
-        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+    public Bitmap getThumbnail() {
+        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(currentBitmap, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
         return thumbImage;
     }
 
-    public Bitmap getSmallImage(){
-        Log.d("onCreateEdit","getSmallImage");
-        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(originalBitmap, 480, 760);
-        return thumbImage;
+    // cropped is applied on originalBitmap and saved in croppedBitmap
+    public void applyCropImage () {
+        if (originalBitmap != null && cropPosition != null) {
+            Mat imgToProcess = new Mat();
+            Utils.bitmapToMat(originalBitmap, imgToProcess);
+            Mat outMat = new Mat();
+            Mat pts = new Mat(4, 2, 1);
+            for (int i = 0; i < 4; i++) {
+                pts.put(i, 0, cropPosition.get(i).x);
+                pts.put(i, 1, cropPosition.get(i).y);
+            }
+            ImageEditUtil.cropImage(imgToProcess.getNativeObjAddr(),
+                    outMat.getNativeObjAddr(), pts.getNativeObjAddr());
+
+            croppedBitmap = Bitmap.createBitmap(outMat.cols(),
+                                    outMat.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(outMat, croppedBitmap);
+        }
+    }
+
+    // filter is applied on croppedBitmap and saved in currentBitmap.
+    public void applyFilter () {
+        if (ImageEditUtil.isValidFilter(filterName)) {
+            Mat imgToProcess = new Mat();
+            Utils.bitmapToMat(croppedBitmap, imgToProcess);
+            Mat outMat = new Mat();
+            int filter_id = ImageEditUtil.getFilterId (filterName);
+            ImageEditUtil.filterImage(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), filter_id);
+            currentBitmap = Bitmap.createBitmap(outMat.cols(),
+                    outMat.rows(), Bitmap.Config.ARGB_8888);
+            Utils.matToBitmap(outMat, currentBitmap);
+        }
+    }
+
+    public void applyFilter (String filterName) {
+        this.filterName = filterName;
+        applyFilter();
+    }
+
+    public void applyCropImage (ArrayList <Point> cropPosition) {
+        setCropPosition(cropPosition);
+        applyCropImage();
+    }
+
+    private Bitmap getSmallImage (Context context, Bitmap bitmap) {
+        Log.d("onCreateEdit", "getSmallImage");
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int context_width = displayMetrics.widthPixels;
+        int context_height = displayMetrics.heightPixels;
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        double fx = (double) context_width / width;
+        double fy = (double) context_height / height;
+        double scale = min (fx, fy);
+        // adjusting for floating point errors.
+        int new_width = (int) (width * scale - EPS);
+        int new_height = (int) (height * scale - EPS);
+        return ThumbnailUtils.extractThumbnail(bitmap, new_width, new_height);
+    }
+
+    public Bitmap getSmallOriginalImage(Context context) {
+        return getSmallImage(context, originalBitmap);
+    }
+
+    public Bitmap getSmallCroppedImage(Context context) {
+        return getSmallImage(context, croppedBitmap);
+    }
+
+    public Bitmap getSmallCurrentImage(Context context) {
+        return getSmallImage(context, currentBitmap);
     }
 }

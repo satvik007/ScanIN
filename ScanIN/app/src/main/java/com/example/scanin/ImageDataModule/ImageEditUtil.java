@@ -1,25 +1,30 @@
 package com.example.scanin.ImageDataModule;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
+import java.util.ArrayList;
+import org.opencv.core.Point;
 
 public class ImageEditUtil {
-    private static String[] filterList = {"black_and_white", "magic_filter"};
+    private static String[] filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
 
     static {
         System.loadLibrary("image-edit-util");
     }
 
+    // check for filter_name == null;
     public static boolean isValidFilter(String filter_name){
         return Arrays.asList(ImageEditUtil.filterList).contains(filter_name);
+    }
+
+    public static int getFilterId (String filter_name) {
+        return Arrays.asList(filterList).indexOf (filter_name);
     }
 
     public static Bitmap ImageProxyToBitmap(Image image){
@@ -46,5 +51,11 @@ public class ImageEditUtil {
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
     }
 
-    public static native void getTestGray(long imgAddr, long grayImgAddr);
+    public static native void getTestGray (long imgAddr, long grayImgAddr);
+
+    public static native void getBestPoints (long imgAddr, long pts);
+
+    public static native void cropImage(long imgAddr, long cropImgAddr, long pts);
+
+    public static native void filterImage(long imgAddr, long filterImgAddr, int filterId);
 }
