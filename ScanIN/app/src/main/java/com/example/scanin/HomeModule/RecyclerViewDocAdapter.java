@@ -39,6 +39,11 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         int layoutIdForImageAdapter =R.layout.doc_item;
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
+
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        layoutParams.width = (int) (parent.getWidth() * 0.3);
+        layoutParams.height = (int) (parent.getWidth() * 0.3);
+        view.setLayoutParams(layoutParams);
         return new DocViewHolder(view);
     }
 
@@ -47,8 +52,10 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         DocumentsAndFirstImage documentsAndFirstImage = mDataset.get(position);
 
         holder.textView.setText(documentsAndFirstImage.getDocument().getDocumentName());
-        Picasso.with(holder.imageView.getContext()).load(documentsAndFirstImage.getFirstImage().getUri())
-                .fit().centerCrop()
+        Picasso.with(holder.imageView.getContext())
+                .load(documentsAndFirstImage.getImageInfo().getUri())
+                .fit()
+                .centerCrop()
                 .into(holder.imageView);
     }
 

@@ -7,6 +7,7 @@ import java.util.List;
 
 public class DocumentAndImageInfo {
     @Embedded public Document document;
+
     @Relation(
             parentColumn = "document_id",
             entityColumn = "img_document_id"

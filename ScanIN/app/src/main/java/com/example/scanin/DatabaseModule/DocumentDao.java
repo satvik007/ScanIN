@@ -16,5 +16,4 @@ public interface DocumentDao {
 
     @Delete
     public void deleteDocument(Document document);
-
 }

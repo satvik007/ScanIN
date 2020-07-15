@@ -9,7 +9,6 @@ import java.util.List;
 @Dao
 public interface DocAndFirstImageDao {
     @Transaction
-//    @Query("SELECT document.*, image_info.* FROM document INNER JOIN image_info ON document.documentId=image_info.document_id")
-    @Query("Select * from document")
+    @Query("SELECT * FROM document")
     List<DocumentsAndFirstImage> loadDocumentAllImageInfo();
 }

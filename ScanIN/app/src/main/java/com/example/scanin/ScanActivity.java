@@ -334,6 +334,10 @@ public class ScanActivity extends AppCompatActivity
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
                 imageData.add(new ImageData(((ImageInfo)s).getUri()));
+                ImageInfo temp = (ImageInfo)s;
+                Log.d(TAG, "Saved_inOld: "+String.valueOf(temp.getImg_document_id()));
+                Log.d(TAG, "Saved_inOld: "+String.valueOf(temp.getUri()));
+                Log.d(TAG, "Saved: "+String.valueOf(temp.getPosition()));
                 //
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
@@ -357,6 +361,7 @@ public class ScanActivity extends AppCompatActivity
                 ImageInfo temp = (ImageInfo)s;
                 Log.d(TAG, "Saved: "+String.valueOf(temp.getImg_document_id()));
                 Log.d(TAG, "Saved: "+String.valueOf(temp.getUri()));
+                Log.d(TAG, "Saved: "+String.valueOf(temp.getPosition()));
                 this.current_document_id = ((ImageInfo) s).getImg_document_id();
                 imageData.add(new ImageData(temp.getUri()));
 

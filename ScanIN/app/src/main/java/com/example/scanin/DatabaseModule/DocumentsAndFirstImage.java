@@ -1,15 +1,14 @@
 package com.example.scanin.DatabaseModule;
 
-import android.util.Log;
-
 import androidx.room.Embedded;
 import androidx.room.Relation;
-
-import java.util.List;
 
 public class DocumentsAndFirstImage {
     @Embedded
     public Document document;
+
+//    @ColumnInfo(name = "position")
+//    public long position;
 
 //    @Embedded
 //    List<ImageInfo> imageInfo;
@@ -18,29 +17,29 @@ public class DocumentsAndFirstImage {
             parentColumn = "document_id",
             entityColumn = "img_document_id"
     )
-    List<ImageInfo> imageInfos;
+     public ImageInfo imageInfo;
 
     public Document getDocument() {
         return document;
     }
 
-    public List<ImageInfo> getImageInfos() {
-        return imageInfos;
+    public ImageInfo getImageInfo() {
+        return imageInfo;
     }
 
-    public ImageInfo getFirstImage(){
-        if(imageInfos.size() <= 0){
-            Log.e("DocAndFirst", "imageInfo0");
-        }
-        return imageInfos.get(0);
-    }
+    //    public ImageInfo getFirstImage(){
+//        if(imageInfos.size() <= 0){
+//            Log.e("DocAndFirst", "imageInfo0");
+//        }
+//        return imageInfos.get(0);
+//    }
 
     public void setDocument(Document document) {
         this.document = document;
     }
 
-    public void setImageInfo(List<ImageInfo> imageInfos1) {
-        this.imageInfos = imageInfos1;
+    public void setImageInfo(ImageInfo imageInfo) {
+        this.imageInfo = imageInfo;
     }
 
     public void DocumentAndFirstImage(){
