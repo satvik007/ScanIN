@@ -14,4 +14,11 @@ public class DocumentAndImageInfo {
     )
     public List<ImageInfo> images;
 
+    public Document getDocument() {
+        return document;
+    }
+
+    public List<ImageInfo> getImages() {
+        return images;
+    }
 }

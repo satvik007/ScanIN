@@ -1,6 +1,7 @@
 package com.example.scanin;
 
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,29 +11,27 @@ import android.widget.RelativeLayout;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEditAdapter.EditViewHolder> {
-    private ArrayList<ImageData> mDataset = new ArrayList<ImageData>();
+    private DocumentAndImageInfo documentAndImageInfo;
     private ProgressBar progressBar;
 
     public class EditViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         public EditViewHolder(View view){
             super(view);
-            imageView =view.findViewById(R.id.holderImageCrop);
+            imageView =view.findViewById(R.id.image_edit_item);
         }
     }
 
-    public RecyclerViewEditAdapter(ArrayList<ImageData> mDataset){
-        this.mDataset = mDataset;
+    public RecyclerViewEditAdapter(DocumentAndImageInfo documentAndImageInfo){
+        this.documentAndImageInfo = documentAndImageInfo;
     }
 
     public RecyclerViewEditAdapter.EditViewHolder onCreateViewHolder(ViewGroup parent, int viewtype){
-        int layoutIdForImageAdapter =R.layout.image_edit_crop;
+        int layoutIdForImageAdapter =R.layout.image_edit_item;
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
         return new EditViewHolder(view);
@@ -77,29 +76,21 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 
     @Override
     public void onBindViewHolder(RecyclerViewEditAdapter.EditViewHolder holder, int position) {
-//        ImageData imageData = mDataset.get(position);
-////        holder.imageView.setImageBitmap(
-////                decodeSampledBitmapFromResource(getResources(), R.id.myimage, 100, 100));
-////        holder.imageView.setImageBitmap(imageData.getOriginalBitmap());
-//        Log.d("onCreateEdit", String.valueOf(imageData));
-//        holder.imageView.setImageBitmap(imageData.getSmallImage());
-        position = mDataset.size() - 1 - position;
-        ImageData imageData = mDataset.get(position);
-        Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
+        Uri uri = documentAndImageInfo.getImages().get(position).getUri();
+        Picasso.with(holder.imageView.getContext()).load(uri)
                 .fit().centerCrop()
                 .into(holder.imageView);
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        if(documentAndImageInfo == null) return 0;
+        return documentAndImageInfo.getImages().size();
     }
 
-    public void setmDataset(ArrayList<ImageData> mDataset)
+    public void setmDataset(DocumentAndImageInfo documentAndImageInfo)
     {
-//        this.mDataset = null;
-//        this.notifyDataSetChanged();
-        this.mDataset = new ArrayList<>(mDataset);
+        this.documentAndImageInfo = documentAndImageInfo;
         this.notifyDataSetChanged();
     }
 }

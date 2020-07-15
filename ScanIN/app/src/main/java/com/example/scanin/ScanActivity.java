@@ -28,8 +28,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.example.scanin.DatabaseModule.AppDatabase;
 import com.example.scanin.DatabaseModule.Document;
+import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
-import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
 import com.example.scanin.StateMachineModule.MachineStates;
 import com.example.scanin.StateMachineModule.StateMachine;
@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -79,7 +78,7 @@ public class ScanActivity extends AppCompatActivity
     private Scheduler preview_executor = Schedulers.newThread();
     private final CompositeDisposable disposable = new CompositeDisposable();
 
-    private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
+    private DocumentAndImageInfo documentAndImageInfos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,12 +101,9 @@ public class ScanActivity extends AppCompatActivity
             Log.d(TAG, "entered_add_scan");
             startCamera();
         }else if(action == MachineActions.HOME_OPEN_DOC){
+            current_document_id = getIntent().getIntExtra("CURRENT_DOCUMENT_ID", -1);
             CurrentMachineState = MachineStates.EDIT_2;
-            imageEditFragment.setCurrentMachineState(CurrentMachineState);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_edit, imageEditFragment)
-                    .commit();
-            startCamera();
+            readDocumentImages(current_document_id);
         }else if(action == MachineActions.EDIT_PDF){
 
         }else{
@@ -206,7 +202,7 @@ public class ScanActivity extends AppCompatActivity
                         Uri savedUri = Uri.fromFile(photoFile);
                         Log.d("CameraSaved","Called");
                         long position;
-                        saveImageInfo(savedUri, imageData.size());
+                        saveImageInfo(savedUri, documentAndImageInfos.getImages().size());
 //                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
 //                        imageEditFragment.setCurrentMachineState(nextState);
 //                        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -267,23 +263,21 @@ public class ScanActivity extends AppCompatActivity
     @Override
     public void onCreateGridCallback() {
         Log.d("onCreateGrid", "Called");
-        imageGridFragment.setImagePathList(imageData);
+        imageGridFragment.setImagePathList(documentAndImageInfos);
     }
 
-    public void swap(int i, int j){
-        Uri temp = imageData.get(i).getFileName();
-        ImageData i_d = imageData.get(i);
-        ImageData j_d = imageData.get(j);
-        i_d.setFileName(j_d.getFileName());
-        j_d.setFileName(temp);
-    }
+//    public void swap(int i, int j){
+//        Uri temp = imageData.get(i).getFileName();
+//        ImageData i_d = imageData.get(i);
+//        ImageData j_d = imageData.get(j);
+//        i_d.setFileName(j_d.getFileName());
+//        j_d.setFileName(temp);
+//    }
 
 
     @Override
     public void onCreateEditCallback() {
-        Log.d("OnCreateEdit", "Called");
-        Log.d("OnCreateEdit", String.valueOf(imageData.size()));
-        imageEditFragment.setImagePathList(imageData);
+        imageEditFragment.setImagePathList(documentAndImageInfos);
     }
 
     @Override
@@ -362,12 +356,7 @@ public class ScanActivity extends AppCompatActivity
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
-                imageData.add(new ImageData(((ImageInfo)s).getUri()));
-                ImageInfo temp = (ImageInfo)s;
-                Log.d(TAG, "Saved_inOld: "+String.valueOf(temp.getImg_document_id()));
-                Log.d(TAG, "Saved_inOld: "+String.valueOf(temp.getUri()));
-                Log.d(TAG, "Saved: "+String.valueOf(temp.getPosition()));
-                //
+                documentAndImageInfos.images.add((ImageInfo) s);
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -387,14 +376,7 @@ public class ScanActivity extends AppCompatActivity
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
-                ImageInfo temp = (ImageInfo)s;
-                Log.d(TAG, "Saved: "+String.valueOf(temp.getImg_document_id()));
-                Log.d(TAG, "Saved: "+String.valueOf(temp.getUri()));
-                Log.d(TAG, "Saved: "+String.valueOf(temp.getPosition()));
-                this.current_document_id = ((ImageInfo) s).getImg_document_id();
-                imageData.add(new ImageData(temp.getUri()));
-
-                //
+                documentAndImageInfos.images.add((ImageInfo) s);
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -412,6 +394,21 @@ public class ScanActivity extends AppCompatActivity
     public long createDocument(){
         String document_name = "Unname001";
         return appDatabase.documentDao().insertDocument(new Document(document_name));
+    }
+
+    public void readDocumentImages(long id){
+        disposable.add(Single.create(s->{
+            DocumentAndImageInfo temp = appDatabase.documentAndImageDao().loadDocumentAllImageInfo(id);
+            s.onSuccess(temp);
+        }).subscribeOn(Schedulers.newThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(s->{
+            documentAndImageInfos = (DocumentAndImageInfo) s;
+            imageEditFragment.setCurrentMachineState(CurrentMachineState);
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.fragment_edit, imageEditFragment)
+                    .commit();
+        }, Throwable::printStackTrace));
     }
 
     public void updateImageInFile(Uri uri, Bitmap bitmap){

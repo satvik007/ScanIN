@@ -1,6 +1,6 @@
 package com.example.scanin;
 
-import android.util.Log;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,13 +8,11 @@ import android.widget.ImageView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
-
 public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGridAdapter.GridViewHolder> {
-    private ArrayList<ImageData> mDataset = new ArrayList<ImageData>();
+    private DocumentAndImageInfo documentAndImageInfo;
     public final GridAdapterOnClickHandler mClickHandler;
 
     public interface GridAdapterOnClickHandler{
@@ -36,8 +34,8 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
         }
     }
 
-    public RecyclerViewGridAdapter(ArrayList<ImageData> mDataset, GridAdapterOnClickHandler mClickHandler){
-        this.mDataset = mDataset;
+    public RecyclerViewGridAdapter(DocumentAndImageInfo documentAndImageInfo, GridAdapterOnClickHandler mClickHandler){
+        this.documentAndImageInfo = documentAndImageInfo;
         this.mClickHandler = mClickHandler;
     }
 
@@ -51,28 +49,20 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(GridViewHolder holder, int position) {
-        Log.d("GridAdapt", "imageLoaded");
-        ImageData imageData = mDataset.get(position);
-//        if(imageData.getOriginalBitmap() == null){
-//            try {
-//                imageData.setOriginalBitmap(holder.imageView.getContext());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        holder.imageView.setImageBitmap(imageData.getThumbnail());
-        Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
+        Uri uri = documentAndImageInfo.getImages().get(position).getUri();
+        Picasso.with(holder.imageView.getContext()).load(uri)
                 .placeholder(R.drawable.ic_rotate)
                 .resize(200, 100).into(holder.imageView);
-        Log.d("GridAdapt-1", "imageLoaded");
     }
 
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        if(documentAndImageInfo == null) return 0;
+        return documentAndImageInfo.getImages().size();
     }
 
-    public void setmDataset(ArrayList<ImageData> mDataset){
-        this.mDataset = mDataset;
+    public void setmDataset(DocumentAndImageInfo documentAndImageInfo){
+        this.documentAndImageInfo = documentAndImageInfo;
+        this.notifyDataSetChanged();
     }
 }

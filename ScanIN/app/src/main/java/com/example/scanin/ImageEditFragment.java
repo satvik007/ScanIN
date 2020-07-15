@@ -2,7 +2,6 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.StateMachineModule.MachineActions;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,7 +31,7 @@ public class ImageEditFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
+    private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
     int CurrentMachineState = -1;
 
@@ -99,12 +96,12 @@ public class ImageEditFragment extends Fragment {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 //        SpeedyLinearLayoutManager layoutManager = new SpeedyLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewEditAdapter(imageData);
+        mAdapter = new RecyclerViewEditAdapter(documentAndImageInfo);
         recyclerView.setAdapter(mAdapter);
 //        LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
         PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
-        mAdapter.setmDataset(imageData);
+        mAdapter.setmDataset(documentAndImageInfo);
 
         rootView.findViewById(R.id.edit_add_more).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,9 +138,9 @@ public class ImageEditFragment extends Fragment {
         return rootView;
     }
 
-    public void setImagePathList(ArrayList<ImageData> imageData) {
-        this.imageData = imageData;
-        mAdapter.setmDataset(imageData);
+    public void setImagePathList(DocumentAndImageInfo documentAndImageInfo) {
+        this.documentAndImageInfo = documentAndImageInfo;
+        mAdapter.setmDataset(documentAndImageInfo);
     }
 
     public void setCurrentMachineState(int currentMachineState) {
@@ -152,8 +149,6 @@ public class ImageEditFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        Log.d("editFrag", "onDestroy");
-        mAdapter.setmDataset(new ArrayList<ImageData>());
         mAdapter.notifyDataSetChanged();
         super.onDestroyView();
     }

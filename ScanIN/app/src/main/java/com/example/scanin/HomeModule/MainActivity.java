@@ -37,7 +37,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, DocAdapterClickListener{
 
     private FloatingActionButton btnTakePicture;
     private ImageButton btnSavePicture;
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RecyclerView recyclerView = findViewById(R.id.recyclerview_doc);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewDocAdapter(documentsAndFirstImages);
+        mAdapter = new RecyclerViewDocAdapter(documentsAndFirstImages, this);
         recyclerView.setAdapter(mAdapter);
         loadDocsInfo();
 
@@ -160,6 +160,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("STATE", MachineStates.HOME);
         intent.putExtra("ACTION", MachineActions.HOME_ADD_SCAN);
         startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View view, int position) {
+        findViewById(R.id.recyclerview_doc).setClickable(false);
+        DocumentsAndFirstImage clickedItem = documentsAndFirstImages.get(position);
+        Intent intent = new Intent(this, ScanActivity.class);
+        intent.putExtra("CURRENT_DOCUMENT_ID", clickedItem.getDocument().getDocumentId());
+        intent.putExtra("STATE", MachineStates.HOME);
+        intent.putExtra("ACTION", MachineActions.HOME_OPEN_DOC);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onLongClick(View view, int position) {
+
     }
 
     @Override

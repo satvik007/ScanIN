@@ -12,6 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scanin.DatabaseModule.Document;
+import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
 
@@ -32,7 +34,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
+    private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewGridAdapter mAdapter = null;
     int CurrentMachineState = -1;
 
@@ -99,7 +101,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
         recyclerView.setLayoutManager(layoutManager);
         //set adapter
-        mAdapter = new RecyclerViewGridAdapter(imageData, this);
+        mAdapter = new RecyclerViewGridAdapter(documentAndImageInfo, this);
         recyclerView.setAdapter(mAdapter);
         imageGridFragmentCallback.onCreateGridCallback();
 
@@ -125,12 +127,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     @Override
     public void onClick(int position) {
         ScanActivity scanActivity = (ScanActivity)getActivity();
-        scanActivity.imageEditFragment.setImagePathList(imageData);
-//        getActivity().getSupportFragmentManager()
-//                .beginTransaction()
-//                .add(R.id.fragment_camera, scanActivity.imageEditFragment)
-//                .addToBackStack(null)
-//                .commit();
+        scanActivity.imageEditFragment.setImagePathList(documentAndImageInfo);
     }
 
     @Override
@@ -139,9 +136,9 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         super.onDestroyView();
     }
 
-    public void setImagePathList(ArrayList<ImageData> imageData) {
-        this.imageData = imageData;
-        mAdapter.setmDataset(imageData);
+    public void setImagePathList(DocumentAndImageInfo documentAndImageInfo) {
+        this.documentAndImageInfo = documentAndImageInfo;
+        mAdapter.setmDataset(documentAndImageInfo);
     }
 
     public void setCurrentMachineState(int currentMachineState) {

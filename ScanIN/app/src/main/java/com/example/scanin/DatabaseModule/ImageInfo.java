@@ -1,9 +1,11 @@
 package com.example.scanin.DatabaseModule;
 
+import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
@@ -23,6 +25,15 @@ public class ImageInfo {
 
     @ColumnInfo(name="img_document_id")
     private long img_document_id;
+
+    @Ignore
+    private Bitmap originalBitmap;
+    @Ignore
+    private Bitmap croppedBitmap;
+    @Ignore
+    private Bitmap currentBitmap;
+    @Ignore
+    private String filterName;
 
     public ImageInfo(long document_id1, @NotNull Uri uri1, long position1){
         uri = uri1;

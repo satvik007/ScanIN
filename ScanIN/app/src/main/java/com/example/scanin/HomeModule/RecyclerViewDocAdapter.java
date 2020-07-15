@@ -19,19 +19,36 @@ import java.util.ArrayList;
 
 public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDocAdapter.DocViewHolder> {
     private ArrayList<DocumentsAndFirstImage> mDataset = new ArrayList<DocumentsAndFirstImage>();
+    private DocAdapterClickListener mListener;
 
-    public class DocViewHolder extends RecyclerView.ViewHolder {
+    public RecyclerViewDocAdapter(ArrayList<DocumentsAndFirstImage> mDataset, DocAdapterClickListener mListener){
+        this.mDataset = mDataset;
+        this.mListener = mListener;
+    }
+
+    public class DocViewHolder extends RecyclerView.ViewHolder{
         ImageView imageView;
         TextView textView;
-        public DocViewHolder(View view){
+        DocAdapterClickListener listener;
+
+        public DocViewHolder(View view, DocAdapterClickListener listener){
             super(view);
             imageView =view.findViewById(R.id.doc_image);
             textView = view.findViewById(R.id.doc_name);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mListener.onClick(view, getAdapterPosition());
+                }
+            });
+            view.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    mListener.onLongClick(view, getAdapterPosition());
+                    return true;
+                }
+            });
         }
-    }
-
-    public RecyclerViewDocAdapter(ArrayList<DocumentsAndFirstImage> mDataset){
-        this.mDataset = mDataset;
     }
 
     @NotNull
@@ -44,7 +61,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         layoutParams.width = (int) (parent.getWidth() * 0.45);
         layoutParams.height = (int) (parent.getWidth() * 0.3);
         view.setLayoutParams(layoutParams);
-        return new DocViewHolder(view);
+        return new DocViewHolder(view, mListener);
     }
 
     @Override
