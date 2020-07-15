@@ -59,11 +59,11 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 ////        holder.imageView.setImageBitmap(imageData.getOriginalBitmap());
 //        Log.d("onCreateEdit", String.valueOf(imageData));
 //        holder.imageView.setImageBitmap(imageData.getSmallImage());
-
+        position = mDataset.size() - 1 - position;
         ImageData imageData = mDataset.get(position);
         Picasso.with(holder.imageView.getContext()).load(imageData.getFileName())
-                .placeholder(R.drawable.ic_rotate)
-                .resize(400, 400).into(holder.imageView);
+                .fit().centerCrop()
+                .into(holder.imageView);
     }
 
     @Override
@@ -73,7 +73,9 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 
     public void setmDataset(ArrayList<ImageData> mDataset)
     {
-        this.mDataset = mDataset;
+//        this.mDataset = null;
+//        this.notifyDataSetChanged();
+        this.mDataset = new ArrayList<>(mDataset);
         this.notifyDataSetChanged();
     }
 }

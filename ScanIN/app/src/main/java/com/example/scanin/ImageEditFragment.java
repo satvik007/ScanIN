@@ -2,6 +2,7 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -122,6 +123,21 @@ public class ImageEditFragment extends Fragment {
         });
 
         imageEditFragmentCallback.onCreateEditCallback();
+//        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
+//        recyclerView.scrollToPosition((int)imageData.size() - 1);
+//        recyclerView.post(() -> {
+//            View view = layoutManager.findViewByPosition((int)imageData.size() - 1);
+//            if (view == null) {
+//                Log.e("Snapping:", "Cant find target View for initial Snap");
+//                return;
+//            }
+//
+//            int[] snapDistance = pagerSnapHelper.calculateDistanceToFinalSnap(layoutManager, view);
+//            assert snapDistance != null;
+//            if (snapDistance[0] != 0 || snapDistance[1] != 0) {
+//                recyclerView.scrollBy(snapDistance[0], snapDistance[1]);
+//            }
+//         });
         return rootView;
     }
 
@@ -132,5 +148,13 @@ public class ImageEditFragment extends Fragment {
 
     public void setCurrentMachineState(int currentMachineState) {
         this.CurrentMachineState = currentMachineState;
+    }
+
+    @Override
+    public void onDestroyView() {
+        Log.d("editFrag", "onDestroy");
+        mAdapter.setmDataset(new ArrayList<ImageData>());
+        mAdapter.notifyDataSetChanged();
+        super.onDestroyView();
     }
 }

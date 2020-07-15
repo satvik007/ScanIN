@@ -96,6 +96,7 @@ public class ScanActivity extends AppCompatActivity
 
         if(action == MachineActions.HOME_ADD_SCAN){
             CurrentMachineState = MachineStates.CAMERA;
+            Log.d(TAG, "entered_add_scan");
             startCamera();
         }else if(action == MachineActions.HOME_OPEN_DOC){
             CurrentMachineState = MachineStates.EDIT_2;
@@ -172,8 +173,11 @@ public class ScanActivity extends AppCompatActivity
                 outputFileOptions, Executors.newSingleThreadExecutor(), new ImageCapture.OnImageSavedCallback() {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+//                        imageEditFragment = new ImageEditFragment();
                         Uri savedUri = Uri.fromFile(photoFile);
-                        saveImageInfo(savedUri);
+                        Log.d("CameraSaved","Called");
+                        long position;
+                        saveImageInfo(savedUri, imageData.size());
 //                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
 //                        imageEditFragment.setCurrentMachineState(nextState);
 //                        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -237,9 +241,19 @@ public class ScanActivity extends AppCompatActivity
         imageGridFragment.setImagePathList(imageData);
     }
 
+    public void swap(int i, int j){
+        Uri temp = imageData.get(i).getFileName();
+        ImageData i_d = imageData.get(i);
+        ImageData j_d = imageData.get(j);
+        i_d.setFileName(j_d.getFileName());
+        j_d.setFileName(temp);
+    }
+
+
     @Override
     public void onCreateEditCallback() {
-        Log.d("onCreateEdit", "Called");
+        Log.d("OnCreateEdit", "Called");
+        Log.d("OnCreateEdit", String.valueOf(imageData.size()));
         imageEditFragment.setImagePathList(imageData);
     }
 
@@ -309,10 +323,10 @@ public class ScanActivity extends AppCompatActivity
         }));
     }
 
-    public void saveImageInfo(Uri uri) {
+    public void saveImageInfo(Uri uri, long position) {
         if (current_document_id != -1) {
             disposable.add(Single.create(s -> {
-                ImageInfo imageInfo = new ImageInfo(current_document_id, uri);
+                ImageInfo imageInfo = new ImageInfo(current_document_id, uri, position);
                 saveImageInfoHelper(imageInfo);
                 s.onSuccess(imageInfo);
             })
@@ -320,7 +334,6 @@ public class ScanActivity extends AppCompatActivity
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
                 imageData.add(new ImageData(((ImageInfo)s).getUri()));
-
                 //
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
@@ -328,12 +341,13 @@ public class ScanActivity extends AppCompatActivity
                 fragmentManager.beginTransaction()
                         .add(R.id.fragment_edit, imageEditFragment)
                         .commit();
-            }));
+            }, Throwable::printStackTrace));
         }
         else{
             disposable.add(Single.create(s->{
                 long id = createDocument();
-                ImageInfo imageInfo = new ImageInfo(id, uri);
+                Log.d(TAG, "new_doc_saved");
+                ImageInfo imageInfo = new ImageInfo(id, uri, position);
                 saveImageInfoHelper(imageInfo);
                 s.onSuccess(imageInfo);
             })
@@ -341,8 +355,9 @@ public class ScanActivity extends AppCompatActivity
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
                 ImageInfo temp = (ImageInfo)s;
-                Log.d("CreateDoc:", String.valueOf(temp.getDocument_id()));
-                this.current_document_id = ((ImageInfo) s).getDocument_id();
+                Log.d(TAG, "Saved: "+String.valueOf(temp.getImg_document_id()));
+                Log.d(TAG, "Saved: "+String.valueOf(temp.getUri()));
+                this.current_document_id = ((ImageInfo) s).getImg_document_id();
                 imageData.add(new ImageData(temp.getUri()));
 
                 //
@@ -352,7 +367,7 @@ public class ScanActivity extends AppCompatActivity
                 fragmentManager.beginTransaction()
                         .add(R.id.fragment_edit, imageEditFragment)
                         .commit();
-            }));
+            }, Throwable::printStackTrace));
         }
     }
 

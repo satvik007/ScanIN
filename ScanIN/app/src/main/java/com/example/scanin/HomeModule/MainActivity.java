@@ -14,7 +14,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scanin.DatabaseModule.AppDatabase;
+import com.example.scanin.DatabaseModule.DocumentsAndFirstImage;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.R;
 import com.example.scanin.ScanActivity;
@@ -27,6 +31,12 @@ import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+
+import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -41,7 +51,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
     public static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 2000;
 
+    private AppDatabase appDatabase;
+    private CompositeDisposable disposable;
+
     private Bitmap bitmap;
+    private ArrayList<DocumentsAndFirstImage> documentsAndFirstImages;
+    private RecyclerViewDocAdapter mAdapter;
 
     private static String TAG="MainActivity";
     static {
@@ -55,20 +70,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         TextView textView=(TextView) findViewById(R.id.sample_text);
         ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
-//        textView.setText(stringFromJNI());
-
         // Example of a call to a native method
         TextView tv = findViewById(R.id.sample_text);
-//        tv.setText(stringFromJNI());
-
         if (OpenCVLoader.initDebug()) {
             textView.setText(textView.getText()+"\n OPENCV LOADED SUCCESSFULLY");
-//            textView.setText(textView.getText()+"\n"+validate(500,500));
-
         } else {
             Log.d(TAG, "OPENCV DİD NOT LOAD");
-
         }
+
+        appDatabase = AppDatabase.getInstance(this);
+        disposable = new CompositeDisposable();
+        RecyclerView recyclerView = findViewById(R.id.recyclerview_doc);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
+        recyclerView.setLayoutManager(layoutManager);
+        mAdapter = new RecyclerViewDocAdapter(documentsAndFirstImages);
+        recyclerView.setAdapter(mAdapter);
+        loadDocsInfo();
+
 
         btnTakePicture = (FloatingActionButton) findViewById(R.id.fab);
         btnSavePicture = (ImageButton) findViewById(R.id.open_doc);
@@ -92,6 +110,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public void loadDocsInfo(){
+        disposable.add(Single.create(s->{
+            s.onSuccess(appDatabase.docAndFirstImageDao().loadDocumentAllImageInfo());
+        }).subscribeOn(Schedulers.single())
+            .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(s->{
+                    documentsAndFirstImages = (ArrayList<DocumentsAndFirstImage>) s;
+//                    if(documentsAndFirstImages.size() == 0) return;
+//                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
+//                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfos()));
+//                    Log.d("DocInfo0", String.valueOf(documentsAndFirstImages.get(0).getFirstImage().getUri()));
+//                    Log.d("DocInfo1", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getUri()));
+                    mAdapter.setmDataset(documentsAndFirstImages);
+                }, Throwable::printStackTrace));
+    }
+//
+//    public void loadDocsInfo(){
+//        disposable.add(Single.create(s->{
+////            s.onSuccess(appDatabase.docAndFirstImageDao().loadDocumentAllImageInfo());
+//            s.onSuccess(appDatabase.imageInfoDao().getAllImageInfo());
+//        }).subscribeOn(Schedulers.single())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(s->{
+////                    documentsAndFirstImages = (ArrayList<DocumentsAndFirstImage>) s;
+////                    if(documentsAndFirstImages.size() == 0) return;
+////                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
+////                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfos()));
+////                    Log.d("DocInfo0", String.valueOf(documentsAndFirstImages.get(0).getFirstImage().getUri()));
+//////                    Log.d("DocInfo1", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getUri()));
+////                    mAdapter.setmDataset(documentsAndFirstImages);
+//                    ArrayList<ImageInfo> temp = (ArrayList<ImageInfo>) s;
+//                    Log.d("DbRead", "Size: "+ String.valueOf(temp.size()));
+//                    if(temp.size() == 0) return;
+//                    Log.d("DbRead_0", "Size: "+ String.valueOf(temp.get(0).getUri()));
+//                    Log.d("DbRead_0", "docID: "+ String.valueOf(temp.get(0).getImg_document_id()));
+//                    Log.d("DbRead_0", "Position: "+ String.valueOf(temp.get(0).getPosition()));
+//                    Log.d("DbRead_1", "Size: "+ String.valueOf(temp.get(1).getUri()));
+//                    Log.d("DbRead_1", "docID: "+ String.valueOf(temp.get(1).getImg_document_id()));
+//                    Log.d("DbRead_1", "Position: "+ String.valueOf(temp.get(1).getPosition()));
+//
+//                }, Throwable::printStackTrace));
+//    }
+
     public void startCameraActivity(){
 //        Intent intent = new Intent(this, CameraActivity.class);
 ////        startActivity(intent);
@@ -107,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         Log.d("Main-Activity", "OnDestroyCalled");
         super.onDestroy();
+        disposable.dispose();
     }
 
     @Override
@@ -190,6 +252,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onRestart() {
         Log.d("Main-Activity", "OnRestartCalled");
         super.onRestart();
+        loadDocsInfo();
     }
 
     //    public native String stringFromJNI();

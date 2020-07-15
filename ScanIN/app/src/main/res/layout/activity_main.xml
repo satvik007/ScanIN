@@ -8,18 +8,24 @@
 
     <ImageView
         android:id="@+id/capturePreview"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="255dp"
+        android:layout_height="203dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="50dp"
         android:layout_marginEnd="50dp"
         android:foregroundGravity="clip_horizontal"
-        app:layout_constraintBottom_toTopOf="@+id/sample_text"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="50"
         tools:srcCompat="@tools:sample/avatars" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/recyclerview_doc"
+        app:layout_constraintTop_toBottomOf="@id/capturePreview"
+        app:layout_constraintBottom_toTopOf="@id/sample_text"/>
 
     <TextView
         android:id="@+id/sample_text"

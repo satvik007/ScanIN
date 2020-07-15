@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey;
 public class Document {
 
     @PrimaryKey(autoGenerate=true)
+    @ColumnInfo(name="document_id")
     private int documentId;
     @ColumnInfo(name="document_name")
     private String documentName;

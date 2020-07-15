@@ -8,8 +8,9 @@ import java.util.List;
 public class DocumentAndImageInfo {
     @Embedded public Document document;
     @Relation(
-            parentColumn = "documentId",
-            entityColumn = "document_id"
+            parentColumn = "document_id",
+            entityColumn = "img_document_id"
     )
     public List<ImageInfo> images;
+
 }
