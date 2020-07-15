@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:layout_margin="0dp"
     android:padding="0dp"
-    android:background="@color/white"
     android:orientation="vertical">
 
     <ImageView
@@ -12,8 +11,8 @@
         android:layout_height="match_parent"
         android:paddingBottom="0dp"
         android:paddingTop="0dp"
+        android:paddingRight="4dp"
         android:adjustViewBounds="true"
-        android:background="@color/white"
         android:id="@+id/image_edit_item"/>
 
 </LinearLayout>
