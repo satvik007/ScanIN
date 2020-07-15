@@ -94,6 +94,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Filters"
+                android:textColor="@color/white"
                 android:layout_weight="25"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_filter" />
