@@ -53,6 +53,20 @@
                 app:layout_constraintTop_toTopOf="@+id/horizontalGuidelineBottom" />
 
             <ImageButton
+                android:id="@+id/add_photo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="0dp"
+                android:layout_marginBottom="0dp"
+                android:background="@android:color/transparent"
+                android:elevation="5dp"
+                android:src="@drawable/ic_add_photo"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/verticalGuidelineLeft"
+                app:layout_constraintTop_toTopOf="@+id/horizontalGuidelineBottom" />
+
+
+            <ImageButton
                 android:id="@+id/flash_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
