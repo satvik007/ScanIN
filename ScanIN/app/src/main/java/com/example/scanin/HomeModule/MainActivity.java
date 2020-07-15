@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,7 +25,6 @@ import com.example.scanin.StateMachineModule.MachineActions;
 import com.example.scanin.StateMachineModule.MachineStates;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
 
@@ -68,20 +66,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        TextView textView=(TextView) findViewById(R.id.sample_text);
+//        TextView textView=(TextView) findViewById(R.id.sample_text);
         ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
-        if (OpenCVLoader.initDebug()) {
-            textView.setText(textView.getText()+"\n OPENCV LOADED SUCCESSFULLY");
-        } else {
-            Log.d(TAG, "OPENCV DİD NOT LOAD");
-        }
+//        TextView tv = findViewById(R.id.sample_text);
+//        if (OpenCVLoader.initDebug()) {
+//            textView.setText(textView.getText()+"\n OPENCV LOADED SUCCESSFULLY");
+//        } else {
+//            Log.d(TAG, "OPENCV DİD NOT LOAD");
+//        }
 
         appDatabase = AppDatabase.getInstance(this);
         disposable = new CompositeDisposable();
         RecyclerView recyclerView = findViewById(R.id.recyclerview_doc);
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewDocAdapter(documentsAndFirstImages);
         recyclerView.setAdapter(mAdapter);
@@ -89,11 +87,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         btnTakePicture = (FloatingActionButton) findViewById(R.id.fab);
-        btnSavePicture = (ImageButton) findViewById(R.id.open_doc);
-        capturePreview = (ImageView) findViewById(R.id.capturePreview);
+//        btnSavePicture = (ImageButton) findViewById(R.id.open_doc);
+//        capturePreview = (ImageView) findViewById(R.id.capturePreview);
 
         btnTakePicture.setOnClickListener(MainActivity.this);
-        btnSavePicture.setOnClickListener(MainActivity.this);
+//        btnSavePicture.setOnClickListener(MainActivity.this);
     }
 
     @Override
@@ -102,12 +100,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             view.setClickable(false);
             startCameraActivity();
         }
-        else if(view.getId()==R.id.open_doc){
-            Intent intent = new Intent(this, ScanActivity.class);
-            intent.putExtra("STATE", MachineStates.HOME);
-            intent.putExtra("ACTION", MachineActions.HOME_OPEN_DOC);
-            startActivity(intent);
-        }
+//        else if(view.getId()==R.id.open_doc){
+//            Intent intent = new Intent(this, ScanActivity.class);
+//            intent.putExtra("STATE", MachineStates.HOME);
+//            intent.putExtra("ACTION", MachineActions.HOME_OPEN_DOC);
+//            startActivity(intent);
+//        }
     }
 
     public void loadDocsInfo(){
@@ -118,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(s->{
                     documentsAndFirstImages = (ArrayList<DocumentsAndFirstImage>) s;
 //                    if(documentsAndFirstImages.size() == 0) return;
-                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
-                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfo().getPosition()));
-                    Log.d("DocInfo1S", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getPosition()));
+//                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
+//                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfo().getPosition()));
+//                    Log.d("DocInfo1S", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getPosition()));
 //                    Log.d("DocInfo1", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getUri()));
                     mAdapter.setmDataset(documentsAndFirstImages);
                 }, Throwable::printStackTrace));

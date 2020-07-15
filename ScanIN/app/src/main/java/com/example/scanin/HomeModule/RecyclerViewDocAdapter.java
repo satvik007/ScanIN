@@ -41,7 +41,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
 
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        layoutParams.width = (int) (parent.getWidth() * 0.3);
+        layoutParams.width = (int) (parent.getWidth() * 0.45);
         layoutParams.height = (int) (parent.getWidth() * 0.3);
         view.setLayoutParams(layoutParams);
         return new DocViewHolder(view);

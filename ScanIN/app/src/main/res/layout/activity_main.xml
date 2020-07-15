@@ -4,49 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="0dp"
     tools:context=".HomeModule.MainActivity">
-
-    <ImageView
-        android:id="@+id/capturePreview"
-        android:layout_width="255dp"
-        android:layout_height="203dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
-        android:foregroundGravity="clip_horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_weight="50"
-        tools:srcCompat="@tools:sample/avatars" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:paddingBottom="0dp"
         android:id="@+id/recyclerview_doc"
-        app:layout_constraintTop_toBottomOf="@id/capturePreview"
-        app:layout_constraintBottom_toTopOf="@id/sample_text"/>
-
-    <TextView
-        android:id="@+id/sample_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/capturePreview" />
-
-    <ImageButton
-        android:id="@+id/open_doc"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/ic_file"
-        android:background="@null"
-        />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
 <!--    <Button-->
 <!--        android:id="@+id/open_doc"-->
