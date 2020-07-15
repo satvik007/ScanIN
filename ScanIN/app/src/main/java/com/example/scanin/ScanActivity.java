@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -151,10 +153,19 @@ public class ScanActivity extends AppCompatActivity
 //        cameraProvider.unbindAll();
         Log.d("Camera-1", "bindPreview2");
         previewView = (PreviewView) findViewById(R.id.view_finder);
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        previewView.getDisplay().getRealMetrics(displayMetrics);
+
+        Log.d("Camera-1", "DisplayMetrics: heightPx " + displayMetrics.heightPixels +
+                ", widthPx " + displayMetrics.widthPixels);
+
         preview = new Preview.Builder()
-                .setTargetResolution(new Size(480, 360))
+                .setTargetResolution(new Size(displayMetrics.widthPixels, displayMetrics.heightPixels))
                 .build();
+
         imageCapture = new ImageCapture.Builder()
+                .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
                 .setTargetRotation(previewView.getDisplay().getRotation()).build();
 
         cameraSelector = new CameraSelector.Builder()

@@ -118,9 +118,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .subscribe(s->{
                     documentsAndFirstImages = (ArrayList<DocumentsAndFirstImage>) s;
 //                    if(documentsAndFirstImages.size() == 0) return;
-                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
-                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfo().getPosition()));
-                    Log.d("DocInfo1S", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getPosition()));
+//                    Log.d("DocInfo", String.valueOf(documentsAndFirstImages.size()));
+//                    Log.d("DocInfo0S", String.valueOf(documentsAndFirstImages.get(0).getImageInfo().getPosition()));
+//                    Log.d("DocInfo1S", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getPosition()));
 //                    Log.d("DocInfo1", String.valueOf(documentsAndFirstImages.get(1).getImageInfo().getUri()));
                     mAdapter.setmDataset(documentsAndFirstImages);
                 }, Throwable::printStackTrace));
