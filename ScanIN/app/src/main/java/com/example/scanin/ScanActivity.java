@@ -11,10 +11,10 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.AspectRatio;
 import androidx.camera.core.Camera;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageCapture;
@@ -86,6 +86,7 @@ public class ScanActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan);
         overridePendingTransition(R.anim.trans_left_in, R.anim.trans_left_out);
+        ImageButton flash_button = findViewById(R.id.flash_button);
 
         int state = getIntent().getIntExtra("STATE", -1);
         int action = getIntent().getIntExtra("ACTION", -1);
@@ -132,6 +133,23 @@ public class ScanActivity extends AppCompatActivity
                 return;
             }
             takePhoto();
+        });
+
+        flash_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(imageCapture == null){
+                    return;
+                }
+                if(imageCapture.getFlashMode() == ImageCapture.FLASH_MODE_OFF) {
+                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_ON);
+                    flash_button.setImageResource(R.drawable.ic_flashon);
+                }
+                else{
+                    imageCapture.setFlashMode(ImageCapture.FLASH_MODE_OFF);
+                    flash_button.setImageResource(R.drawable.ic_flashoff);
+                }
+            }
         });
     }
 
