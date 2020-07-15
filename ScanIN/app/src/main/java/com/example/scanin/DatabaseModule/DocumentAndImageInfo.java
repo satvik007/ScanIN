@@ -3,6 +3,7 @@ package com.example.scanin.DatabaseModule;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import java.util.Collections;
 import java.util.List;
 
 public class DocumentAndImageInfo {
@@ -13,6 +14,17 @@ public class DocumentAndImageInfo {
             entityColumn = "img_document_id"
     )
     public List<ImageInfo> images;
+
+    public DocumentAndImageInfo(){}
+    public DocumentAndImageInfo(Document document, List<ImageInfo> images){
+        this.document = document;
+        this.images = images;
+    }
+
+    public DocumentAndImageInfo(Document document, ImageInfo images){
+        this.document = document;
+        this.images = Collections.singletonList(images);
+    }
 
     public Document getDocument() {
         return document;

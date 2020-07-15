@@ -12,12 +12,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scanin.DatabaseModule.Document;
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
-import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
-
-import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,6 +30,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String TAG = "GRID_FRAG";
     private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewGridAdapter mAdapter = null;
     int CurrentMachineState = -1;
@@ -65,6 +62,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     public interface ImageGridFragmentCallback{
         void onCreateGridCallback();
         void onClickGridCallback(int action);
+        void onClickGridCallback(int action, int position);
     }
 
     @Override
@@ -74,6 +72,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Log.d(TAG, "onCreateCalled");
     }
 
     @Override
@@ -105,29 +104,30 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         recyclerView.setAdapter(mAdapter);
         imageGridFragmentCallback.onCreateGridCallback();
 
-        rootView.findViewById(R.id.temp).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                rootView.setClickable(false);
-                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ADD_SCAN);
-            }
-        });
-
-        rootView.findViewById(R.id.temp_1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                rootView.setClickable(false);
-                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ON_CLICK);
-            }
-        });
+//        rootView.findViewById(R.id.temp).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                rootView.setClickable(false);
+//                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ADD_SCAN);
+//            }
+//        });
+//
+//        rootView.findViewById(R.id.temp_1).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                rootView.setClickable(false);
+//                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ON_CLICK);
+//            }
+//        });
 
         return rootView;
     }
 
     @Override
     public void onClick(int position) {
-        ScanActivity scanActivity = (ScanActivity)getActivity();
-        scanActivity.imageEditFragment.setImagePathList(documentAndImageInfo);
+//        ScanActivity scanActivity = (ScanActivity)getActivity();
+//        scanActivity.imageEditFragment.setImagePathList(documentAndImageInfo);
+        imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ON_CLICK, position);
     }
 
     @Override

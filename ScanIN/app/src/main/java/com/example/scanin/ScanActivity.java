@@ -78,7 +78,7 @@ public class ScanActivity extends AppCompatActivity
     private Scheduler preview_executor = Schedulers.newThread();
     private final CompositeDisposable disposable = new CompositeDisposable();
 
-    private DocumentAndImageInfo documentAndImageInfos;
+    private DocumentAndImageInfo documentAndImageInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +101,10 @@ public class ScanActivity extends AppCompatActivity
             Log.d(TAG, "entered_add_scan");
             startCamera();
         }else if(action == MachineActions.HOME_OPEN_DOC){
-            current_document_id = getIntent().getIntExtra("CURRENT_DOCUMENT_ID", -1);
+            Log.d("Edit2_1", "open edit 2");
+            current_document_id = getIntent().getLongExtra("CURRENT_DOCUMENT_ID", -1);
             CurrentMachineState = MachineStates.EDIT_2;
+            Log.d("Edit2_1", String.valueOf(current_document_id));
             readDocumentImages(current_document_id);
         }else if(action == MachineActions.EDIT_PDF){
 
@@ -201,8 +203,9 @@ public class ScanActivity extends AppCompatActivity
 //                        imageEditFragment = new ImageEditFragment();
                         Uri savedUri = Uri.fromFile(photoFile);
                         Log.d("CameraSaved","Called");
-                        long position;
-                        saveImageInfo(savedUri, documentAndImageInfos.getImages().size());
+                        long position = 0;
+                        if(documentAndImageInfo != null) position = documentAndImageInfo.getImages().size();
+                        saveImageInfo(savedUri, position);
 //                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
 //                        imageEditFragment.setCurrentMachineState(nextState);
 //                        FragmentManager fragmentManager = getSupportFragmentManager();
@@ -263,7 +266,7 @@ public class ScanActivity extends AppCompatActivity
     @Override
     public void onCreateGridCallback() {
         Log.d("onCreateGrid", "Called");
-        imageGridFragment.setImagePathList(documentAndImageInfos);
+        imageGridFragment.setImagePathList(documentAndImageInfo);
     }
 
 //    public void swap(int i, int j){
@@ -277,7 +280,7 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     public void onCreateEditCallback() {
-        imageEditFragment.setImagePathList(documentAndImageInfos);
+        imageEditFragment.setImagePathList(documentAndImageInfo);
     }
 
     @Override
@@ -302,6 +305,24 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     public void onClickGridCallback(int action) {
+        int nextState = StateMachine.getNextState(CurrentMachineState, action);
+        if(nextState == MachineStates.CAMERA){
+            getSupportFragmentManager().beginTransaction()
+                    .remove(imageGridFragment)
+                    .commit();
+            setCamera(nextState);
+        }
+        else{
+            imageEditFragment.setCurrentMachineState(nextState);
+            getSupportFragmentManager().beginTransaction()
+                    .remove(imageGridFragment)
+                    .add(R.id.fragment_edit, imageEditFragment)
+                    .commit();
+        }
+    }
+
+    @Override
+    public void onClickGridCallback(int action, int position) {
         int nextState = StateMachine.getNextState(CurrentMachineState, action);
         if(nextState == MachineStates.CAMERA){
             getSupportFragmentManager().beginTransaction()
@@ -356,7 +377,7 @@ public class ScanActivity extends AppCompatActivity
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
-                documentAndImageInfos.images.add((ImageInfo) s);
+                documentAndImageInfo.images.add((ImageInfo) s);
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -367,16 +388,17 @@ public class ScanActivity extends AppCompatActivity
         }
         else{
             disposable.add(Single.create(s->{
-                long id = createDocument();
+                Document document = createDocument();
                 Log.d(TAG, "new_doc_saved");
-                ImageInfo imageInfo = new ImageInfo(id, uri, position);
+                ImageInfo imageInfo = new ImageInfo(document.getDocumentId(), uri, position);
                 saveImageInfoHelper(imageInfo);
-                s.onSuccess(imageInfo);
+                s.onSuccess(new DocumentAndImageInfo(document, imageInfo));
             })
             .subscribeOn(Schedulers.single())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
-                documentAndImageInfos.images.add((ImageInfo) s);
+                documentAndImageInfo = (DocumentAndImageInfo) s;
+                current_document_id = documentAndImageInfo.getDocument().getDocumentId();
                 int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
                 imageEditFragment.setCurrentMachineState(nextState);
                 FragmentManager fragmentManager = getSupportFragmentManager();
@@ -391,9 +413,10 @@ public class ScanActivity extends AppCompatActivity
         appDatabase.imageInfoDao().insertImageInfo(imageInfo);
     }
 
-    public long createDocument(){
-        String document_name = "Unname001";
-        return appDatabase.documentDao().insertDocument(new Document(document_name));
+    public Document createDocument(){
+        String document_name = "Unname101";
+        long id = appDatabase.documentDao().insertDocument(new Document(document_name));
+        return new Document(id, documentName);
     }
 
     public void readDocumentImages(long id){
@@ -403,7 +426,9 @@ public class ScanActivity extends AppCompatActivity
         }).subscribeOn(Schedulers.newThread())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(s->{
-            documentAndImageInfos = (DocumentAndImageInfo) s;
+            documentAndImageInfo = (DocumentAndImageInfo) s;
+            Log.d("Edit2, ", String.valueOf(documentAndImageInfo.getImages().size()
+                    + String.valueOf(documentAndImageInfo.getDocument().getDocumentId())));
             imageEditFragment.setCurrentMachineState(CurrentMachineState);
             getSupportFragmentManager().beginTransaction()
                     .add(R.id.fragment_edit, imageEditFragment)

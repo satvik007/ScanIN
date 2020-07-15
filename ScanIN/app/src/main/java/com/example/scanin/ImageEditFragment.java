@@ -2,6 +2,7 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +10,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.PagerSnapHelper;
+import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
@@ -30,6 +31,7 @@ public class ImageEditFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private String TAG = "EDIT_FRAG";
 
     private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
@@ -83,6 +85,7 @@ public class ImageEditFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        Log.d(TAG, "onCreateCalled");
     }
 
     @Override
@@ -98,8 +101,8 @@ public class ImageEditFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewEditAdapter(documentAndImageInfo);
         recyclerView.setAdapter(mAdapter);
-//        LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
-        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
+        LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
+//        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
         mAdapter.setmDataset(documentAndImageInfo);
 
@@ -121,7 +124,7 @@ public class ImageEditFragment extends Fragment {
 
         imageEditFragmentCallback.onCreateEditCallback();
 //        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
-//        recyclerView.scrollToPosition((int)imageData.size() - 1);
+//        if(CurrentMachineState != MachineStates.EDIT_2)recyclerView.scrollToPosition((int)documentAndImageInfo.getImages().size() - 1);
 //        recyclerView.post(() -> {
 //            View view = layoutManager.findViewByPosition((int)imageData.size() - 1);
 //            if (view == null) {

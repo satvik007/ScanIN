@@ -9,7 +9,7 @@ public class Document {
 
     @PrimaryKey(autoGenerate=true)
     @ColumnInfo(name="document_id")
-    private int documentId;
+    private long documentId;
     @ColumnInfo(name="document_name")
     private String documentName;
 
@@ -21,12 +21,12 @@ public class Document {
 
     }
 
-    public Document(int id, String documentName1){
+    public Document(long id, String documentName1){
         documentId = id;
         documentName = documentName1;
     }
 
-    public int getDocumentId() {
+    public long getDocumentId() {
         return documentId;
     }
 
@@ -34,7 +34,7 @@ public class Document {
         return documentName;
     }
 
-    public void setDocumentId(int documentId) {
+    public void setDocumentId(long documentId) {
         this.documentId = documentId;
     }
 
