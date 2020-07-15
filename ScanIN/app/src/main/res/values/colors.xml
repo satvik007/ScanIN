@@ -21,7 +21,8 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
     <color name="halfTransparentBackground">#aacccccc</color>
-
+    <color name="polygonViewCircleStrokeColor">#ff59a9ff</color>
+    <color name="polygonViewCircleBackground">#90e5f8ff</color>
 </resources>
 
 
