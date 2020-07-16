@@ -1,8 +1,7 @@
 package com.example.scanin.DatabaseModule;
 
+import android.app.Application;
 import android.content.Context;
-
-import com.example.scanin.ScanActivity;
 
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
@@ -25,7 +24,7 @@ public class Repository {
     private Scheduler insert_thread = Schedulers.single();
     private Scheduler update_image_thread = Schedulers.single();
 
-    public Repository(ScanActivity application, Context context){
+    public Repository(Application application, Context context){
         AppDatabase appDatabase = AppDatabase.getInstance(application);
         documentAndImageDao = appDatabase.documentAndImageDao();
         imageInfoDao = appDatabase.imageInfoDao();

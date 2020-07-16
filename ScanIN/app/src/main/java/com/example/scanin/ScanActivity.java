@@ -98,7 +98,7 @@ public class ScanActivity extends AppCompatActivity
         cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
         outputDirectory = getOutputDirectory();
         appDatabase = AppDatabase.getInstance(this);
-        repository = new Repository(this, this);
+        repository = new Repository(this.getApplication(), this);
         CurrentMachineState = MachineStates.HOME;
 
         if(action == MachineActions.HOME_ADD_SCAN){

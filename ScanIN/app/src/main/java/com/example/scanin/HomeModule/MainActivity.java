@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.AppDatabase;
+import com.example.scanin.DatabaseModule.Document;
 import com.example.scanin.DatabaseModule.DocumentsAndFirstImage;
+import com.example.scanin.DatabaseModule.Repository;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.R;
 import com.example.scanin.ScanActivity;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AppDatabase appDatabase;
     private CompositeDisposable disposable;
+    private Repository repository;
 
     private Bitmap bitmap;
     private ArrayList<DocumentsAndFirstImage> documentsAndFirstImages;
@@ -78,6 +81,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         appDatabase = AppDatabase.getInstance(this);
         disposable = new CompositeDisposable();
+        repository = new Repository(this.getApplication(), this);
+
         RecyclerView recyclerView = findViewById(R.id.recyclerview_doc);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(layoutManager);
@@ -175,7 +180,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onLongClick(View view, int position) {
-
+        Document document = documentsAndFirstImages.get(position).getDocument();
+        documentsAndFirstImages.remove(position);
+        mAdapter.setmDataset(documentsAndFirstImages);
+        mAdapter.notifyDataSetChanged();
+        repository.deleteDocument(document);
     }
 
     @Override
