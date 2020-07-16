@@ -242,6 +242,7 @@ public class ScanActivity extends AppCompatActivity
     public void onBackPressed() {
         int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.BACK);
         if(nextState == MachineStates.ABORT){
+            CurrentMachineState = -1;
             super.onBackPressed();
             overridePendingTransition(R.anim.trans_right_in, R.anim.trans_right_out);
         }else{
