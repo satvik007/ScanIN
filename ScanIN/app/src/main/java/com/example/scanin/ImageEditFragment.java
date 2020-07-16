@@ -1,7 +1,12 @@
 package com.example.scanin;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PointF;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +23,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.StateMachineModule.MachineActions;
 
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import java.util.ArrayList;
+import java.util.Map;
+import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.PolygonView;
+import android.view.View.OnClickListener;
+import com.squareup.picasso.Picasso;
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ImageEditFragment#newInstance} factory method to
@@ -33,17 +48,103 @@ public class ImageEditFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
     private String TAG = "EDIT_FRAG";
+    private View rootView;
     private View mainView;
     private View cropView;
     private PolygonView polygonView;
     private ProgressBar progressBar;
+    private int imgPosition;
+    private ImageData currentImg;
+    private ImageView cropImageView;
 
+    private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
     int CurrentMachineState = -1;
     Integer adapterPosition=0;
     RecyclerView recyclerView;
+
+    private OnClickListener mainCrop = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            mainView.setVisibility(View.GONE);
+            cropView.setVisibility(View.VISIBLE);
+            showProgressBar();
+            imgPosition = mAdapter.imgPosition;
+            Uri uri = documentAndImageInfo.getImages().get(imgPosition).getUri();
+            currentImg = new ImageData(uri);
+            try {
+                currentImg.setOriginalBitmap(getContext());
+                hideProgressBar();
+                Bitmap bmp = currentImg.getSmallOriginalImage(cropImageView.getContext());
+                cropImageView.setImageBitmap(bmp);
+            } catch (Exception e) {
+                Log.d(getTag(), "IO ERROR in loading image in crop");
+            }
+        }
+    };
+
+    private OnClickListener cropApply = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // TODO
+//            Map<Integer, PointF> points = polygonView.getPoints();
+            cropView.setVisibility(View.GONE);
+            mainView.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private OnClickListener cropBack = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // TODO
+            cropView.setVisibility(View.GONE);
+            mainView.setVisibility(View.VISIBLE);
+        }
+    };
+
+    private OnClickListener cropAutoDetect = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // TODO
+
+        }
+    };
+
+    private OnClickListener cropNoCrop = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // TODO
+
+        }
+    };
+
+    private OnClickListener cropRotate = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            // TODO
+
+        }
+    };
+
+    private void setViewInteract(View view, boolean canDo) {
+        view.setEnabled(canDo);
+        if (view instanceof ViewGroup) {
+            for (int i = 0; i < ((ViewGroup) view).getChildCount(); i++) {
+                setViewInteract(((ViewGroup) view).getChildAt(i), canDo);
+            }
+        }
+    }
+
+    protected void showProgressBar() {
+        //setViewInteract(rootView, false);
+        progressBar.setVisibility(View.VISIBLE);
+    };
+
+    protected void hideProgressBar() {
+        //setViewInteract(rootView, false);
+        progressBar.setVisibility(View.GONE);
+    };
 
     public ImageEditFragment() {
         // Required empty public constructor
@@ -108,7 +209,7 @@ public class ImageEditFragment extends Fragment {
         cropView.setVisibility(View.GONE);
         polygonView = rootView.findViewById(R.id.polygonView);
         progressBar = rootView.findViewById(R.id.progressBar);
-        ImageView cropImageView = rootView.findViewById(R.id.imageView);
+        cropImageView = rootView.findViewById(R.id.cropImageView);
 
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
@@ -139,7 +240,6 @@ public class ImageEditFragment extends Fragment {
                 imageEditFragmentCallback.onClickEditCallback(MachineActions.REORDER);
             }
         });
-
         // crop button in main
         rootView.findViewById(R.id.crop).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -149,52 +249,36 @@ public class ImageEditFragment extends Fragment {
 //                Picasso.with(getContext()).load(recyclerView.getAd)
             }
         });
+        ImageButton btnMainCrop = rootView.findViewById(R.id.crop);
+        Button btnCropApply = rootView.findViewById(R.id.crop_apply);
+        Button btnCropBack = rootView.findViewById(R.id.crop_back);
+        Button btnCropAutoDetect = rootView.findViewById(R.id.crop_auto_detect);
+        Button btnCropNoCrop = rootView.findViewById(R.id.crop_no_crop);
+        Button btnCropRotate = rootView.findViewById(R.id.crop_rotate);
 
-        // check button in crop
-        rootView.findViewById(R.id.crop_apply).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cropView.setVisibility(View.GONE);
-                mainView.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-        // back button in crop
-        rootView.findViewById(R.id.crop_back).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                cropView.setVisibility(View.GONE);
-                mainView.setVisibility(View.VISIBLE);
-
-            }
-        });
-
-        // auto-detect button in crop
-        rootView.findViewById(R.id.crop_auto_detect).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        // no-crop button in crop
-        rootView.findViewById(R.id.crop_no_crop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        // rotate button in crop
-        rootView.findViewById(R.id.crop_rotate).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
+        btnMainCrop.setOnClickListener(mainCrop);
+        btnCropApply.setOnClickListener(cropApply);
+        btnCropBack.setOnClickListener(cropBack);
+        btnCropAutoDetect.setOnClickListener(cropAutoDetect);
+        btnCropNoCrop.setOnClickListener(cropNoCrop);
+        btnCropRotate.setOnClickListener(cropRotate);
 
         imageEditFragmentCallback.onCreateEditCallback();
+//        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
+//        recyclerView.scrollToPosition((int)imageData.size() - 1);
+//        recyclerView.post(() -> {
+//            View view = layoutManager.findViewByPosition((int)imageData.size() - 1);
+//            if (view == null) {
+//                Log.e("Snapping:", "Cant find target View for initial Snap");
+//                return;
+//            }
+//
+//            int[] snapDistance = pagerSnapHelper.calculateDistanceToFinalSnap(layoutManager, view);
+//            assert snapDistance != null;
+//            if (snapDistance[0] != 0 || snapDistance[1] != 0) {
+//                recyclerView.scrollBy(snapDistance[0], snapDistance[1]);
+//            }
+//         });
         return rootView;
     }
 

@@ -91,6 +91,8 @@ public class ImageData {
         try {
             this.originalBitmap =  MediaStore.Images.Media.getBitmap(context.getContentResolver() , fileName);
             this.originalBitmap = ImageData.rotateBitmap(this.originalBitmap);
+            this.croppedBitmap = originalBitmap;
+            this.currentBitmap = originalBitmap;
         } catch (Exception e){
             throw e;
         }

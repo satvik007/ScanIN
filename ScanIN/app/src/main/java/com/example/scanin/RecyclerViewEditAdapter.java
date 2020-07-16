@@ -19,10 +19,11 @@ import com.squareup.picasso.Picasso;
 public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEditAdapter.EditViewHolder> {
     private DocumentAndImageInfo documentAndImageInfo;
     private ProgressBar progressBar;
+
     private ScanActivity context;
     private static final int MAX_WIDTH = 1024;
     private static final int MAX_HEIGHT = 768;
-
+    public int imgPosition;
     public class EditViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         public EditViewHolder(View view){
