@@ -12,7 +12,7 @@ import java.util.List;
 @Dao
 public interface ImageInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertImageInfo(ImageInfo imageInfo);
+    public long insertImageInfo(ImageInfo imageInfo);
 
     @Update
     public void updateImageInfo(ImageInfo imageInfo);

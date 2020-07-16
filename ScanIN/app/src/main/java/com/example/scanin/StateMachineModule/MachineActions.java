@@ -12,4 +12,5 @@ public class MachineActions {
     public static final int HOME_OPEN_PDF = 109;
     public static final int EDIT_PDF = 110;
     public static final int REORDER = 111;
+    public static final int NO_ACTION = 199;
 }

@@ -5,12 +5,14 @@ import android.net.Uri;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName="image_info")
+@Entity(tableName="image_info", foreignKeys = @ForeignKey(entity = Document.class,
+         parentColumns = "document_id", childColumns = "img_document_id", onDelete = ForeignKey.CASCADE))
 public class ImageInfo {
     @PrimaryKey(autoGenerate = true)
     private long image_id;
