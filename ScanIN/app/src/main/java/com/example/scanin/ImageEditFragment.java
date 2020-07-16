@@ -2,15 +2,15 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.SyncStateContract;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -21,18 +21,11 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
+import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
 
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.ProgressBar;
-import java.util.ArrayList;
-import java.util.Map;
-import com.example.scanin.ImageDataModule.ImageData;
-import com.example.scanin.PolygonView;
-import android.view.View.OnClickListener;
-import com.squareup.picasso.Picasso;
+import java.util.Objects;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ImageEditFragment#newInstance} factory method to
@@ -57,6 +50,7 @@ public class ImageEditFragment extends Fragment {
     private int imgPosition;
     private ImageData currentImg;
     private ImageView cropImageView;
+    private LinearSnapHelper pagerSnapHelper;
 
     private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
@@ -71,7 +65,11 @@ public class ImageEditFragment extends Fragment {
             cropView.setVisibility(View.VISIBLE);
             showProgressBar();
             imgPosition = mAdapter.imgPosition;
-            Uri uri = documentAndImageInfo.getImages().get(imgPosition).getUri();
+            View currentView = pagerSnapHelper.findSnapView(Objects.requireNonNull(recyclerView.getLayoutManager()));
+            if(currentView == null) return;
+            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
+            if(pos == null) return;
+            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
             currentImg = new ImageData(uri);
             try {
                 currentImg.setOriginalBitmap(getContext());
@@ -218,7 +216,7 @@ public class ImageEditFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewEditAdapter(null, (ScanActivity) getActivity());
         recyclerView.setAdapter(mAdapter);
-        LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
+        pagerSnapHelper = new LinearSnapHelper();
 //        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
 
@@ -283,6 +281,7 @@ public class ImageEditFragment extends Fragment {
     }
 
     public void setImagePathList(DocumentAndImageInfo documentAndImageInfo) {
+        this.documentAndImageInfo = documentAndImageInfo;
         mAdapter.setmDataset(documentAndImageInfo);
     }
 
