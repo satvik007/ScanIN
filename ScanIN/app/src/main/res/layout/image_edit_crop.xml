@@ -1,78 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.scanin.ScanActivity"
-    android:background="#ffffff"
+    android:background="#000"
     android:id="@+id/rlContainer"
     >
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imgEditCropHorGuidelineBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.75" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imgEditCropVertGuidelineLeft"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imgEditCropVertGuidelineRight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="20dp" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/imgEditCropHorGuidelineTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_begin="20dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/imgEditCropHorGuidelineTop"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        android:elevation="10dp"
+        android:gravity="center"
+        >
+        <Button
+            android:id="@+id/crop_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="go_back"
+            android:drawableTop="@drawable/ic_arrow_back"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/adjust_borders"
+            android:layout_weight="1"
+            />
+
+        <TextView
+            android:id="@+id/adjust_borders"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingBottom="20dp"
+            android:text="@string/adjust_borders"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintLeft_toRightOf="@id/crop_back"
+            app:layout_constraintRight_toLeftOf="@id/crop_apply"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            />
+
+        <Button
+            android:id="@+id/crop_apply"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="select_crop"
+            android:drawableTop="@drawable/ic_check"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/adjust_borders"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/imgEditCropHorGuidelineBottom"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:elevation="10dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/crop_auto_detect"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/auto_detect"
+            android:drawableTop="@drawable/ic_auto_detect"
+            android:text="@string/auto_detect"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+
+            app:layout_constraintRight_toLeftOf="@+id/crop_no_crop"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:id="@+id/crop_no_crop"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/no_crop"
+            android:drawableTop="@drawable/ic_no_crop"
+            android:text="@string/no_crop"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintStart_toEndOf="@+id/crop_auto_detect"
+            app:layout_constraintEnd_toStartOf="@+id/crop_rotate"
+            android:layout_weight="1"
+            />
+
+        <Button
+            android:id="@+id/crop_rotate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/rotate"
+            android:drawableTop="@drawable/ic_baseline_rotate_right_24"
+            android:text="@string/rotate"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/crop_no_crop"
+            android:layout_weight="1"
+            />
+    </LinearLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.scanin.ScanActivity"
-        android:background="#ffffff"
+        android:background="#000"
         android:orientation="vertical"
-        android:weightSum="10">
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp">
-            <Button
-                android:contentDescription="go_back"
-                android:id="@+id/crop_back"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:drawableTop="@drawable/ic_arrow_back"
-                />
-            <TextView
-                android:id="@+id/adjust_borders"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/adjust_borders"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:textSize="16sp"
-                android:textColor="@color/black"
-                />
-            <Button
-                android:contentDescription="select_crop"
-                android:id="@+id/crop_apply"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:drawableTop="@drawable/ic_check"
-                />
-        </RelativeLayout>
+        android:weightSum="10"
+        tools:context="com.example.scanin.ScanActivity">
+
         <FrameLayout
             android:id="@+id/frameLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="8"
             android:layout_gravity="center"
-            android:layout_margin="10dp">
+            android:layout_margin="10dp"
+            android:layout_weight="8">
 
             <FrameLayout
                 android:id="@+id/holderImageCrop"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:background="@color/cardview_shadow_end_color"
-                android:layout_margin="10dp">
+                android:layout_margin="10dp"
+                android:background="@color/cardview_shadow_end_color">
 
                 <ImageView
                     android:id="@+id/cropImageView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:adjustViewBounds="true"/>
+                    android:adjustViewBounds="true" />
             </FrameLayout>
 
             <com.example.scanin.PolygonView
@@ -80,56 +184,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:visibility="gone"/>
+                android:visibility="gone" />
+
         </FrameLayout>
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:gravity="center">
-            <Button
-                android:contentDescription="@string/auto_detect"
-                android:id="@+id/crop_auto_detect"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:drawableTop="@drawable/ic_auto_detect"
-                android:text="@string/auto_detect"
-                android:textSize="8dp"
-                />
-            <Button
-                android:contentDescription="@string/no_crop"
-                android:id="@+id/crop_no_crop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_centerInParent="true"
-                android:drawableTop="@drawable/ic_no_crop"
-                android:text="@string/no_crop"
-                android:textSize="8dp"
-                />
-            <Button
-                android:contentDescription="@string/rotate"
-                android:id="@+id/crop_rotate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentEnd="true"
-                android:drawableTop="@drawable/ic_baseline_rotate_right_24"
-                android:text="@string/rotate"
-                android:textSize="8dp"
-                />
-        </RelativeLayout>
     </LinearLayout>
-    <ProgressBar
+
+
+
+
+        <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/halfTransparentBackground"
         android:padding="100dp"
         />
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
