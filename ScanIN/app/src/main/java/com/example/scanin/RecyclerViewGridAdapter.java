@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,9 +22,11 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
 
     public class GridViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         ImageView imageView;
+        TextView textView;
         public GridViewHolder(View view){
             super(view);
             imageView =view.findViewById(R.id.image_thumbnail);
+            textView = view.findViewById(R.id.img_position);
             view.setOnClickListener(this);
         }
 
@@ -50,6 +53,7 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     @Override
     public void onBindViewHolder(GridViewHolder holder, int position) {
         Uri uri = documentAndImageInfo.getImages().get(position).getUri();
+        holder.textView.setText(String.valueOf(position));
         Picasso.with(holder.imageView.getContext()).load(uri)
                 .fit()
                 .centerInside()
