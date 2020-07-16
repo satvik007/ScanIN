@@ -30,6 +30,7 @@ import com.example.scanin.DatabaseModule.AppDatabase;
 import com.example.scanin.DatabaseModule.Document;
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
+import com.example.scanin.DatabaseModule.Repository;
 import com.example.scanin.StateMachineModule.MachineActions;
 import com.example.scanin.StateMachineModule.MachineStates;
 import com.example.scanin.StateMachineModule.StateChangeHelper;
@@ -74,6 +75,7 @@ public class ScanActivity extends AppCompatActivity
     private AppDatabase appDatabase;
     private String documentName = null;
     private long current_document_id = -1;
+    private Repository repository;
 
     //Schedulers for Image and Database
     private Scheduler preview_executor = Schedulers.newThread();
@@ -96,6 +98,7 @@ public class ScanActivity extends AppCompatActivity
         cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
         outputDirectory = getOutputDirectory();
         appDatabase = AppDatabase.getInstance(this);
+        repository = new Repository(this, this);
         CurrentMachineState = MachineStates.HOME;
 
         if(action == MachineActions.HOME_ADD_SCAN){
@@ -265,6 +268,16 @@ public class ScanActivity extends AppCompatActivity
     @Override
     public void onClickEditCallback(int action) {
         StateChangeHelper.EditActionChange(action, ScanActivity.this);
+    }
+
+    public void editDeleteImageCallback(int position){
+        ImageInfo tempImageInfo = documentAndImageInfo.getImages().get(position);
+        documentAndImageInfo.getImages().remove(position);
+        imageEditFragment.setImagePathList(documentAndImageInfo);
+        if(documentAndImageInfo.getImages().size() <= 1){
+            repository.deleteDocument(documentAndImageInfo.getDocument());
+        }
+        else repository.deleteImage(tempImageInfo);
     }
 
     @Override

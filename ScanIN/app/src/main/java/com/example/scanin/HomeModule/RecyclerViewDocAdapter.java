@@ -1,6 +1,7 @@
 package com.example.scanin.HomeModule;
 
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,10 +68,13 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
     @Override
     public void onBindViewHolder(RecyclerViewDocAdapter.DocViewHolder holder, int position) {
         DocumentsAndFirstImage documentsAndFirstImage = mDataset.get(position);
-
+        if(documentsAndFirstImage.getImageInfo() == null) {
+            return;
+        }
         holder.textView.setText(documentsAndFirstImage.getDocument().getDocumentName());
+        Uri uri = documentsAndFirstImage.getImageInfo().getUri();
         Picasso.with(holder.imageView.getContext())
-                .load(documentsAndFirstImage.getImageInfo().getUri())
+                .load(uri)
                 .fit()
                 .centerCrop()
                 .into(holder.imageView);

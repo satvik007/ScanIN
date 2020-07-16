@@ -30,7 +30,7 @@ public class Repository {
         documentAndImageDao = appDatabase.documentAndImageDao();
         imageInfoDao = appDatabase.imageInfoDao();
         documentDao = appDatabase.documentDao();
-        repositoryCallback = (RepositoryCallback)context;
+//        repositoryCallback = (RepositoryCallback)context;
     }
 
     public void getDocumentImageInfo(long document_id, CompositeDisposable disposable){

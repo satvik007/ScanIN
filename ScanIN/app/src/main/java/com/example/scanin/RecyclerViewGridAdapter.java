@@ -51,8 +51,9 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     public void onBindViewHolder(GridViewHolder holder, int position) {
         Uri uri = documentAndImageInfo.getImages().get(position).getUri();
         Picasso.with(holder.imageView.getContext()).load(uri)
-                .placeholder(R.drawable.ic_rotate)
-                .resize(200, 100).into(holder.imageView);
+                .fit()
+                .centerInside()
+                .into(holder.imageView);
     }
 
     @Override

@@ -17,7 +17,7 @@ import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.LinearSnapHelper;
+import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
@@ -50,7 +50,8 @@ public class ImageEditFragment extends Fragment {
     private int imgPosition;
     private ImageData currentImg;
     private ImageView cropImageView;
-    private LinearSnapHelper pagerSnapHelper;
+//    private LinearSnapHelper pagerSnapHelper;
+    private PagerSnapHelper pagerSnapHelper;
 
     private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
@@ -153,6 +154,7 @@ public class ImageEditFragment extends Fragment {
     public interface ImageEditFragmentCallback{
         void onCreateEditCallback();
         void onClickEditCallback(int action);
+        void editDeleteImageCallback(int position);
     }
 
     @Override
@@ -216,12 +218,22 @@ public class ImageEditFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewEditAdapter(null, (ScanActivity) getActivity());
         recyclerView.setAdapter(mAdapter);
-        pagerSnapHelper = new LinearSnapHelper();
-//        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
-        pagerSnapHelper.attachToRecyclerView(recyclerView);
-
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if(newState == RecyclerView.SCROLL_STATE_IDLE){
+//                    Integer position = ((LinearLayoutManager)layoutManager).findFirstVisibleItemPosition();
+//                    setCurrentAdapterPosition(position);
+//                }
+//            }
+//        });
+
+//        pagerSnapHelper = new LinearSnapHelper();
+        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
+        pagerSnapHelper.attachToRecyclerView(recyclerView);
 
         rootView.findViewById(R.id.edit_add_more).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -236,6 +248,18 @@ public class ImageEditFragment extends Fragment {
             public void onClick(View view) {
                 view.setClickable(false);
                 imageEditFragmentCallback.onClickEditCallback(MachineActions.REORDER);
+            }
+        });
+
+        rootView.findViewById(R.id.discard).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(mAdapter.getItemCount() >= 0){
+                    View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                    if(currentView == null) return;
+                    adapterPosition = layoutManager.getPosition(currentView);
+                    imageEditFragmentCallback.editDeleteImageCallback(adapterPosition);
+                }
             }
         });
         // crop button in main
