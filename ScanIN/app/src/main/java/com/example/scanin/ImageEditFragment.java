@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -15,9 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.StateMachineModule.MachineActions;
-import android.widget.ProgressBar;
-import java.util.ArrayList;
-import com.example.scanin.PolygonView;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ImageEditFragment#newInstance} factory method to
@@ -40,9 +40,10 @@ public class ImageEditFragment extends Fragment {
     private PolygonView polygonView;
     private ProgressBar progressBar;
 
-    private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
     int CurrentMachineState = -1;
+    Integer adapterPosition=0;
+    RecyclerView recyclerView;
 
     public ImageEditFragment() {
         // Required empty public constructor
@@ -107,18 +108,21 @@ public class ImageEditFragment extends Fragment {
         cropView.setVisibility(View.GONE);
         polygonView = rootView.findViewById(R.id.polygonView);
         progressBar = rootView.findViewById(R.id.progressBar);
+        ImageView cropImageView = rootView.findViewById(R.id.imageView);
 
-        RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
+        recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 //        SpeedyLinearLayoutManager layoutManager = new SpeedyLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new RecyclerViewEditAdapter(documentAndImageInfo);
+        mAdapter = new RecyclerViewEditAdapter(null, (ScanActivity) getActivity());
         recyclerView.setAdapter(mAdapter);
         LinearSnapHelper pagerSnapHelper = new LinearSnapHelper();
 //        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
-        mAdapter.setmDataset(documentAndImageInfo);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setItemViewCacheSize(20);
 
         rootView.findViewById(R.id.edit_add_more).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +146,7 @@ public class ImageEditFragment extends Fragment {
             public void onClick(View view) {
                 mainView.setVisibility(View.GONE);
                 cropView.setVisibility(View.VISIBLE);
-
+//                Picasso.with(getContext()).load(recyclerView.getAd)
             }
         });
 
@@ -191,27 +195,15 @@ public class ImageEditFragment extends Fragment {
         });
 
         imageEditFragmentCallback.onCreateEditCallback();
-//        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
-//        if(CurrentMachineState != MachineStates.EDIT_2)recyclerView.scrollToPosition((int)documentAndImageInfo.getImages().size() - 1);
-//        recyclerView.post(() -> {
-//            View view = layoutManager.findViewByPosition((int)imageData.size() - 1);
-//            if (view == null) {
-//                Log.e("Snapping:", "Cant find target View for initial Snap");
-//                return;
-//            }
-//
-//            int[] snapDistance = pagerSnapHelper.calculateDistanceToFinalSnap(layoutManager, view);
-//            assert snapDistance != null;
-//            if (snapDistance[0] != 0 || snapDistance[1] != 0) {
-//                recyclerView.scrollBy(snapDistance[0], snapDistance[1]);
-//            }
-//         });
         return rootView;
     }
 
     public void setImagePathList(DocumentAndImageInfo documentAndImageInfo) {
-        this.documentAndImageInfo = documentAndImageInfo;
         mAdapter.setmDataset(documentAndImageInfo);
+    }
+
+    public void setCurrentAdapterPosition(Integer position){
+        adapterPosition = position;
     }
 
     public void setCurrentMachineState(int currentMachineState) {

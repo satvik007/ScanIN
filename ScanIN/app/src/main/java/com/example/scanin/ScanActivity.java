@@ -32,6 +32,7 @@ import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
 import com.example.scanin.StateMachineModule.MachineActions;
 import com.example.scanin.StateMachineModule.MachineStates;
+import com.example.scanin.StateMachineModule.StateChangeHelper;
 import com.example.scanin.StateMachineModule.StateMachine;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -78,7 +79,7 @@ public class ScanActivity extends AppCompatActivity
     private Scheduler preview_executor = Schedulers.newThread();
     private final CompositeDisposable disposable = new CompositeDisposable();
 
-    private DocumentAndImageInfo documentAndImageInfo;
+    public DocumentAndImageInfo documentAndImageInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +96,7 @@ public class ScanActivity extends AppCompatActivity
         cameraProviderFuture = ProcessCameraProvider.getInstance((Context)this);
         outputDirectory = getOutputDirectory();
         appDatabase = AppDatabase.getInstance(this);
+        CurrentMachineState = MachineStates.HOME;
 
         if(action == MachineActions.HOME_ADD_SCAN){
             CurrentMachineState = MachineStates.CAMERA;
@@ -103,7 +105,6 @@ public class ScanActivity extends AppCompatActivity
         }else if(action == MachineActions.HOME_OPEN_DOC){
             Log.d("Edit2_1", "open edit 2");
             current_document_id = getIntent().getLongExtra("CURRENT_DOCUMENT_ID", -1);
-            CurrentMachineState = MachineStates.EDIT_2;
             Log.d("Edit2_1", String.valueOf(current_document_id));
             readDocumentImages(current_document_id);
         }else if(action == MachineActions.EDIT_PDF){
@@ -116,12 +117,7 @@ public class ScanActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 view.setClickable(false);
-                int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_EDIT_GRID);
-                imageGridFragment.setCurrentMachineState(nextState);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .add(R.id.fragment_grid, imageGridFragment)
-                        .commit();
+                StateChangeHelper.CameraActionChange(MachineActions.CAMERA_EDIT_GRID, ScanActivity.this);
             }
         });
 
@@ -152,7 +148,7 @@ public class ScanActivity extends AppCompatActivity
     }
 
     //start camera
-    private void startCamera(){
+    public void startCamera(){
         cameraProviderFuture.addListener(() ->{
             try{
                 Log.d("Camera-1", "bindPreview1");
@@ -177,11 +173,12 @@ public class ScanActivity extends AppCompatActivity
                 ", widthPx " + displayMetrics.widthPixels);
 
         preview = new Preview.Builder()
-                .setTargetResolution(new Size(displayMetrics.widthPixels, displayMetrics.heightPixels))
+                .setTargetResolution(new Size(1024, 768))
                 .build();
 
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
+                .setTargetResolution(new Size(1024, 768))
                 .setTargetRotation(previewView.getDisplay().getRotation()).build();
 
         cameraSelector = new CameraSelector.Builder()
@@ -206,13 +203,6 @@ public class ScanActivity extends AppCompatActivity
                         long position = 0;
                         if(documentAndImageInfo != null) position = documentAndImageInfo.getImages().size();
                         saveImageInfo(savedUri, position);
-//                        int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
-//                        imageEditFragment.setCurrentMachineState(nextState);
-//                        FragmentManager fragmentManager = getSupportFragmentManager();
-//                        fragmentManager.beginTransaction()
-//                                .add(R.id.fragment_edit, imageEditFragment)
-//                                .commit();
-//                        readImageFromFile(savedUri);
                     }
 
                     @Override
@@ -247,20 +237,13 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        Log.d("Scan-ActivityBack", String.valueOf(CurrentMachineState));
         int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.BACK);
-
-        if(nextState == MachineStates.CAMERA){
-            Log.d("Scan-ActivityBack", "Opening Camera");
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageEditFragment)
-                    .commit();
-            setCamera(nextState);
-            return;
+        if(nextState == MachineStates.ABORT){
+            super.onBackPressed();
+            overridePendingTransition(R.anim.trans_right_in, R.anim.trans_right_out);
+        }else{
+            StateChangeHelper.AnonymousActionChange(this.CurrentMachineState, MachineActions.BACK, ScanActivity.this);
         }
-
-        super.onBackPressed();
-        overridePendingTransition(R.anim.trans_right_in, R.anim.trans_right_out);
     }
 
     @Override
@@ -269,77 +252,27 @@ public class ScanActivity extends AppCompatActivity
         imageGridFragment.setImagePathList(documentAndImageInfo);
     }
 
-//    public void swap(int i, int j){
-//        Uri temp = imageData.get(i).getFileName();
-//        ImageData i_d = imageData.get(i);
-//        ImageData j_d = imageData.get(j);
-//        i_d.setFileName(j_d.getFileName());
-//        j_d.setFileName(temp);
-//    }
-
-
     @Override
     public void onCreateEditCallback() {
+        Log.d(TAG, "Pos1: " + String.valueOf(imageEditFragment.adapterPosition));
         imageEditFragment.setImagePathList(documentAndImageInfo);
+//        if(imageEditFragment.adapterPosition != null && imageEditFragment.adapterPosition >=0){
+//            Log.d(TAG, "Pos: " + String.valueOf(imageEditFragment.adapterPosition));
+//            imageEditFragment.recyclerView.scrollToPosition(imageEditFragment.adapterPosition);
+//        }
     }
 
     @Override
     public void onClickEditCallback(int action) {
-        int nextState = StateMachine.getNextState(CurrentMachineState, action);
-        if(nextState == MachineStates.CAMERA){
-            Log.d("OpenCamera", "opened");
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageEditFragment)
-                    .commit();
-            setCamera(nextState);
-        }
-        else {
-            imageEditFragment.setCurrentMachineState(nextState);
-            imageGridFragment.setCurrentMachineState(nextState);
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageEditFragment)
-                    .add(R.id.fragment_grid, imageGridFragment)
-                    .commit();
-        }
+        StateChangeHelper.EditActionChange(action, ScanActivity.this);
     }
 
     @Override
-    public void onClickGridCallback(int action) {
-        int nextState = StateMachine.getNextState(CurrentMachineState, action);
-        if(nextState == MachineStates.CAMERA){
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .commit();
-            setCamera(nextState);
-        }
-        else{
-            imageEditFragment.setCurrentMachineState(nextState);
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .add(R.id.fragment_edit, imageEditFragment)
-                    .commit();
-        }
+    public void onClickGridCallback(int action, Integer position) {
+        StateChangeHelper.GridActionChange(action, ScanActivity.this, position);
     }
 
-    @Override
-    public void onClickGridCallback(int action, int position) {
-        int nextState = StateMachine.getNextState(CurrentMachineState, action);
-        if(nextState == MachineStates.CAMERA){
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .commit();
-            setCamera(nextState);
-        }
-        else{
-            imageEditFragment.setCurrentMachineState(nextState);
-            getSupportFragmentManager().beginTransaction()
-                    .remove(imageGridFragment)
-                    .add(R.id.fragment_edit, imageEditFragment)
-                    .commit();
-        }
-    }
-
-    private void setCamera(int nextState){
+    public void setCamera(int nextState){
         CurrentMachineState = nextState;
         findViewById(R.id.camera_capture_button).setClickable(true);
         findViewById(R.id.grid_button).setClickable(true);
@@ -378,12 +311,7 @@ public class ScanActivity extends AppCompatActivity
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(s->{
                 documentAndImageInfo.images.add((ImageInfo) s);
-                int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
-                imageEditFragment.setCurrentMachineState(nextState);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .add(R.id.fragment_edit, imageEditFragment)
-                        .commit();
+                StateChangeHelper.CameraActionChange(MachineActions.CAMERA_CAPTURE_PHOTO, ScanActivity.this);
             }, Throwable::printStackTrace));
         }
         else{
@@ -399,12 +327,7 @@ public class ScanActivity extends AppCompatActivity
             .subscribe(s->{
                 documentAndImageInfo = (DocumentAndImageInfo) s;
                 current_document_id = documentAndImageInfo.getDocument().getDocumentId();
-                int nextState = StateMachine.getNextState(CurrentMachineState, MachineActions.CAMERA_CAPTURE_PHOTO);
-                imageEditFragment.setCurrentMachineState(nextState);
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .add(R.id.fragment_edit, imageEditFragment)
-                        .commit();
+                StateChangeHelper.CameraActionChange(MachineActions.CAMERA_CAPTURE_PHOTO, ScanActivity.this);
             }, Throwable::printStackTrace));
         }
     }
@@ -429,10 +352,7 @@ public class ScanActivity extends AppCompatActivity
             documentAndImageInfo = (DocumentAndImageInfo) s;
             Log.d("Edit2, ", String.valueOf(documentAndImageInfo.getImages().size()
                     + String.valueOf(documentAndImageInfo.getDocument().getDocumentId())));
-            imageEditFragment.setCurrentMachineState(CurrentMachineState);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_edit, imageEditFragment)
-                    .commit();
+            StateChangeHelper.HomeActionChange(MachineActions.HOME_OPEN_DOC, ScanActivity.this);
         }, Throwable::printStackTrace));
     }
 

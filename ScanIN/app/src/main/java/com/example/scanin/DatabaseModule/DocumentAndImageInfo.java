@@ -3,6 +3,7 @@ package com.example.scanin.DatabaseModule;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class DocumentAndImageInfo {
 
     public DocumentAndImageInfo(Document document, ImageInfo images){
         this.document = document;
-        this.images = Collections.singletonList(images);
+        this.images = new ArrayList<>(Collections.singletonList(images));
     }
 
     public Document getDocument() {

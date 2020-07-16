@@ -61,8 +61,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
 
     public interface ImageGridFragmentCallback{
         void onCreateGridCallback();
-        void onClickGridCallback(int action);
-        void onClickGridCallback(int action, int position);
+        void onClickGridCallback(int action, Integer position);
     }
 
     @Override
@@ -139,6 +138,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
     public void setImagePathList(DocumentAndImageInfo documentAndImageInfo) {
         this.documentAndImageInfo = documentAndImageInfo;
         mAdapter.setmDataset(documentAndImageInfo);
+        mAdapter.notifyDataSetChanged();
     }
 
     public void setCurrentMachineState(int currentMachineState) {
