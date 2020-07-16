@@ -14,6 +14,9 @@ public interface ImageInfoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     public long insertImageInfo(ImageInfo imageInfo);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    public List<Long> insertAllOrders(List<ImageInfo> imageInfos);
+
     @Update
     public void updateImageInfo(ImageInfo imageInfo);
 

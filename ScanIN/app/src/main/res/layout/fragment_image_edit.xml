@@ -53,7 +53,6 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-
             android:scaleType="fitCenter"
             android:layout_marginBottom="10dp"
             android:orientation="horizontal"
@@ -70,6 +69,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="25"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_crop" />
 
@@ -78,6 +78,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="25"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_rotate" />
 
@@ -86,6 +87,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="25"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_brightness_and_contrast" />
 
@@ -94,8 +96,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Filters"
+                android:textSize="5pt"
                 android:textColor="@color/white"
                 android:layout_weight="25"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_filter" />
         </LinearLayout>
