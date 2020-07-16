@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
 public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEditAdapter.EditViewHolder> {
     private DocumentAndImageInfo documentAndImageInfo;
     private ProgressBar progressBar;
-
+    public int imgPosition;
     public class EditViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         public EditViewHolder(View view){
