@@ -23,7 +23,7 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
         ImageView imageView;
         public EditViewHolder(View view){
             super(view);
-            imageView =view.findViewById(R.id.holderImageCrop);
+            imageView =view.findViewById(R.id.image_edit_item);
         }
     }
 
@@ -32,7 +32,7 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
     }
 
     public RecyclerViewEditAdapter.EditViewHolder onCreateViewHolder(ViewGroup parent, int viewtype){
-        int layoutIdForImageAdapter =R.layout.image_edit_crop;
+        int layoutIdForImageAdapter =R.layout.image_edit_item;
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
         return new EditViewHolder(view);

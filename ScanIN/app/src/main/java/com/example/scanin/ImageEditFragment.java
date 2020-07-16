@@ -15,8 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
+import android.widget.ProgressBar;
 
 import java.util.ArrayList;
+import com.example.scanin.PolygonView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,6 +35,10 @@ public class ImageEditFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private View mainView;
+    private View cropView;
+    private PolygonView polygonView;
+    private ProgressBar progressBar;
 
     private ArrayList<ImageData> imageData = new ArrayList<ImageData>();
     RecyclerViewEditAdapter mAdapter = null;
@@ -94,6 +100,13 @@ public class ImageEditFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_image_edit, container, false);
         ((ScanActivity)getActivity()).CurrentMachineState = this.CurrentMachineState;
+
+        cropView = rootView.findViewById(R.id.rlContainer);
+        mainView = rootView.findViewById(R.id.edit_main);
+        cropView.setVisibility(View.GONE);
+        polygonView = rootView.findViewById(R.id.polygonView);
+        progressBar = rootView.findViewById(R.id.progressBar);
+
         RecyclerView recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -119,6 +132,60 @@ public class ImageEditFragment extends Fragment {
             public void onClick(View view) {
                 view.setClickable(false);
                 imageEditFragmentCallback.onClickEditCallback(MachineActions.REORDER);
+            }
+        });
+
+        // crop button in main
+        rootView.findViewById(R.id.crop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mainView.setVisibility(View.GONE);
+                cropView.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        // check button in crop
+        rootView.findViewById(R.id.crop_apply).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cropView.setVisibility(View.GONE);
+                mainView.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        // back button in crop
+        rootView.findViewById(R.id.crop_back).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cropView.setVisibility(View.GONE);
+                mainView.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        // auto-detect button in crop
+        rootView.findViewById(R.id.crop_auto_detect).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        // no-crop button in crop
+        rootView.findViewById(R.id.crop_no_crop).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        // rotate button in crop
+        rootView.findViewById(R.id.crop_rotate).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
