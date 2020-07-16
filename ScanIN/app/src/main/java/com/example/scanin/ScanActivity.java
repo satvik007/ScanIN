@@ -393,14 +393,9 @@ public class ScanActivity extends AppCompatActivity
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onPause() {
-        if(CurrentMachineState == MachineStates.CAMERA){
+        if(CurrentMachineState == MachineStates.CAMERA) {
             findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#000000"));
-<<<<<<< HEAD
-=======
-//            findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
->>>>>>> d32ac48d2897adbd5440c208fb3b3ad0793db2c1
         }
-//        findViewById(R.id.fragment_camera).setVisibility(View.INVISIBLE);
         super.onPause();
     }
     protected void onStop() {
