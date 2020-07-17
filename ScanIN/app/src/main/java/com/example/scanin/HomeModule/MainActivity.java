@@ -3,6 +3,7 @@ package com.example.scanin.HomeModule;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -181,10 +182,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onLongClick(View view, int position) {
         Document document = documentsAndFirstImages.get(position).getDocument();
-        documentsAndFirstImages.remove(position);
-        mAdapter.setmDataset(documentsAndFirstImages);
-        mAdapter.notifyDataSetChanged();
-        repository.deleteDocument(document);
+//        documentsAndFirstImages.remove(position);
+//        mAdapter.setmDataset(documentsAndFirstImages);
+//        mAdapter.notifyDataSetChanged();
+//        repository.deleteDocument(document);
+        view.setBackgroundColor(Color.parseColor("#1C69E1"));
     }
 
     @Override
