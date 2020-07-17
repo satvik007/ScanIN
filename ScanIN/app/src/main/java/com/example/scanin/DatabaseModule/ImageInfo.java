@@ -7,11 +7,13 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName="image_info", foreignKeys = @ForeignKey(entity = Document.class,
+@Entity(indices = {@Index(value = {"img_document_id"})},
+        tableName="image_info", foreignKeys = @ForeignKey(entity = Document.class,
          parentColumns = "document_id", childColumns = "img_document_id", onDelete = ForeignKey.CASCADE))
 public class ImageInfo {
     @PrimaryKey(autoGenerate = true)

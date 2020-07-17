@@ -1,6 +1,7 @@
 package com.example.scanin.DatabaseModule;
 
 import androidx.room.Embedded;
+import androidx.room.Ignore;
 import androidx.room.Relation;
 
 import java.util.ArrayList;
@@ -17,11 +18,13 @@ public class DocumentAndImageInfo {
     public List<ImageInfo> images;
 
     public DocumentAndImageInfo(){}
+    @Ignore
     public DocumentAndImageInfo(Document document, List<ImageInfo> images){
         this.document = document;
         this.images = images;
     }
 
+    @Ignore
     public DocumentAndImageInfo(Document document, ImageInfo images){
         this.document = document;
         this.images = new ArrayList<>(Collections.singletonList(images));
