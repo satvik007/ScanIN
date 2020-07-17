@@ -2,14 +2,18 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -24,7 +28,18 @@ import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
 
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,7 +52,7 @@ public class ImageEditFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private FrameLayout holderImageCrop;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -47,17 +62,74 @@ public class ImageEditFragment extends Fragment {
     private View cropView;
     private PolygonView polygonView;
     private ProgressBar progressBar;
-    private int imgPosition;
     private ImageData currentImg;
     private ImageView cropImageView;
 //    private LinearSnapHelper pagerSnapHelper;
     private PagerSnapHelper pagerSnapHelper;
-
+    protected CompositeDisposable disposable = new CompositeDisposable();
+    private Bitmap selectedImage;
     private DocumentAndImageInfo documentAndImageInfo;
     RecyclerViewEditAdapter mAdapter = null;
     int CurrentMachineState = -1;
     Integer adapterPosition=0;
     RecyclerView recyclerView;
+
+    private Map <Integer, PointF> convertArrayList2Map (ArrayList <Point> pts) {
+        Map <Integer, PointF> res = new HashMap<>();
+        res.put (0, new PointF((float) pts.get(0).x, (float) pts.get(0).y));
+        res.put (1, new PointF((float) pts.get(1).x, (float) pts.get(1).y));
+        // Polygon view uses a stupid order.
+        res.put (2, new PointF((float) pts.get(3).x, (float) pts.get(3).y));
+        res.put (3, new PointF((float) pts.get(2).x, (float) pts.get(2).y));
+        return res;
+    }
+
+    public Map <Integer, PointF> scalePoints (Map <Integer, PointF> pts, float scale) {
+        Map <Integer, PointF> res = new HashMap<>();
+        for (int i = 0; i < 4; i++) {
+            PointF c = pts.get(i);
+            res.put (i, new PointF(c.x * scale, c.y * scale));
+        }
+        return res;
+    }
+
+    public Map <Integer, PointF> addThreshold (Map <Integer, PointF> pts, int thresh) {
+        Map <Integer, PointF> res = new HashMap<>();
+        for (int i = 0; i < 4; i++) {
+            PointF c = pts.get(i);
+            res.put (i, new PointF(c.x  + thresh, c.y + thresh));
+        }
+        return res;
+    }
+
+    private void initializeCropping() {
+        Bitmap tempBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
+        Map<Integer, PointF> pointFs = null;
+
+        int height = tempBitmap.getHeight();
+        int width = tempBitmap.getWidth();
+
+        double scale = currentImg.getScale(width, height);
+        try {
+            ArrayList<Point> points = currentImg.getBestPoints();
+            pointFs = convertArrayList2Map(points);
+            pointFs = scalePoints(pointFs, (float) scale);
+
+            polygonView.setPoints(pointFs);
+            polygonView.setVisibility(View.VISIBLE);
+
+            int padding = (int) getResources().getDimension(R.dimen.scanPadding);
+
+            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(tempBitmap.getWidth() + 2 * padding, tempBitmap.getHeight() + 2 * padding);
+            layoutParams.gravity = Gravity.CENTER;
+
+            polygonView.setLayoutParams(layoutParams);
+            polygonView.setPointColor(getResources().getColor(R.color.colorPrimary));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private OnClickListener mainCrop = new OnClickListener() {
         @Override
@@ -66,20 +138,23 @@ public class ImageEditFragment extends Fragment {
 //            if(currentView == null) return;
 //            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
 //            if(pos == null) return;
-//            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
+//
+            int pos = mAdapter.imgPosition;
+            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
+            Log.d (getTag(), uri.toString());
 
             mainView.setVisibility(View.GONE);
             cropView.setVisibility(View.VISIBLE);
-//            showProgressBar();
-//
-//            currentImg = new ImageData(uri);
-//            try {
-//                hideProgressBar();
-//                Bitmap bmp = currentImg.getSmallOriginalImage(cropImageView.getContext());
-//                cropImageView.setImageBitmap(bmp);
-//            } catch (Exception e) {
-//                Log.d(getTag(), "IO ERROR in loading image in crop");
-//            }
+            currentImg = new ImageData(uri);
+            try {
+                currentImg.setOriginalBitmap(cropImageView.getContext());
+                selectedImage = currentImg.getSmallOriginalImage(cropImageView.getContext());
+                hideProgressBar();
+                cropImageView.setImageBitmap(selectedImage);
+            } catch (Exception e) {
+                Log.e(getTag(), "IO ERROR in loading image in crop");
+            }
+            initializeCropping();
         }
     };
 
@@ -87,7 +162,7 @@ public class ImageEditFragment extends Fragment {
         @Override
         public void onClick(View view) {
             // TODO
-//            Map<Integer, PointF> points = polygonView.getPoints();
+
             cropView.setVisibility(View.GONE);
             mainView.setVisibility(View.VISIBLE);
         }
@@ -96,7 +171,6 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener cropBack = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            // TODO
             cropView.setVisibility(View.GONE);
             mainView.setVisibility(View.VISIBLE);
         }
@@ -105,16 +179,16 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener cropAutoDetect = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            // TODO
-
+            ArrayList<Point> points = currentImg.getBestPoints();
+            Map<Integer, PointF> pointFs = convertArrayList2Map(points);
+            polygonView.setPoints(pointFs);
         }
     };
 
     private OnClickListener cropNoCrop = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            // TODO
-
+            polygonView.setDefaultPoints();
         }
     };
 
@@ -210,7 +284,7 @@ public class ImageEditFragment extends Fragment {
         polygonView = rootView.findViewById(R.id.polygonView);
         progressBar = rootView.findViewById(R.id.progressBar);
         cropImageView = rootView.findViewById(R.id.cropImageView);
-
+        holderImageCrop = rootView.findViewById(R.id.holderImageCrop);
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -313,5 +387,6 @@ public class ImageEditFragment extends Fragment {
     public void onDestroyView() {
         mAdapter.notifyDataSetChanged();
         super.onDestroyView();
+        disposable.clear();
     }
 }

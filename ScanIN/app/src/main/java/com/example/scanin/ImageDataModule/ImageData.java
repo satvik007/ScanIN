@@ -113,6 +113,15 @@ public class ImageData {
         return thumbImage;
     }
 
+    public double getScale (int cwidth, int cheight) {
+        int width = originalBitmap.getWidth();
+        int height = originalBitmap.getHeight();
+        double fx = (double) cwidth / width;
+        double fy = (double) cheight / height;
+        double scale = min (fx, fy);
+        return scale;
+    }
+
     // cropped is applied on originalBitmap and saved in croppedBitmap
     public void applyCropImage () {
         if (originalBitmap != null && cropPosition != null) {

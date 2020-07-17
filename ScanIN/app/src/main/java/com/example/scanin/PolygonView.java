@@ -92,6 +92,15 @@ public class PolygonView extends FrameLayout {
         super.attachViewToParent(child, index, params);
     }
 
+    public void setDefaultPoints () {
+        Map <Integer, PointF> def = new HashMap<>();
+        def.put (0, new PointF (0.0f, 0.0f));
+        def.put (1, new PointF (getMeasuredWidth(), 0.0f));
+        def.put (3, new PointF (getMeasuredWidth(), getMeasuredHeight()));
+        def.put (2, new PointF (0.0f, getMeasuredHeight()));
+        setPoints(def);
+    }
+
     private void initPaint() {
         paint = new Paint();
         paint.setColor(getResources().getColor(R.color.colorPrimary));
