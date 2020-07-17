@@ -11,6 +11,9 @@ import android.util.Log;
 import android.util.DisplayMetrics;
 import androidx.appcompat.app.AppCompatActivity;
 import java.io.IOException;
+
+import org.opencv.core.CvType;
+import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.android.Utils;
 import org.opencv.core.Mat;
@@ -152,6 +155,21 @@ public class ImageData {
     public void applyCropImage (ArrayList <Point> cropPosition) {
         setCropPosition(cropPosition);
         applyCropImage();
+    }
+
+    public ArrayList <Point> getBestPoints () {
+        ArrayList <Point> res = new ArrayList<Point>();
+        if (originalBitmap != null) {
+            Mat imgToProcess = new Mat();
+            Utils.bitmapToMat(originalBitmap, imgToProcess);
+            Mat pts = new Mat(4, 2, CvType.CV_16U);
+            pts.setTo(new Scalar(-1));
+            ImageEditUtil.getBestPoints(imgToProcess.getNativeObjAddr(), pts.getNativeObjAddr());
+            for (int i = 0; i < 4; ++i) {
+                res.add(new Point (pts.get(i, 0)[0], pts.get(i, 1)[0]));
+            }
+        }
+        return res;
     }
 
     private Bitmap getSmallImage (Context context, Bitmap bitmap) {
