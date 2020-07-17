@@ -62,24 +62,24 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener mainCrop = new OnClickListener() {
         @Override
         public void onClick(View view) {
+//            View currentView = pagerSnapHelper.findSnapView(Objects.requireNonNull(recyclerView.getLayoutManager()));
+//            if(currentView == null) return;
+//            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
+//            if(pos == null) return;
+//            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
+
             mainView.setVisibility(View.GONE);
             cropView.setVisibility(View.VISIBLE);
-            showProgressBar();
-            imgPosition = mAdapter.imgPosition;
-            View currentView = pagerSnapHelper.findSnapView(Objects.requireNonNull(recyclerView.getLayoutManager()));
-            if(currentView == null) return;
-            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
-            if(pos == null) return;
-            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
-            currentImg = new ImageData(uri);
-            try {
-                currentImg.setOriginalBitmap(getContext());
-                hideProgressBar();
-                Bitmap bmp = currentImg.getSmallOriginalImage(cropImageView.getContext());
-                cropImageView.setImageBitmap(bmp);
-            } catch (Exception e) {
-                Log.d(getTag(), "IO ERROR in loading image in crop");
-            }
+//            showProgressBar();
+//
+//            currentImg = new ImageData(uri);
+//            try {
+//                hideProgressBar();
+//                Bitmap bmp = currentImg.getSmallOriginalImage(cropImageView.getContext());
+//                cropImageView.setImageBitmap(bmp);
+//            } catch (Exception e) {
+//                Log.d(getTag(), "IO ERROR in loading image in crop");
+//            }
         }
     };
 
@@ -262,15 +262,7 @@ public class ImageEditFragment extends Fragment {
                 }
             }
         });
-        // crop button in main
-        rootView.findViewById(R.id.crop).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainView.setVisibility(View.GONE);
-                cropView.setVisibility(View.VISIBLE);
-//                Picasso.with(getContext()).load(recyclerView.getAd)
-            }
-        });
+
         ImageButton btnMainCrop = rootView.findViewById(R.id.crop);
         Button btnCropApply = rootView.findViewById(R.id.crop_apply);
         Button btnCropBack = rootView.findViewById(R.id.crop_back);
