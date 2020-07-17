@@ -102,6 +102,15 @@ public class ImageEditFragment extends Fragment {
         return res;
     }
 
+    private Map <Integer, PointF> getDefaultPoints (int width, int height) {
+        Map <Integer, PointF> res = new HashMap<>();
+        res.put (0, new PointF (0.0f, 0.0f));
+        res.put (1, new PointF (width, 0.0f));
+        res.put (3, new PointF (width, height));
+        res.put (2, new PointF (0.0f, height));
+        return res;
+    }
+
     private void initializeCropping() {
         Bitmap tempBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
         Map<Integer, PointF> pointFs = null;
@@ -179,16 +188,36 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener cropAutoDetect = new OnClickListener() {
         @Override
         public void onClick(View view) {
+            showProgressBar();
+            Bitmap tempBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
+            int height = tempBitmap.getHeight();
+            int width = tempBitmap.getWidth();
+            double scale = currentImg.getScale(width, height);
             ArrayList<Point> points = currentImg.getBestPoints();
             Map<Integer, PointF> pointFs = convertArrayList2Map(points);
+            pointFs = scalePoints(pointFs, (float) scale);
             polygonView.setPoints(pointFs);
+            polygonView.invalidate();
+            hideProgressBar();
         }
     };
 
     private OnClickListener cropNoCrop = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            polygonView.setDefaultPoints();
+            showProgressBar();
+            int width = cropImageView.getMeasuredWidth();
+            int height = cropImageView.getMeasuredHeight();
+
+            if (width == 0 || height == 0) {
+                Log.e (getTag(), "Measured width still causing issues.");
+                width = cropImageView.getWidth();
+                height = cropImageView.getHeight();
+            }
+            Map <Integer, PointF> default_points = getDefaultPoints (width, height);
+            polygonView.setPoints(default_points);
+            polygonView.invalidate();
+            hideProgressBar();
         }
     };
 
