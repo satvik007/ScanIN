@@ -103,21 +103,13 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         recyclerView.setAdapter(mAdapter);
         imageGridFragmentCallback.onCreateGridCallback();
 
-//        rootView.findViewById(R.id.temp).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                rootView.setClickable(false);
-//                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ADD_SCAN);
-//            }
-//        });
-//
-//        rootView.findViewById(R.id.temp_1).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                rootView.setClickable(false);
-//                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ON_CLICK);
-//            }
-//        });
+        rootView.findViewById(R.id.grid_add).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rootView.setClickable(false);
+                imageGridFragmentCallback.onClickGridCallback(MachineActions.GRID_ADD_SCAN, null);
+            }
+        });
 
         return rootView;
     }

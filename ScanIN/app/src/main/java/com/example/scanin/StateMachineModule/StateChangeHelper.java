@@ -26,7 +26,7 @@ public class StateChangeHelper {
             context.getSupportFragmentManager().beginTransaction()
                     .remove(context.imageGridFragment)
                     .commit();
-            context.setCamera(nextState);
+            context.startCamera();
         }
         else{
              context.imageEditFragment.setCurrentMachineState(nextState);

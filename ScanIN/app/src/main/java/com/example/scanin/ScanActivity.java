@@ -3,11 +3,8 @@ package com.example.scanin;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
@@ -394,7 +391,7 @@ public class ScanActivity extends AppCompatActivity
     @Override
     protected void onPause() {
         if(CurrentMachineState == MachineStates.CAMERA) {
-            findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#000000"));
+//            findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#000000"));
         }
         super.onPause();
     }
@@ -410,12 +407,12 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     protected void onResume() {
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#00000000"));
-            }
-        }, 600);
+//        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#00000000"));
+//            }
+//        }, 600);
         super.onResume();
     }
 }
