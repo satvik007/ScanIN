@@ -8,7 +8,7 @@
 #include <vector>
 #include <opencv2/core.hpp>
 #include <opencv2/imgproc.hpp>
-
+#include <android/log.h>
 #include "filters.hpp"
 #include "corners.hpp"
 using namespace cv;
@@ -71,5 +71,19 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_getBestPoints(JNIEnv *env,
     std::vector <Point> vec_pts;
 
     find_best_corners(src, vec_pts);
-    res = Mat(vec_pts);
+
+#ifdef DEBUG
+    String currentLog = "";
+    for (int i = 0; i < 4; i++) {
+        currentLog += std::to_string(i) + ". " + std::to_string (vec_pts[i].x) +
+                " " + std::to_string (vec_pts[i].y) + "\n";
+    }
+    __android_log_print(ANDROID_LOG_DEBUG, APPNAME, "%s", currentLog.c_str());
+#endif
+
+    for (int i = 0; i < 4; i++) {
+        res.at<uint16_t> (i, 0) = vec_pts[i].x;
+        res.at<uint16_t> (i, 1) = vec_pts[i].y;
+    }
+
 }
