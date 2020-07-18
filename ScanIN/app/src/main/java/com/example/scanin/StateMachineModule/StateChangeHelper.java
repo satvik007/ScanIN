@@ -22,20 +22,36 @@ public class StateChangeHelper {
 
     public static void GridActionChange(int action, ScanActivity context, Integer pos){
         Integer nextState = StateMachine.getNextState(context.CurrentMachineState, action);
-        if(nextState.equals(MachineStates.CAMERA)) {
-            context.getSupportFragmentManager().beginTransaction()
-                    .remove(context.imageGridFragment)
-                    .commit();
-            context.startCamera();
+        if(context.CurrentMachineState == MachineStates.GRID_1){
+            if(nextState.equals(MachineStates.CAMERA)) {
+                context.getSupportFragmentManager().beginTransaction()
+                        .remove(context.imageGridFragment)
+                        .commit();
+            }
+            else{
+                context.imageEditFragment.setCurrentMachineState(nextState);
+                context.imageEditFragment.setCurrentAdapterPosition(pos);
+                context.getSupportFragmentManager().beginTransaction()
+                        .remove(context.imageGridFragment)
+                        .add(R.id.fragment_edit, context.imageEditFragment)
+                        .commit();
+            }
+        }else if(context.CurrentMachineState == MachineStates.GRID_2){
+            if(nextState.equals(MachineStates.CAMERA)) {
+                context.getSupportFragmentManager().beginTransaction()
+                        .remove(context.imageGridFragment)
+                        .commit();
+                context.startCamera();
+            }
+            else{
+                context.imageEditFragment.setCurrentMachineState(nextState);
+                context.imageEditFragment.setCurrentAdapterPosition(pos);
+                context.getSupportFragmentManager().beginTransaction()
+                        .remove(context.imageGridFragment)
+                        .add(R.id.fragment_edit, context.imageEditFragment)
+                        .commit();
+            }
         }
-        else{
-             context.imageEditFragment.setCurrentMachineState(nextState);
-             context.imageEditFragment.setCurrentAdapterPosition(pos);
-             context.getSupportFragmentManager().beginTransaction()
-                     .remove(context.imageGridFragment)
-                     .add(R.id.fragment_edit, context.imageEditFragment)
-                     .commit();
-         }
     }
 
     public static void EditActionChange(int action, ScanActivity context){
