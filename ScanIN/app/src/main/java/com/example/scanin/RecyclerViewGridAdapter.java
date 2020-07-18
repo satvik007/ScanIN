@@ -62,10 +62,10 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
 //        holder.imageView.getLayoutParams().width = holder.itemView.getWidth();
 
         if(position%2==0){
-            holder.itemView.setPadding(0, 0, 10, 0);
+            holder.itemView.setPadding(0, 0, 20, 0);
         }
         else{
-            holder.itemView.setPadding(10, 0, 0, 0);
+            holder.itemView.setPadding(20, 0, 0, 0);
         }
         Picasso.with(holder.imageView.getContext()).load(uri)
                 .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
