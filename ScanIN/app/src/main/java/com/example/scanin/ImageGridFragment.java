@@ -96,7 +96,7 @@ public class ImageGridFragment extends Fragment implements RecyclerViewGridAdapt
         recyclerView.setHasFixedSize(true);
 
         //use a linear layout manager
-        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 3);
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getContext(), 2);
         recyclerView.setLayoutManager(layoutManager);
         //set adapter
         mAdapter = new RecyclerViewGridAdapter(documentAndImageInfo, this);

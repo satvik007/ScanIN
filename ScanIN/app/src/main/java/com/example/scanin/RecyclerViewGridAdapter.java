@@ -10,11 +10,14 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
+import com.example.scanin.ImageDataModule.BitmapTransform;
 import com.squareup.picasso.Picasso;
 
 public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGridAdapter.GridViewHolder> {
     private DocumentAndImageInfo documentAndImageInfo;
     public final GridAdapterOnClickHandler mClickHandler;
+    private static final int MAX_WIDTH = 1024;
+    private static final int MAX_HEIGHT = 768;
 
     public interface GridAdapterOnClickHandler{
         void onClick(int position);
@@ -54,9 +57,20 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
     public void onBindViewHolder(GridViewHolder holder, int position) {
         Uri uri = documentAndImageInfo.getImages().get(position).getUri();
         holder.textView.setText(String.valueOf(position));
+        int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
+//        Log.d("GridAdapt", String.valueOf(holder.itemView.getWidth()));
+//        holder.imageView.getLayoutParams().width = holder.itemView.getWidth();
+
+        if(position%2==0){
+            holder.itemView.setPadding(0, 0, 10, 0);
+        }
+        else{
+            holder.itemView.setPadding(10, 0, 0, 0);
+        }
         Picasso.with(holder.imageView.getContext()).load(uri)
-                .fit()
-                .centerInside()
+                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
+                .resize(size, size)
+                .centerCrop()
                 .into(holder.imageView);
     }
 
