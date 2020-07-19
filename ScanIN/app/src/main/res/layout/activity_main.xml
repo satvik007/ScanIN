@@ -4,25 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="0dp"
+    android:paddingTop="4dp"
     tools:context=".HomeModule.MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Recent"
+        android:textSize="12pt"
+        android:textStyle="bold"
+        android:background="#F4F6F6"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:elevation="2dp"
+        android:paddingBottom="4dp"
+        android:id="@+id/main_heading"
+        android:textColor="@color/black"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="15dp"
+        android:layout_height="0dp"
+        android:paddingTop="0dp"
         android:paddingBottom="0dp"
+        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
         android:id="@+id/recyclerview_doc"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-<!--    <Button-->
-<!--        android:id="@+id/open_doc"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Save"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintVertical_weight="50" />-->
+        app:layout_constraintTop_toBottomOf="@id/main_heading"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"
@@ -32,8 +41,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:backgroundTint="@color/colorAccent"
-        app:srcCompat="@drawable/ic_plus_24"
-        />
+        app:srcCompat="@drawable/ic_plus_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 <!--    android:contentDescription="@string/fab_content_desc"-->

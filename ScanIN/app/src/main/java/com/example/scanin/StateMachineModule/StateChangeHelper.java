@@ -1,5 +1,7 @@
 package com.example.scanin.StateMachineModule;
 
+import android.util.Log;
+
 import com.example.scanin.R;
 import com.example.scanin.ScanActivity;
 
@@ -72,6 +74,7 @@ public class StateChangeHelper {
             }
         }else if(context.CurrentMachineState == MachineStates.EDIT_2){
             if(nextState.equals(MachineStates.CAMERA)){
+                Log.d("StateChange", "from edit2->camera");
                 context.getSupportFragmentManager().beginTransaction()
                         .remove(context.imageEditFragment)
                         .commit();

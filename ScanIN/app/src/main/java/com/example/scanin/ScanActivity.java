@@ -1,10 +1,12 @@
 package com.example.scanin;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Size;
@@ -101,7 +103,6 @@ public class ScanActivity extends AppCompatActivity
         CurrentMachineState = MachineStates.HOME;
 
         if(action == MachineActions.HOME_ADD_SCAN){
-            CurrentMachineState = MachineStates.CAMERA;
             Log.d(TAG, "entered_add_scan");
             startCamera();
         }else if(action == MachineActions.HOME_OPEN_DOC){
@@ -151,6 +152,7 @@ public class ScanActivity extends AppCompatActivity
 
     //start camera
     public void startCamera(){
+        CurrentMachineState = MachineStates.CAMERA;
         cameraProviderFuture.addListener(() ->{
             try{
                 Log.d("Camera-1", "bindPreview1");
@@ -387,13 +389,13 @@ public class ScanActivity extends AppCompatActivity
         else return true;
     }
 
-    @SuppressLint("ResourceAsColor")
     @Override
     protected void onPause() {
-        if(CurrentMachineState == MachineStates.CAMERA) {
-//            findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#000000"));
-        }
         super.onPause();
+        Log.d(TAG, "onPause Called");
+        if(CurrentMachineState == MachineStates.CAMERA) {
+            findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#000000"));
+        }
     }
     protected void onStop() {
         super.onStop();
@@ -401,18 +403,17 @@ public class ScanActivity extends AppCompatActivity
 
     @Override
     protected void onRestart() {
-//        findViewById(R.id.fragment_camera).setVisibility(View.VISIBLE);
         super.onRestart();
     }
 
     @Override
     protected void onResume() {
-//        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#00000000"));
-//            }
-//        }, 600);
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                findViewById(R.id.fragment_tools).setBackgroundColor(Color.parseColor("#00000000"));
+            }
+        }, 600);
         super.onResume();
     }
 }

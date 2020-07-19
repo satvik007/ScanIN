@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentsAndFirstImage;
+import com.example.scanin.ImageDataModule.BitmapTransform;
 import com.example.scanin.R;
 import com.squareup.picasso.Picasso;
 
@@ -21,6 +22,8 @@ import java.util.ArrayList;
 public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDocAdapter.DocViewHolder> {
     private ArrayList<DocumentsAndFirstImage> mDataset = new ArrayList<DocumentsAndFirstImage>();
     private DocAdapterClickListener mListener;
+    private static final int MAX_WIDTH = 1024;
+    private static final int MAX_HEIGHT = 768;
 
     public RecyclerViewDocAdapter(ArrayList<DocumentsAndFirstImage> mDataset, DocAdapterClickListener mListener){
         this.mDataset = mDataset;
@@ -58,10 +61,10 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         LayoutInflater inflater =LayoutInflater.from(parent.getContext());
         View view =inflater.inflate(layoutIdForImageAdapter, parent, false);
 
-        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        layoutParams.width = (int) (parent.getWidth() * 0.45);
-        layoutParams.height = (int) (parent.getWidth() * 0.3);
-        view.setLayoutParams(layoutParams);
+//        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+//        layoutParams.width = (int) (parent.getWidth() * 0.45);
+//        layoutParams.height = (int) (parent.getWidth() * 0.3);
+//        view.setLayoutParams(layoutParams);
         return new DocViewHolder(view, mListener);
     }
 
@@ -71,12 +74,20 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         if(documentsAndFirstImage.getImageInfo() == null) {
             return;
         }
+
+        if(position%2==0){
+            holder.itemView.setPadding(0, 10, 40, 0);
+        }
+        else{
+            holder.itemView.setPadding(40, 10, 0, 0);
+        }
+
+        int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
         holder.textView.setText(documentsAndFirstImage.getDocument().getDocumentName());
         Uri uri = documentsAndFirstImage.getImageInfo().getUri();
-        Picasso.with(holder.imageView.getContext())
-                .load(uri)
-                .fit()
-                .centerCrop()
+        Picasso.with(holder.imageView.getContext()).load(uri)
+                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
+                .resize(0,200)
                 .into(holder.imageView);
     }
 
