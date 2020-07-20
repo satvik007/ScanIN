@@ -14,6 +14,7 @@ import androidx.room.PrimaryKey;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Entity(indices = {@Index(value = {"img_document_id"})},
@@ -38,10 +39,13 @@ public class ImageInfo {
     private int filterId;
 
     @ColumnInfo(name="cropPosition")
-    private Map<Integer, PointF> cropPosition;
+    private String cropPosition;
 
     @ColumnInfo(name="rotationConfig")
     private int rotationConfig;
+
+    @ColumnInfo(name="rotationAfter")
+    private int rotationAfter;
 
     @Ignore
     private Bitmap originalBitmap;
@@ -60,6 +64,7 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        rotationAfter = 0;
     }
 
     public ImageInfo(long document_id1, long position1){
@@ -69,6 +74,7 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        rotationAfter = 0;
     }
 
     public ImageInfo(Uri uri1, long position1){
@@ -78,6 +84,7 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        rotationAfter = 0;
     }
     
     public ImageInfo(){
@@ -132,12 +139,35 @@ public class ImageInfo {
         this.filterId = filter_id;
     }
 
-    public Map <Integer, PointF> getCropPosition() {
+    public String getCropPosition () {
         return cropPosition;
     }
 
-    public void setCropPosition (Map <Integer, PointF> cropPosition) {
+    public void setCropPosition (String cropPosition) {
         this.cropPosition = cropPosition;
+    }
+
+    public Map <Integer, PointF> getCropPositionMap() {
+        if (cropPosition == null) {
+            return null;
+        } else {
+            String[] spl = cropPosition.split(" ");
+            Map <Integer, PointF> res = new HashMap <> ();
+            for (int i = 0; i < 4; i++) {
+                res.put (i, new PointF (Float.parseFloat(spl[2 * i]), Float.parseFloat(spl[2 * i + 1])));
+            }
+            return res;
+        }
+    }
+
+    public void setCropPositionMap (Map <Integer, PointF> cropPosition) throws NullPointerException {
+        StringBuilder res = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            float x = cropPosition.get(i).x;
+            float y = cropPosition.get(i).y;
+            res.append(Float.toString(x)).append(" ").append(Float.toString(y)).append(" ");
+        }
+        this.cropPosition = res.toString();
     }
 
     public int getRotationConfig() {
@@ -146,6 +176,14 @@ public class ImageInfo {
 
     public void setRotationConfig(int rotationValue) {
         this.rotationConfig = rotationValue;
+    }
+
+    public int getRotationAfter () {
+        return rotationAfter;
+    }
+
+    public void setRotationAfter (int rotationAfter) {
+        this.rotationAfter = rotationAfter;
     }
 
 }
