@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Recent"
-        android:textSize="12pt"
+        android:textSize="22sp"
         android:textStyle="bold"
         android:background="#F4F6F6"
         android:paddingRight="20dp"

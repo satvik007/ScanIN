@@ -23,6 +23,7 @@
     <color name="halfTransparentBackground">#aacccccc</color>
     <color name="polygonViewCircleStrokeColor">#ff59a9ff</color>
     <color name="polygonViewCircleBackground">#90e5f8ff</color>
+    <color name="file_name_color">#34495E</color>
 </resources>
 
 

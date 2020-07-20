@@ -76,10 +76,10 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         }
 
         if(position%2==0){
-            holder.itemView.setPadding(0, 10, 40, 0);
+            holder.itemView.setPadding(0, 30, 40, 0);
         }
         else{
-            holder.itemView.setPadding(40, 10, 0, 0);
+            holder.itemView.setPadding(40, 30, 0, 0);
         }
 
         int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
