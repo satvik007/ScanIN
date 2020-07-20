@@ -2,13 +2,9 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,21 +25,18 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
+import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.StateMachineModule.MachineActions;
+import com.squareup.picasso.Picasso;
 
-import org.opencv.core.MatOfPoint2f;
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,6 +72,7 @@ public class ImageEditFragment extends Fragment {
     RecyclerView recyclerView;
     private int cropHeight;
     private int cropWidth;
+    private int filterPreviewHeight = 100;
 
     private Map <Integer, PointF> convertArrayList2Map (ArrayList <Point> pts) {
         Map <Integer, PointF> res = new HashMap<>();
@@ -384,6 +378,84 @@ public class ImageEditFragment extends Fragment {
             }
         });
 
+        ImageView original_filter_view = rootView.findViewById(R.id.original_filter);
+        ImageView magic_filter_view = rootView.findViewById(R.id.magic_filter);
+        ImageView sharpen_filter_view = rootView.findViewById(R.id.sharpen_filter);
+        ImageView gray_filter_view = rootView.findViewById(R.id.gray_filter);
+
+        rootView.findViewById(R.id.filters).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                        .transform(new FilterTransformation("original_filter"))
+                        .resize(filterPreviewHeight, filterPreviewHeight)
+                        .centerCrop()
+                        .into(original_filter_view);
+                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                        .transform(new FilterTransformation("magic_filter"))
+                        .resize(filterPreviewHeight, filterPreviewHeight)
+                        .centerCrop()
+                        .into(magic_filter_view);
+                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                        .transform(new FilterTransformation("sharpen_filter"))
+                        .resize(filterPreviewHeight, filterPreviewHeight)
+                        .centerCrop()
+                        .into(sharpen_filter_view);
+                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                        .transform(new FilterTransformation("gray_filter"))
+                        .resize(filterPreviewHeight, filterPreviewHeight)
+                        .centerCrop()
+                        .into(gray_filter_view);
+            }
+        });
+
+        original_filter_view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("original_filter");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        magic_filter_view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("magic_filter");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        sharpen_filter_view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("sharpen_filter");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        gray_filter_view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("gray_filter");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
         ImageButton btnMainCrop = rootView.findViewById(R.id.crop);
         Button btnCropApply = rootView.findViewById(R.id.crop_apply);
         Button btnCropBack = rootView.findViewById(R.id.crop_back);
@@ -399,22 +471,6 @@ public class ImageEditFragment extends Fragment {
         btnCropRotate.setOnClickListener(cropRotate);
 
         imageEditFragmentCallback.onCreateEditCallback();
-
-//        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
-//        recyclerView.scrollToPosition((int)imageData.size() - 1);
-//        recyclerView.post(() -> {
-//            View view = layoutManager.findViewByPosition((int)imageData.size() - 1);
-//            if (view == null) {
-//                Log.e("Snapping:", "Cant find target View for initial Snap");
-//                return;
-//            }
-//
-//            int[] snapDistance = pagerSnapHelper.calculateDistanceToFinalSnap(layoutManager, view);
-//            assert snapDistance != null;
-//            if (snapDistance[0] != 0 || snapDistance[1] != 0) {
-//                recyclerView.scrollBy(snapDistance[0], snapDistance[1]);
-//            }
-//         });
         return rootView;
     }
 

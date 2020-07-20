@@ -103,6 +103,49 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            android:elevation="1dp">
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_preview_height"
+                android:layout_weight="25"
+                android:background="@color/white"
+                android:id="@+id/original_filter"
+                android:tag="original_filter"
+                android:layout_marginRight="4dp"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_preview_height"
+                android:layout_weight="25"
+                android:background="@color/white"
+                android:id="@+id/magic_filter"
+                android:tag="magic_filter"
+                android:layout_marginRight="4dp"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_preview_height"
+                android:layout_weight="25"
+                android:background="@color/white"
+                android:id="@+id/sharpen_filter"
+                android:tag="sharpen_filter"
+                android:layout_marginRight="4dp"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="@dimen/filter_preview_height"
+                android:layout_weight="25"
+                android:background="@color/white"
+                android:scaleType="fitXY"
+                android:id="@+id/gray_filter"
+                android:tag="gray_filter"/>
+
+        </LinearLayout>
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/horizontalGuidelineBottom"
             android:layout_width="wrap_content"

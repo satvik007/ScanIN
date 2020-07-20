@@ -5,14 +5,13 @@ import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.ArrayList;
-import org.opencv.core.Point;
 
 public class ImageEditUtil {
-    private static String[] filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
+    public static String[] filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
 
     static {
         System.loadLibrary("image-edit-util");
@@ -25,6 +24,11 @@ public class ImageEditUtil {
 
     public static int getFilterId (String filter_name) {
         return Arrays.asList(filterList).indexOf (filter_name);
+    }
+
+    public static String getFilterName(int filter_id){
+        if(filter_id == -1) return "original_filter";
+        return filterList[filter_id];
     }
 
     public static Bitmap ImageProxyToBitmap(Image image){

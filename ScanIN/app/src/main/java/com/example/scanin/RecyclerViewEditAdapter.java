@@ -13,7 +13,10 @@ import android.widget.RelativeLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
+import com.example.scanin.DatabaseModule.ImageInfo;
 import com.example.scanin.ImageDataModule.BitmapTransform;
+import com.example.scanin.ImageDataModule.FilterTransformation;
+import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.squareup.picasso.Picasso;
 
 public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEditAdapter.EditViewHolder> {
@@ -83,20 +86,11 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 
     @Override
     public void onBindViewHolder(RecyclerViewEditAdapter.EditViewHolder holder, int position) {
-        Uri uri = documentAndImageInfo.getImages().get(position).getUri();
+        ImageInfo imageInfo = documentAndImageInfo.getImages().get(position);
+        Uri uri = imageInfo.getUri();
 
         int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
 
-// Loads given image
-//        int h = holder.itemView.getLayoutParams().height;
-//        int w = 0;
-//        int x = 10;
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        context.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        int h = holder.itemView.getHeight();
-//        int w = holder.itemView.getWidth();
-//        Log.d("holder_h", String.valueOf(w));
-//        Log.d("holder_w", String.valueOf(w));
         int w = Resources.getSystem().getDisplayMetrics().widthPixels;
         if(position == 0) {
             holder.itemView.setPadding(40, 0, 0, 0);
@@ -106,21 +100,24 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
             holder.itemView.setPadding(0, 0, 40, 0);
             w+=40;
         }
-//        int h = w*3/4;
-////        Log.d("holder_h", String.valueOf(h));
-//        Log.d("holder_w", String.valueOf(w));
-////        int h = displayMetrics.heightPixels;
-//        holder.itemView.setLayoutParams(new ViewGroup.LayoutParams(w, h));
         holder.itemView.setLayoutParams(new ViewGroup.LayoutParams(w-80, ViewGroup.LayoutParams.MATCH_PARENT));
 //        int size = (int) Math.ceil(Math.sqrt(w * h));
 //        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.itemView.getLayoutParams();
 //        layoutParams.setMargins();
-        Picasso.with(holder.imageView.getContext())
-                .load(uri)
-                .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
-                .resize(size, size)
-                .centerInside()
-                .into(holder.imageView);
+        if(documentAndImageInfo.getImages().get(position).getFilterId() == -1){
+            Picasso.with(holder.imageView.getContext())
+                    .load(uri)
+                    .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
+                    .resize(size, size)
+                    .centerInside()
+                    .into(holder.imageView);
+        }else{
+            Picasso.with(holder.imageView.getContext()).load(uri)
+                    .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
+                    .resize(size, size)
+                    .centerCrop()
+                    .into(holder.imageView);
+        }
         if(position != getItemCount() - 1){
 
 //            Picasso.with()

@@ -3,7 +3,6 @@ package com.example.scanin.DatabaseModule;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
@@ -11,6 +10,8 @@ import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
+
+import com.example.scanin.ImageDataModule.ImageEditUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -186,4 +187,8 @@ public class ImageInfo {
         this.rotationAfter = rotationAfter;
     }
 
+    public void setFilterName(String filterName) {
+        this.filterName = filterName;
+        this.filterId = ImageEditUtil.getFilterId(filterName);
+    }
 }
