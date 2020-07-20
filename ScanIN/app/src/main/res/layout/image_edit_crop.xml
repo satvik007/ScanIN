@@ -155,20 +155,21 @@
         android:weightSum="10"
         tools:context="com.example.scanin.ScanActivity">
 
-        <FrameLayout
-            android:id="@+id/frameLayout"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_margin="10dp"
-            android:layout_weight="8">
+<!--        <FrameLayout-->
+<!--            android:id="@+id/frameLayout"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:layout_weight="8">-->
 
             <FrameLayout
                 android:id="@+id/holderImageCrop"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 android:layout_gravity="center"
-                android:layout_margin="10dp"
+                android:layout_margin="20dp"
+                android:layout_weight="8"
                 android:background="@color/cardview_shadow_end_color">
 
                 <ImageView
@@ -176,14 +177,24 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:scaleType="fitXY"
                     android:adjustViewBounds="true" />
-            </FrameLayout>
+<!--            </FrameLayout>-->
 
             <com.example.scanin.PolygonView
                 android:id="@+id/polygonView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
+                app:layout_constraintTop_toTopOf="@+id/cropImageView"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toBottomOf="@+id/cropImageView"
+                android:layout_marginBottom="16dp"
+                app:layout_constraintVertical_bias="0.5"
+                android:layout_marginLeft="16dp"
+                app:layout_constraintLeft_toLeftOf="@+id/cropImageView"
+                android:layout_marginRight="16dp"
+                app:layout_constraintRight_toRightOf="@+id/cropImageView"
                 android:visibility="gone" />
 
         </FrameLayout>

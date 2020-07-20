@@ -2,16 +2,20 @@ package com.example.scanin;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -73,6 +77,8 @@ public class ImageEditFragment extends Fragment {
     int CurrentMachineState = -1;
     Integer adapterPosition=0;
     RecyclerView recyclerView;
+    private int cropHeight;
+    private int cropWidth;
 
     private Map <Integer, PointF> convertArrayList2Map (ArrayList <Point> pts) {
         Map <Integer, PointF> res = new HashMap<>();
@@ -112,32 +118,44 @@ public class ImageEditFragment extends Fragment {
     }
 
     private void initializeCropping() {
-        Bitmap tempBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
-        Map<Integer, PointF> pointFs = null;
+        ViewTreeObserver vto = cropImageView.getViewTreeObserver();
+        vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            public boolean onPreDraw() {
+                // Remove after the first run so it doesn't fire forever
+                cropImageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                int height = cropImageView.getMeasuredHeight();
+                int width = cropImageView.getMeasuredWidth();
 
-        int height = tempBitmap.getHeight();
-        int width = tempBitmap.getWidth();
+                Log.d("Dimension", "MainCrop: " + width + " - " + height);
 
-        double scale = currentImg.getScale(width, height);
-        try {
-            ArrayList<Point> points = currentImg.getBestPoints();
-            pointFs = convertArrayList2Map(points);
-            pointFs = scalePoints(pointFs, (float) scale);
+                Map<Integer, PointF> pointFs = null;
 
-            polygonView.setPoints(pointFs);
-            polygonView.setVisibility(View.VISIBLE);
+                double scale = currentImg.getScale(width, height);
+                try {
+                    ArrayList<Point> points = currentImg.getBestPoints();
+                    pointFs = convertArrayList2Map(points);
+                    pointFs = scalePoints(pointFs, (float) scale);
 
-            int padding = (int) getResources().getDimension(R.dimen.scanPadding);
+                    polygonView.setPoints(pointFs);
+                    polygonView.setVisibility(View.VISIBLE);
 
-            FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(tempBitmap.getWidth() + 2 * padding, tempBitmap.getHeight() + 2 * padding);
-            layoutParams.gravity = Gravity.CENTER;
+                    int padding = (int) getResources().getDimension(R.dimen.scanPadding);
 
-            polygonView.setLayoutParams(layoutParams);
-            polygonView.setPointColor(getResources().getColor(R.color.colorPrimary));
+                    FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width + 2 * padding, height + 2 * padding);
+                    layoutParams.gravity = Gravity.CENTER;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                    polygonView.setLayoutParams(layoutParams);
+                    polygonView.setPointColor(getResources().getColor(R.color.colorPrimary));
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+        });
+
+
     }
 
     private OnClickListener mainCrop = new OnClickListener() {
@@ -189,9 +207,11 @@ public class ImageEditFragment extends Fragment {
         @Override
         public void onClick(View view) {
             showProgressBar();
-            Bitmap tempBitmap = ((BitmapDrawable) cropImageView.getDrawable()).getBitmap();
-            int height = tempBitmap.getHeight();
-            int width = tempBitmap.getWidth();
+            int height = cropImageView.getMeasuredHeight();
+            int width = cropImageView.getMeasuredWidth();
+
+            Log.i("Dimension", "Auto Detect: " + width+" - "+height);
+
             double scale = currentImg.getScale(width, height);
             ArrayList<Point> points = currentImg.getBestPoints();
             Map<Integer, PointF> pointFs = convertArrayList2Map(points);
@@ -209,11 +229,8 @@ public class ImageEditFragment extends Fragment {
             int width = cropImageView.getMeasuredWidth();
             int height = cropImageView.getMeasuredHeight();
 
-            if (width == 0 || height == 0) {
-                Log.e (getTag(), "Measured width still causing issues.");
-                width = cropImageView.getWidth();
-                height = cropImageView.getHeight();
-            }
+            Log.i("Dimension", "No Crop: " + width+" - "+height);
+
             Map <Integer, PointF> default_points = getDefaultPoints (width, height);
             polygonView.setPoints(default_points);
             polygonView.invalidate();
@@ -312,7 +329,7 @@ public class ImageEditFragment extends Fragment {
         cropView.setVisibility(View.GONE);
         polygonView = rootView.findViewById(R.id.polygonView);
         progressBar = rootView.findViewById(R.id.progressBar);
-        cropImageView = rootView.findViewById(R.id.cropImageView);
+        cropImageView = (ImageView) rootView.findViewById(R.id.cropImageView);
         holderImageCrop = rootView.findViewById(R.id.holderImageCrop);
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
@@ -323,6 +340,7 @@ public class ImageEditFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(20);
+
 //        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //            @Override
 //            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -381,6 +399,7 @@ public class ImageEditFragment extends Fragment {
         btnCropRotate.setOnClickListener(cropRotate);
 
         imageEditFragmentCallback.onCreateEditCallback();
+
 //        Objects.requireNonNull(recyclerView.getLayoutManager()).scrollToPosition((int)imageData.size() - 1);
 //        recyclerView.scrollToPosition((int)imageData.size() - 1);
 //        recyclerView.post(() -> {
