@@ -107,11 +107,11 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 //            Picasso.with(holder.imageView.getContext()).load(uri)
             Picasso.get().load(uri)
                     .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
-                    .rotate(90f*imageInfo.getRotationConfig())
                     .resize(size, size)
                     .centerInside()
                     .into(holder.imageView);
 
+            holder.imageView.setRotation(90f*imageInfo.getRotationConfig());
         if(position != getItemCount() - 1){
 
 //            Picasso.with()
