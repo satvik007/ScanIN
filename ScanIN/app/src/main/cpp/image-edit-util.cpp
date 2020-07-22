@@ -52,13 +52,24 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_filterImage(JNIEnv *env, j
     Mat &src = *(Mat*) img_addr;
     Mat &dst = *(Mat*) filter_img_addr;
 
+    Mat temp;
+    cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
     // filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
     switch (filter_id) {
-        case 0: magic_filter(src, dst); break;
-        case 1: gray_filter(src, dst); break;
-        case 2: dark_magic_filter(src, dst); break;
-        case 3: sharpen_filter(src, dst); break;
+        case 0: magic_filter(temp, dst); break;
+        case 1: gray_filter(temp, dst); break;
+        case 2: dark_magic_filter(temp, dst); break;
+        case 3: sharpen_filter(temp, dst); break;
         default: std::cerr << "We should never reach here." << std::endl;
+    }
+    temp.release();
+
+    if (dst.type() == CV_8UC3) {
+        cv::cvtColor (dst, dst, cv::COLOR_BGR2RGBA);
+    } else if (dst.type() == CV_8UC1){
+        cv::cvtColor (dst, dst, cv::COLOR_GRAY2RGBA);
+    } else {
+        __android_log_print(ANDROID_LOG_ERROR, "NativeCode", "%s", "incorrect image output type.");
     }
 }
 
@@ -70,7 +81,11 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_getBestPoints(JNIEnv *env,
     Mat &res = *(Mat*) pts;
     std::vector <Point> vec_pts;
 
-    find_best_corners(src, vec_pts);
+    Mat temp;
+    cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
+
+    find_best_corners(temp, vec_pts);
+    temp.release();
 
 #ifdef DEBUG
     String currentLog = "";
