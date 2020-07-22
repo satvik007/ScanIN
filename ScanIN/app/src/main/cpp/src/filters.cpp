@@ -41,12 +41,16 @@
  * – INTER_CUBIC - a bicubic interpolation over 4x4 pixel neighborhood
  * – INTER_LANCZOS4 - a Lanczos interpolation over 8x8 pixel neighborhood
 */
-void resize_image_if_bigger (cv::Mat &input, cv::Mat &dst, const int dim, const int interpolation) {
+double resize_image_if_bigger (cv::Mat &input, cv::Mat &dst, const int dim, const int interpolation) {
     int maxdim = std::max(input.rows,input.cols);
     if (maxdim > dim)
     {
         double scale = (double)dim/(double)maxdim;
         cv::resize(input, dst, cv::Size(), scale, scale, interpolation);
+        return scale;
+    } else {
+        input.copyTo (dst);
+        return 1.0;
     }
 }
 
