@@ -160,4 +160,8 @@ public class ImageInfo {
         this.rotationConfig = rotationValue;
     }
 
+    public void incrementRotationConfig(){
+        this.rotationConfig = (this.rotationConfig + 1)%4;
+    }
+
 }

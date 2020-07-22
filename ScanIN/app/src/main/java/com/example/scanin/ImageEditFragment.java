@@ -17,7 +17,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -489,6 +488,17 @@ public class ImageEditFragment extends Fragment {
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
                 documentAndImageInfo.getImages().get(adapterPosition).setFilterId(ImageEditUtil.getFilterId("dark_magic_filter"));
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        rootView.findViewById(R.id.rotate).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).incrementRotationConfig();
                 mAdapter.notifyDataSetChanged();
             }
         });

@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
-import com.example.scanin.ImageDataModule.BitmapTransform;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.squareup.picasso.Picasso;
@@ -104,20 +103,13 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 //        int size = (int) Math.ceil(Math.sqrt(w * h));
 //        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.itemView.getLayoutParams();
 //        layoutParams.setMargins();
-        if(documentAndImageInfo.getImages().get(position).getFilterId() == -1){
-            Picasso.with(holder.imageView.getContext())
-                    .load(uri)
-                    .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
-                    .resize(size, size)
-                    .centerInside()
-                    .into(holder.imageView);
-        }else{
             Picasso.with(holder.imageView.getContext()).load(uri)
                     .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
+                    .rotate(90f*imageInfo.getRotationConfig())
                     .resize(size, size)
                     .centerInside()
                     .into(holder.imageView);
-        }
+
         if(position != getItemCount() - 1){
 
 //            Picasso.with()
