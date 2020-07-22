@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -73,6 +74,8 @@ public class ImageEditFragment extends Fragment {
     private int cropHeight;
     private int cropWidth;
     private int filterPreviewHeight = 100;
+    private RecyclerView.LayoutManager layoutManager;
+    boolean filterVisible = false;
 
     private Map <Integer, PointF> convertArrayList2Map (ArrayList <Point> pts) {
         Map <Integer, PointF> res = new HashMap<>();
@@ -89,15 +92,6 @@ public class ImageEditFragment extends Fragment {
         for (int i = 0; i < 4; i++) {
             PointF c = pts.get(i);
             res.put (i, new PointF(c.x * scale, c.y * scale));
-        }
-        return res;
-    }
-
-    public Map <Integer, PointF> addThreshold (Map <Integer, PointF> pts, int thresh) {
-        Map <Integer, PointF> res = new HashMap<>();
-        for (int i = 0; i < 4; i++) {
-            PointF c = pts.get(i);
-            res.put (i, new PointF(c.x  + thresh, c.y + thresh));
         }
         return res;
     }
@@ -160,7 +154,10 @@ public class ImageEditFragment extends Fragment {
 //            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
 //            if(pos == null) return;
 //
-            int pos = mAdapter.imgPosition;
+//            View currentView = pagerSnapHelper.findSnapView(layoutManager);
+//            if(currentView == null) return;
+//            adapterPosition = layoutManager.getPosition(currentView);
+            int pos = 0;
             Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
             Log.d (getTag(), uri.toString());
 
@@ -327,7 +324,7 @@ public class ImageEditFragment extends Fragment {
         holderImageCrop = rootView.findViewById(R.id.holderImageCrop);
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 //        SpeedyLinearLayoutManager layoutManager = new SpeedyLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewEditAdapter(null, (ScanActivity) getActivity());
@@ -378,37 +375,53 @@ public class ImageEditFragment extends Fragment {
             }
         });
 
+        HorizontalScrollView filter_scroll_view = rootView.findViewById(R.id.filter_scroll_view);
         ImageView original_filter_view = rootView.findViewById(R.id.original_filter);
         ImageView magic_filter_view = rootView.findViewById(R.id.magic_filter);
         ImageView sharpen_filter_view = rootView.findViewById(R.id.sharpen_filter);
         ImageView gray_filter_view = rootView.findViewById(R.id.gray_filter);
+        ImageView dark_magic_filter_view = rootView.findViewById(R.id.dark_magic_filter);
 
         rootView.findViewById(R.id.filters).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                View currentView = pagerSnapHelper.findSnapView(layoutManager);
-                if(currentView == null) return;
-                adapterPosition = layoutManager.getPosition(currentView);
-                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
-                        .transform(new FilterTransformation("original_filter"))
-                        .resize(filterPreviewHeight, filterPreviewHeight)
-                        .centerCrop()
-                        .into(original_filter_view);
-                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
-                        .transform(new FilterTransformation("magic_filter"))
-                        .resize(filterPreviewHeight, filterPreviewHeight)
-                        .centerCrop()
-                        .into(magic_filter_view);
-                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
-                        .transform(new FilterTransformation("sharpen_filter"))
-                        .resize(filterPreviewHeight, filterPreviewHeight)
-                        .centerCrop()
-                        .into(sharpen_filter_view);
-                Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
-                        .transform(new FilterTransformation("gray_filter"))
-                        .resize(filterPreviewHeight, filterPreviewHeight)
-                        .centerCrop()
-                        .into(gray_filter_view);
+
+                if (filterVisible) {
+                    filterVisible = false;
+                    filter_scroll_view.setVisibility(View.GONE);
+                } else {
+                    filter_scroll_view.setVisibility(View.VISIBLE);
+                    View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                    if(currentView == null) return;
+
+                    adapterPosition = layoutManager.getPosition(currentView);
+                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                            .transform(new FilterTransformation("original_filter"))
+                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .centerCrop()
+                            .into(original_filter_view);
+                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                            .transform(new FilterTransformation("magic_filter"))
+                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .centerCrop()
+                            .into(magic_filter_view);
+                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                            .transform(new FilterTransformation("sharpen_filter"))
+                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .centerCrop()
+                            .into(sharpen_filter_view);
+                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                            .transform(new FilterTransformation("dark_magic_filter"))
+                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .centerCrop()
+                            .into(dark_magic_filter_view);
+                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                            .transform(new FilterTransformation("gray_filter"))
+                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .centerCrop()
+                            .into(gray_filter_view);
+                    filterVisible = true;
+                }
             }
         });
 
@@ -452,6 +465,17 @@ public class ImageEditFragment extends Fragment {
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
                 documentAndImageInfo.getImages().get(adapterPosition).setFilterName("gray_filter");
+                mAdapter.notifyDataSetChanged();
+            }
+        });
+
+        dark_magic_filter_view.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("dark_magic_filter");
                 mAdapter.notifyDataSetChanged();
             }
         });
