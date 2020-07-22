@@ -177,12 +177,12 @@ public class ScanActivity extends AppCompatActivity
                 ", widthPx " + displayMetrics.widthPixels);
 
         preview = new Preview.Builder()
-                .setTargetResolution(new Size(1024, 768))
+                .setTargetResolution(new Size(768, 1024))
                 .build();
 
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                .setTargetResolution(new Size(1024, 768))
+                .setTargetResolution(new Size(768, 1024))
                 .setTargetRotation(previewView.getDisplay().getRotation()).build();
 
         cameraSelector = new CameraSelector.Builder()
