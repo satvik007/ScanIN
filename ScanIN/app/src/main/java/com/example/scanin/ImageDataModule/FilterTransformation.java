@@ -1,6 +1,7 @@
 package com.example.scanin.ImageDataModule;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.squareup.picasso.Transformation;
 
@@ -18,6 +19,8 @@ public class FilterTransformation implements Transformation {
     public Bitmap transform(Bitmap source) {
         Bitmap bitmap;
         bitmap = source.copy(source.getConfig(), true);
+        Log.d("Filter-Trans", String.valueOf(bitmap.getHeight()));
+        Log.d("Filter-Trans", String.valueOf(bitmap.getWidth()));
         source.recycle();
         if(this.filter_name.equals("original_filter")){
             return bitmap;

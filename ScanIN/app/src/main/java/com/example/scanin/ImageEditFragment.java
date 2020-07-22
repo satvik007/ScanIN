@@ -405,27 +405,27 @@ public class ImageEditFragment extends Fragment {
                     adapterPosition = layoutManager.getPosition(currentView);
                     Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("original_filter"))
-                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .fit()
                             .centerCrop()
                             .into(original_filter_view);
                     Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("magic_filter"))
-                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .fit()
                             .centerCrop()
                             .into(magic_filter_view);
                     Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("sharpen_filter"))
-                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .fit()
                             .centerCrop()
                             .into(sharpen_filter_view);
                     Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("dark_magic_filter"))
-                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .fit()
                             .centerCrop()
                             .into(dark_magic_filter_view);
                     Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("gray_filter"))
-                            .resize(filterPreviewHeight, filterPreviewHeight)
+                            .fit()
                             .centerCrop()
                             .into(gray_filter_view);
                     filterVisible = true;
