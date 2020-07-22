@@ -107,6 +107,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
+            android:id="@+id/filter_container"
             android:orientation="horizontal"
             android:padding="5dp"
             android:elevation="1dp">

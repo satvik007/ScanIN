@@ -1,17 +1,13 @@
 package com.example.scanin.DatabaseModule;
 
-import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.net.Uri;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
-import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
-
-import com.example.scanin.ImageDataModule.ImageEditUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +16,7 @@ import java.util.Map;
 
 @Entity(indices = {@Index(value = {"img_document_id"})},
         tableName="image_info", foreignKeys = @ForeignKey(entity = Document.class,
-         parentColumns = "document_id", childColumns = "img_document_id", onDelete = ForeignKey.CASCADE))
+        parentColumns = "document_id", childColumns = "img_document_id", onDelete = ForeignKey.CASCADE))
 public class ImageInfo {
     @PrimaryKey(autoGenerate = true)
     private long image_id;
@@ -45,18 +41,6 @@ public class ImageInfo {
     @ColumnInfo(name="rotationConfig")
     private int rotationConfig;
 
-    @ColumnInfo(name="rotationAfter")
-    private int rotationAfter;
-
-    @Ignore
-    private Bitmap originalBitmap;
-    @Ignore
-    private Bitmap croppedBitmap;
-    @Ignore
-    private Bitmap currentBitmap;
-    @Ignore
-    private String filterName;
-
     public ImageInfo(long document_id1, @NotNull Uri uri1, long position1){
         uri = uri1;
         img_document_id = document_id1;
@@ -65,7 +49,6 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
-        rotationAfter = 0;
     }
 
     public ImageInfo(long document_id1, long position1){
@@ -75,7 +58,6 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
-        rotationAfter = 0;
     }
 
     public ImageInfo(Uri uri1, long position1){
@@ -85,9 +67,8 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
-        rotationAfter = 0;
     }
-    
+
     public ImageInfo(){
 
     }
@@ -179,16 +160,4 @@ public class ImageInfo {
         this.rotationConfig = rotationValue;
     }
 
-    public int getRotationAfter () {
-        return rotationAfter;
-    }
-
-    public void setRotationAfter (int rotationAfter) {
-        this.rotationAfter = rotationAfter;
-    }
-
-    public void setFilterName(String filterName) {
-        this.filterName = filterName;
-        this.filterId = ImageEditUtil.getFilterId(filterName);
-    }
 }

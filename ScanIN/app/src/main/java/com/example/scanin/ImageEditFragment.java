@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageData;
+import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.StateMachineModule.MachineActions;
 import com.squareup.picasso.Picasso;
 
@@ -61,6 +63,7 @@ public class ImageEditFragment extends Fragment {
     private ProgressBar progressBar;
     private ImageData currentImg;
     private ImageView cropImageView;
+    private LinearLayout filterContainer;
 //    private LinearSnapHelper pagerSnapHelper;
     private PagerSnapHelper pagerSnapHelper;
     protected CompositeDisposable disposable = new CompositeDisposable();
@@ -326,6 +329,7 @@ public class ImageEditFragment extends Fragment {
         cropImageView = (ImageView) rootView.findViewById(R.id.cropImageView);
         holderImageCrop = rootView.findViewById(R.id.holderImageCrop);
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recyclerview_image);
+        filterContainer = (LinearLayout)rootView.findViewById(R.id.filter_container);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
 //        SpeedyLinearLayoutManager layoutManager = new SpeedyLinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
@@ -383,15 +387,22 @@ public class ImageEditFragment extends Fragment {
         ImageView sharpen_filter_view = rootView.findViewById(R.id.sharpen_filter);
         ImageView gray_filter_view = rootView.findViewById(R.id.gray_filter);
 
+        filterContainer.setOnFocusChangeListener((view, b) -> {
+            Log.d(TAG, "HEre foucus"+String.valueOf(b));
+            if(!b) filterContainer.setVisibility(View.INVISIBLE);
+        });
+
+
         rootView.findViewById(R.id.filters).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
+
                 View currentView = pagerSnapHelper.findSnapView(layoutManager);
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
                 Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                         .transform(new FilterTransformation("original_filter"))
-                        .resize(filterPreviewHeight, filterPreviewHeight)
+                        .resize(100, filterPreviewHeight)
                         .centerCrop()
                         .into(original_filter_view);
                 Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
@@ -418,7 +429,8 @@ public class ImageEditFragment extends Fragment {
                 View currentView = pagerSnapHelper.findSnapView(layoutManager);
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
-                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("original_filter");
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterId(
+                        ImageEditUtil.getFilterId("original_filter"));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -429,7 +441,8 @@ public class ImageEditFragment extends Fragment {
                 View currentView = pagerSnapHelper.findSnapView(layoutManager);
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
-                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("magic_filter");
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterId(
+                        ImageEditUtil.getFilterId("magic_filter"));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -440,7 +453,8 @@ public class ImageEditFragment extends Fragment {
                 View currentView = pagerSnapHelper.findSnapView(layoutManager);
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
-                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("sharpen_filter");
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterId(
+                        ImageEditUtil.getFilterId("sharpen_filter"));
                 mAdapter.notifyDataSetChanged();
             }
         });
@@ -451,7 +465,8 @@ public class ImageEditFragment extends Fragment {
                 View currentView = pagerSnapHelper.findSnapView(layoutManager);
                 if(currentView == null) return;
                 adapterPosition = layoutManager.getPosition(currentView);
-                documentAndImageInfo.getImages().get(adapterPosition).setFilterName("gray_filter");
+                documentAndImageInfo.getImages().get(adapterPosition).setFilterId(
+                        ImageEditUtil.getFilterId("gray_filter"));
                 mAdapter.notifyDataSetChanged();
             }
         });

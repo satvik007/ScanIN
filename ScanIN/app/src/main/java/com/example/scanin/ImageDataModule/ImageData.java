@@ -6,19 +6,16 @@ import android.graphics.Matrix;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 
-import android.util.DisplayMetrics;
-import androidx.appcompat.app.AppCompatActivity;
-import java.io.IOException;
-
-import org.opencv.core.CvType;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.android.Utils;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
-import android.util.Pair;
+import org.opencv.core.Scalar;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static java.lang.Math.min;
