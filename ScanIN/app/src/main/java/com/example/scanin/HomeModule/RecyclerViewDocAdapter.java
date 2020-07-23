@@ -85,7 +85,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
         holder.textView.setText(documentsAndFirstImage.getDocument().getDocumentName());
         Uri uri = documentsAndFirstImage.getImageInfo().getUri();
-        Picasso.with(holder.imageView.getContext()).load(uri)
+        Picasso.get().load(uri)
                 .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
                 .resize(0,200)
                 .into(holder.imageView);

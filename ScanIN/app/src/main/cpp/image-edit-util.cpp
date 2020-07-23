@@ -52,11 +52,14 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_filterImage(JNIEnv *env, j
     Mat &src = *(Mat*) img_addr;
     Mat &dst = *(Mat*) filter_img_addr;
 
+    __android_log_print(ANDROID_LOG_DEBUG, "NativeCode", "%s",
+            ("Filter  rows=" + std::to_string(src.rows) + ", cols=" + std::to_string (src.cols)).c_str());
+
     Mat temp;
     cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
     // filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
     switch (filter_id) {
-        case 0: magic_filter(temp, dst); break;
+        case 0: magic_filter(temp, dst, 1.5, -30); break;
         case 1: gray_filter(temp, dst); break;
         case 2: dark_magic_filter(temp, dst); break;
         case 3: sharpen_filter(temp, dst); break;
@@ -80,6 +83,9 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_getBestPoints(JNIEnv *env,
     Mat &src = *(Mat*) img_addr;
     Mat &res = *(Mat*) pts;
     std::vector <Point> vec_pts;
+
+    std::string clog = "Filter  cols=" + std::to_string(src.cols) + ", rows=" + std::to_string(src.rows);
+    __android_log_print(ANDROID_LOG_DEBUG, "NativeCode", "%s", clog.c_str());
 
     Mat temp;
     cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);

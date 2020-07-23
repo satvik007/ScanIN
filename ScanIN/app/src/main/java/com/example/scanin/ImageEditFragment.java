@@ -151,16 +151,10 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener mainCrop = new OnClickListener() {
         @Override
         public void onClick(View view) {
-//            View currentView = pagerSnapHelper.findSnapView(Objects.requireNonNull(recyclerView.getLayoutManager()));
-//            if(currentView == null) return;
-//            Integer pos = recyclerView.getLayoutManager().getPosition(currentView);
-//            if(pos == null) return;
-//
-//            View currentView = pagerSnapHelper.findSnapView(layoutManager);
-//            if(currentView == null) return;
-//            adapterPosition = layoutManager.getPosition(currentView);
-            int pos = 0;
-            Uri uri = documentAndImageInfo.getImages().get(pos).getUri();
+            View currentView = pagerSnapHelper.findSnapView(layoutManager);
+            if(currentView == null) return;
+            adapterPosition = layoutManager.getPosition(currentView);
+            Uri uri = documentAndImageInfo.getImages().get(adapterPosition).getUri();
             Log.d (getTag(), uri.toString());
 
             mainView.setVisibility(View.GONE);
@@ -347,7 +341,7 @@ public class ImageEditFragment extends Fragment {
 //        });
 
 //        pagerSnapHelper = new LinearSnapHelper();
-        PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
+        pagerSnapHelper = new PagerSnapHelper();
         pagerSnapHelper.attachToRecyclerView(recyclerView);
 
         rootView.findViewById(R.id.edit_add_more).setOnClickListener(new View.OnClickListener() {
@@ -403,27 +397,27 @@ public class ImageEditFragment extends Fragment {
                     if(currentView == null) return;
 
                     adapterPosition = layoutManager.getPosition(currentView);
-                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                    Picasso.get().load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("original_filter"))
                             .fit()
                             .centerCrop()
                             .into(original_filter_view);
-                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                    Picasso.get().load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("magic_filter"))
                             .fit()
                             .centerCrop()
                             .into(magic_filter_view);
-                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                    Picasso.get().load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("sharpen_filter"))
                             .fit()
                             .centerCrop()
                             .into(sharpen_filter_view);
-                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                    Picasso.get().load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("dark_magic_filter"))
                             .fit()
                             .centerCrop()
                             .into(dark_magic_filter_view);
-                    Picasso.with(getActivity()).load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
+                    Picasso.get().load(documentAndImageInfo.getImages().get(adapterPosition).getUri())
                             .transform(new FilterTransformation("gray_filter"))
                             .fit()
                             .centerCrop()

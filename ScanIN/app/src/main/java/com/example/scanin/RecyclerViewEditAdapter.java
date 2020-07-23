@@ -103,7 +103,9 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 //        int size = (int) Math.ceil(Math.sqrt(w * h));
 //        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) holder.itemView.getLayoutParams();
 //        layoutParams.setMargins();
-            Picasso.with(holder.imageView.getContext()).load(uri)
+
+//            Picasso.with(holder.imageView.getContext()).load(uri)
+            Picasso.get().load(uri)
                     .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
                     .rotate(90f*imageInfo.getRotationConfig())
                     .resize(size, size)

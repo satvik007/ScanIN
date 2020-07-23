@@ -67,7 +67,7 @@ public class RecyclerViewGridAdapter extends RecyclerView.Adapter<RecyclerViewGr
         else{
             holder.itemView.setPadding(20, 0, 0, 0);
         }
-        Picasso.with(holder.imageView.getContext()).load(uri)
+        Picasso.get().load(uri)
                 .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
                 .resize(size, size)
                 .centerCrop()
