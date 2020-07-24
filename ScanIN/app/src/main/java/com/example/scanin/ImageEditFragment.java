@@ -49,6 +49,12 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import com.example.scanin.ImageDataModule.ImageEditUtil;
+
+import static com.example.scanin.ImageDataModule.ImageEditUtil.convertArrayList2Map;
+import static com.example.scanin.ImageDataModule.ImageEditUtil.convertMap2ArrayList;
+import static com.example.scanin.ImageDataModule.ImageEditUtil.getDefaultPoints;
+import static com.example.scanin.ImageDataModule.ImageEditUtil.scalePoints;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -89,34 +95,6 @@ public class ImageEditFragment extends Fragment {
     private RecyclerView.LayoutManager layoutManager;
     boolean filterVisible = false;
 
-    private Map <Integer, PointF> convertArrayList2Map (ArrayList <Point> pts) {
-        Map <Integer, PointF> res = new HashMap<>();
-        res.put (0, new PointF((float) pts.get(0).x, (float) pts.get(0).y));
-        res.put (1, new PointF((float) pts.get(1).x, (float) pts.get(1).y));
-        // Polygon view uses a stupid order.
-        res.put (2, new PointF((float) pts.get(3).x, (float) pts.get(3).y));
-        res.put (3, new PointF((float) pts.get(2).x, (float) pts.get(2).y));
-        return res;
-    }
-
-    public Map <Integer, PointF> scalePoints (Map <Integer, PointF> pts, float scale) {
-        Map <Integer, PointF> res = new HashMap<>();
-        for (int i = 0; i < 4; i++) {
-            PointF c = pts.get(i);
-            res.put (i, new PointF(c.x * scale, c.y * scale));
-        }
-        return res;
-    }
-
-    private Map <Integer, PointF> getDefaultPoints (int width, int height) {
-        Map <Integer, PointF> res = new HashMap<>();
-        res.put (0, new PointF (0.0f, 0.0f));
-        res.put (1, new PointF (width, 0.0f));
-        res.put (3, new PointF (width, height));
-        res.put (2, new PointF (0.0f, height));
-        return res;
-    }
-
     private void initializeCropping() {
         ViewTreeObserver vto = cropImageView.getViewTreeObserver();
         vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
@@ -133,6 +111,7 @@ public class ImageEditFragment extends Fragment {
                 double scale = currentImg.getScale(width, height);
                 try {
                     ArrayList<Point> points = currentImg.getBestPoints();
+                    currentImg.setCropPosition(points);
                     pointFs = convertArrayList2Map(points);
                     pointFs = scalePoints(pointFs, (float) scale);
 
@@ -185,7 +164,16 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener cropApply = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            // TODO
+            Map <Integer, PointF> points = polygonView.getPoints();
+            int width = cropImageView.getMeasuredWidth();
+            int height = cropImageView.getMeasuredHeight();
+            double scale = currentImg.getScale(width, height);
+            points = scalePoints(points, (float) (1.0 / scale));
+
+            // The crop position scale is according to the image that was loaded in ImageData.
+            documentAndImageInfo.getImages().get(adapterPosition).setCropPositionMap(points);
+            documentAndImageInfo.getImages().get(adapterPosition).setRotationConfig(currentImg.getRotationConfig());
+            mAdapter.notifyDataSetChanged();
 
             cropView.setVisibility(View.GONE);
             mainView.setVisibility(View.VISIBLE);
@@ -211,6 +199,7 @@ public class ImageEditFragment extends Fragment {
 
             double scale = currentImg.getScale(width, height);
             ArrayList<Point> points = currentImg.getBestPoints();
+            currentImg.setCropPosition(points);
             Map<Integer, PointF> pointFs = convertArrayList2Map(points);
             pointFs = scalePoints(pointFs, (float) scale);
             polygonView.setPoints(pointFs);
@@ -238,8 +227,45 @@ public class ImageEditFragment extends Fragment {
     private OnClickListener cropRotate = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            // TODO
+            Map <Integer, PointF> points = polygonView.getPoints();
+            int width = cropImageView.getMeasuredWidth();
+            int height = cropImageView.getMeasuredHeight();
+            double scale = currentImg.getScale(width, height);
+            points = scalePoints(points, (float) (1.0 / scale));
+            ArrayList <Point> points_ar = convertMap2ArrayList(points);
+            currentImg.setCropPosition(points_ar);
+            currentImg.rotateBitmap();
+            selectedImage = currentImg.getSmallOriginalImage(cropImageView.getContext());
+            cropImageView.setImageBitmap(selectedImage);
 
+            ViewTreeObserver vto = cropImageView.getViewTreeObserver();
+            vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                public boolean onPreDraw() {
+                    // Remove after the first run so it doesn't fire forever
+                    cropImageView.getViewTreeObserver().removeOnPreDrawListener(this);
+                    int height = cropImageView.getMeasuredHeight();
+                    int width = cropImageView.getMeasuredWidth();
+
+                    Log.d("Dimension", "MainCrop: " + width + " - " + height);
+
+                    double scale = currentImg.getScale(width, height);
+                    try {
+                        Map <Integer, PointF> pointFs = convertArrayList2Map(currentImg.getCropPosition());
+                        pointFs = scalePoints(pointFs, (float) scale);
+
+                        polygonView.setPoints(pointFs);
+                        int padding = (int) getResources().getDimension(R.dimen.scanPadding);
+                        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(width + 2 * padding, height + 2 * padding);
+                        layoutParams.gravity = Gravity.CENTER;
+                        polygonView.setLayoutParams(layoutParams);
+                        polygonView.invalidate();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return true;
+                }
+            });
         }
     };
 

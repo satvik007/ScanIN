@@ -2,13 +2,19 @@ package com.example.scanin.ImageDataModule;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
 
+import org.opencv.core.Point;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ImageEditUtil {
     public static String[] filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
@@ -53,6 +59,43 @@ public class ImageEditUtil {
 
             byte[] imageBytes = out.toByteArray();
             return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+    }
+
+    public static Map<Integer, PointF> convertArrayList2Map (ArrayList<Point> pts) {
+        Map <Integer, PointF> res = new HashMap<>();
+        res.put (0, new PointF((float) pts.get(0).x, (float) pts.get(0).y));
+        res.put (1, new PointF((float) pts.get(1).x, (float) pts.get(1).y));
+        // Polygon view uses a stupid order.
+        res.put (2, new PointF((float) pts.get(3).x, (float) pts.get(3).y));
+        res.put (3, new PointF((float) pts.get(2).x, (float) pts.get(2).y));
+        return res;
+    }
+
+    public static ArrayList <Point> convertMap2ArrayList (Map <Integer, PointF> pts) {
+        ArrayList <Point> res = new ArrayList<>();
+        res.add (new Point(pts.get(0).x, pts.get(0).y));
+        res.add (new Point(pts.get(1).x, pts.get(1).y));
+        res.add (new Point(pts.get(3).x, pts.get(3).y));
+        res.add (new Point(pts.get(2).x, pts.get(2).y));
+        return res;
+    }
+
+    public static Map <Integer, PointF> scalePoints (Map <Integer, PointF> pts, float scale) {
+        Map <Integer, PointF> res = new HashMap<>();
+        for (int i = 0; i < 4; i++) {
+            PointF c = pts.get(i);
+            res.put (i, new PointF(c.x * scale, c.y * scale));
+        }
+        return res;
+    }
+
+    public static Map <Integer, PointF> getDefaultPoints (int width, int height) {
+        Map <Integer, PointF> res = new HashMap<>();
+        res.put (0, new PointF (0.0f, 0.0f));
+        res.put (1, new PointF (width, 0.0f));
+        res.put (3, new PointF (width, height));
+        res.put (2, new PointF (0.0f, height));
+        return res;
     }
 
     public static native void getTestGray (long imgAddr, long grayImgAddr);

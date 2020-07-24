@@ -29,6 +29,7 @@ public class ImageData {
     private ArrayList <Point> cropPosition;
     private int THUMBNAIL_SIZE = 64;
     private final double EPS = 1e-10;
+    private int rotationConfig = 0;
 
     public ImageData(Uri uri) {
         this.originalBitmap = null;
@@ -37,6 +38,7 @@ public class ImageData {
         this.filterName = null;
         this.fileName = uri;
         this.cropPosition = null;
+        this.rotationConfig = 0;
     }
 
     public Bitmap getOriginalBitmap() {
@@ -83,6 +85,14 @@ public class ImageData {
         this.fileName = fileName;
     }
 
+    public void setRotationConfig (int rotationConfig) {
+        this.rotationConfig = rotationConfig;
+    }
+
+    public int getRotationConfig () {
+        return rotationConfig;
+    }
+
     public void setCropPosition(ArrayList <Point> cropPosition) {
         this.cropPosition = cropPosition;
     }
@@ -103,6 +113,26 @@ public class ImageData {
         Matrix matrix = new Matrix();
         matrix.postRotate(angle);
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
+    public void rotateBitmap () {
+        originalBitmap = rotateBitmap(originalBitmap);
+        rotateCropPosition ();
+        rotationConfig = (rotationConfig + 1) % 4;
+    }
+
+    public void rotateCropPosition () {
+        if (cropPosition != null) {
+            ArrayList <Point> res = new ArrayList<>();
+            int width = originalBitmap.getWidth();
+            int height = originalBitmap.getHeight();
+
+            for (int i = 0; i < 4; i++) {
+                int j = (i + 4) % 4;
+                res.add (new Point (width - cropPosition.get(j).y, cropPosition.get(j).x));
+            }
+            cropPosition = res;
+        }
     }
 
     public Bitmap getThumbnail() {

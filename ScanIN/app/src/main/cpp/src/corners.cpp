@@ -273,10 +273,11 @@ void _sanitize_rect (std::vector< cv::Point > &rect, cv::Size size) {
 int find_best_corners (cv::Mat &input, std::vector < cv::Point > &rect) {
     cv::Mat img;
     std::vector < cv::Point > default_rect;
+
     default_rect.emplace_back (0, 0);
-    default_rect.emplace_back (input.cols - 1, 0);
-    default_rect.emplace_back (input.cols - 1, input.rows - 1);
-    default_rect.emplace_back (0, input.rows - 1);
+    default_rect.emplace_back (input.cols, 0);
+    default_rect.emplace_back (input.cols, input.rows);
+    default_rect.emplace_back (0, input.rows);
 
     // convert to gray or check if already gray.
     if (input.type() == CV_8UC3) {

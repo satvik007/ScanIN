@@ -71,6 +71,7 @@
                 android:layout_weight="25"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="5dp"
                 android:src="@drawable/ic_crop" />
 
             <ImageButton
@@ -80,6 +81,7 @@
                 android:layout_weight="25"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="5dp"
                 android:src="@drawable/ic_rotate" />
 
             <ImageButton
@@ -89,6 +91,7 @@
                 android:layout_weight="25"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="5dp"
                 android:src="@drawable/ic_brightness_and_contrast" />
 
             <ImageButton
@@ -99,6 +102,7 @@
                 android:layout_weight="25"
                 android:layout_gravity="center"
                 android:background="@android:color/transparent"
+                android:padding="5dp"
                 android:src="@drawable/ic_filter" />
 
         </LinearLayout>
