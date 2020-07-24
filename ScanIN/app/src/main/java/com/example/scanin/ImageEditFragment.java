@@ -1,8 +1,10 @@
 package com.example.scanin;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +20,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -26,18 +29,25 @@ import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
+import com.example.scanin.DatabaseModule.ImageInfo;
+import com.example.scanin.ImageDataModule.BrightnessFilterTransformation1;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.example.scanin.StateMachineModule.MachineActions;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.opencv.core.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 /**
@@ -304,6 +314,7 @@ public class ImageEditFragment extends Fragment {
         Log.d(TAG, "onCreateCalled");
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -496,6 +507,86 @@ public class ImageEditFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             }
         });
+
+        SeekBar brightnessBar = rootView.findViewById(R.id.brightness_bar);
+        Observable.create(s->{
+            brightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    s.onNext(i);
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
+        })
+        .throttleLatest(100, TimeUnit.MILLISECONDS)
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(pos->{
+            int i = (int) pos;
+            View currentView = pagerSnapHelper.findSnapView(layoutManager);
+            if(currentView == null) return;
+            adapterPosition = layoutManager.getPosition(currentView);
+            float beta = (float)(i)/500.0f;
+            documentAndImageInfo.getImages().get(adapterPosition).setBeta(beta);
+            ImageInfo imageInfo = documentAndImageInfo.getImages().get(adapterPosition);
+            ImageView temp = currentView.findViewById(R.id.image_edit_item);
+            Target target = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bmp1, Picasso.LoadedFrom from) {
+//                Bitmap newBitmap = ImageData.changeContrastAndBrightness(bitmap, 1.5, imageInfo.getBeta());
+                    BrightnessFilterTransformation1 t = new BrightnessFilterTransformation1(Objects.requireNonNull(getActivity()), (float)beta);
+//                    Bitmap bmp2 = bmp1.copy(bmp1.getConfig(), true);
+                    Bitmap newBitmap = t.transform(bmp1);
+                    temp.setImageBitmap(newBitmap);
+                    Log.d("Brightnsd", String.valueOf(i));
+                    Log.d("Brightns", String.valueOf(beta));
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            };
+            temp.setTag(target);
+            int size = (int) Math.ceil(Math.sqrt(RecyclerViewEditAdapter.MAX_WIDTH * RecyclerViewEditAdapter.MAX_HEIGHT));
+            Picasso.get().load(imageInfo.getUri())
+                .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
+                .resize(size, size)
+                .centerInside()
+                .into(target);
+        });
+
+//        brightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+//                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+//                if(currentView == null) return;
+//                adapterPosition = layoutManager.getPosition(currentView);
+//                double beta = (double)(i)/100.0f;
+//                Log.d("Brightnsd", String.valueOf(i));
+//                Log.d("Brightns", String.valueOf(beta));
+//                documentAndImageInfo.getImages().get(adapterPosition).setBeta(beta);
+//                mAdapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//            }
+//        });
 
         ImageButton btnMainCrop = rootView.findViewById(R.id.crop);
         Button btnCropApply = rootView.findViewById(R.id.crop_apply);

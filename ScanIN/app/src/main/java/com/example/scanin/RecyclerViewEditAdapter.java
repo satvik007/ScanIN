@@ -2,6 +2,8 @@ package com.example.scanin;
 
 
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,14 +19,17 @@ import com.example.scanin.DatabaseModule.ImageInfo;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import jp.wasabeef.picasso.transformations.gpu.BrightnessFilterTransformation;
 
 public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEditAdapter.EditViewHolder> {
     private DocumentAndImageInfo documentAndImageInfo;
     private ProgressBar progressBar;
 
     private ScanActivity context;
-    private static final int MAX_WIDTH = 1024;
-    private static final int MAX_HEIGHT = 768;
+    public static final int MAX_WIDTH = 1024;
+    public static final int MAX_HEIGHT = 768;
     public int imgPosition;
     public class EditViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
@@ -105,13 +110,33 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
 //        layoutParams.setMargins();
 
 //            Picasso.with(holder.imageView.getContext()).load(uri)
-            Picasso.get().load(uri)
-                    .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
-                    .resize(size, size)
-                    .centerInside()
-                    .into(holder.imageView);
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                Bitmap newBitmap = ImageData.changeContrastAndBrightness(bitmap, 1.5, imageInfo.getBeta());
+                holder.imageView.setImageBitmap(bitmap);
+            }
 
-            holder.imageView.setRotation(90f*imageInfo.getRotationConfig());
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
+
+        holder.imageView.setTag(target);
+        Picasso.get().load(uri)
+                .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
+                .transform(new BrightnessFilterTransformation(context, (float)imageInfo.getBeta()))
+                .resize(size, size)
+                .centerInside()
+                .into(target);
+
+        holder.imageView.setRotation(90f*imageInfo.getRotationConfig());
         if(position != getItemCount() - 1){
 
 //            Picasso.with()

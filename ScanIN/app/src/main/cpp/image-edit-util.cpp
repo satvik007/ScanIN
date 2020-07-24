@@ -62,7 +62,7 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_filterImage(JNIEnv *env, j
         case 0: magic_filter(temp, dst, 1.5, -30); break;
         case 1: gray_filter(temp, dst); break;
         case 2: dark_magic_filter(temp, dst); break;
-        case 3: sharpen_filter(temp, dst); break;
+        case 3: lighten_filter(temp, dst); break;
         default: std::cerr << "We should never reach here." << std::endl;
     }
     temp.release();
@@ -74,6 +74,21 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_filterImage(JNIEnv *env, j
     } else {
         __android_log_print(ANDROID_LOG_ERROR, "NativeCode", "%s", "incorrect image output type.");
     }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_example_scanin_ImageDataModule_ImageEditUtil_changeContrastAndBrightness(JNIEnv *env, jclass clazz,
+                                                                                  jlong img_addr,
+                                                                                  jlong output_img_addr,
+                                                                                  jdouble alpha,  jint beta){
+    Mat &src = *(Mat*) img_addr;
+    Mat &dst = *(Mat*) output_img_addr;
+
+    Mat temp;
+    cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
+
+    src.convertTo(dst, -1, alpha, beta);
+//    dst.convertTo (dst, CV_8UC3);
 }
 
 extern "C"

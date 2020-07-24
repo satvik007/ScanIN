@@ -119,6 +119,20 @@ public class ImageData {
         return scale;
     }
 
+    //Change Brightness and contrast
+    public static Bitmap changeContrastAndBrightness(Bitmap source, double alpha, int beta) {
+        Bitmap bitmap;
+        Mat imgToProcess = new Mat();
+        Utils.bitmapToMat(source, imgToProcess);
+        Mat outMat = new Mat();
+        ImageEditUtil.changeContrastAndBrightness(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), alpha, beta);
+//        ImageEditUtil.filterImage(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), 1);
+        Bitmap currentBitmap = Bitmap.createBitmap(outMat.cols(),
+                              outMat.rows(), Bitmap.Config.ARGB_8888);
+        Utils.matToBitmap(outMat, currentBitmap);
+        return currentBitmap;
+    }
+
     // cropped is applied on originalBitmap and saved in croppedBitmap
     public void applyCropImage () {
         if (originalBitmap != null && cropPosition != null) {

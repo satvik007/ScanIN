@@ -6,6 +6,7 @@ import android.net.Uri;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Ignore;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
@@ -41,6 +42,12 @@ public class ImageInfo {
     @ColumnInfo(name="rotationConfig")
     private int rotationConfig;
 
+    @Ignore
+    private double beta;
+
+    @Ignore
+    private double alpha;
+
     public ImageInfo(long document_id1, @NotNull Uri uri1, long position1){
         uri = uri1;
         img_document_id = document_id1;
@@ -49,6 +56,8 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        alpha = 1;
+        beta = 0;
     }
 
     public ImageInfo(long document_id1, long position1){
@@ -58,6 +67,8 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        alpha = 1;
+        beta = 0;
     }
 
     public ImageInfo(Uri uri1, long position1){
@@ -67,10 +78,13 @@ public class ImageInfo {
         filterId = -1;
         cropPosition = null;
         rotationConfig = 0;
+        alpha = 1;
+        beta = 0;
     }
 
     public ImageInfo(){
-
+        alpha = 1;
+        beta = 0;
     }
 
     public Uri getUri() {
@@ -127,6 +141,22 @@ public class ImageInfo {
 
     public void setCropPosition (String cropPosition) {
         this.cropPosition = cropPosition;
+    }
+
+    public double getAlpha() {
+        return alpha;
+    }
+
+    public double getBeta() {
+        return beta;
+    }
+
+    public void setAlpha(double alpha) {
+        this.alpha = alpha;
+    }
+
+    public void setBeta(double beta) {
+        this.beta = beta;
     }
 
     public Map <Integer, PointF> getCropPositionMap() {

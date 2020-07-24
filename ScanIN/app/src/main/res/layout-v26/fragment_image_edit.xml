@@ -94,7 +94,7 @@
             <ImageButton
                 android:id="@+id/filters"
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:textColor="@color/white"
                 android:layout_weight="25"
                 android:layout_gravity="center"
@@ -109,7 +109,7 @@
             android:scrollbars="horizontal"
             app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
             android:background="#404040"
-            android:elevation="5dp"
+            android:elevation="1dp"
             android:visibility="gone"
             android:id="@+id/filter_scroll_view"
             >
@@ -237,24 +237,14 @@
             android:background="@color/white"
             app:layout_constraintRight_toRightOf="@id/verticalGuidelineRight"
             app:layout_constraintLeft_toLeftOf="@id/verticalGuidelineLeft"
-            app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
-            android:elevation="1dp"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/brightness_text"
-                android:textColor="@color/black"
-                android:layout_gravity="center_horizontal"
-                android:layout_weight="1"
-                android:padding="4dp"
-                android:text="0"/>
+            android:elevation="5dp"
+            app:layout_constraintBottom_toTopOf="@id/image_edit_tools">
             <SeekBar
                 android:max="100"
-                android:progress="50"
+                android:min="-100"
+                android:progress="0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:id="@+id/brightness_bar" />
         </LinearLayout>
 
@@ -301,5 +291,5 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 <!--    layout for crop mode.  -->
-<!--    <include layout="@layout/image_edit_crop" />-->
+    <include layout="@layout/image_edit_crop" />
 </FrameLayout>

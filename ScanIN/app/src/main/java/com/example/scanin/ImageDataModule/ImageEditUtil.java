@@ -62,4 +62,6 @@ public class ImageEditUtil {
     public static native void cropImage(long imgAddr, long cropImgAddr, long pts);
 
     public static native void filterImage(long imgAddr, long filterImgAddr, int filterId);
+
+    public static native void changeContrastAndBrightness(long imgAddr, long outputAddr, double alpha, int beta);
 }
