@@ -38,7 +38,4 @@ public class BrightnessFilterTransformation1 extends GPUFilterTransformation1 {
         filter.setBrightness(mBrightness);
     }
 
-    @Override public String key() {
-        return "BrightnessFilterTransformation(brightness=" + mBrightness + ")";
-    }
 }
