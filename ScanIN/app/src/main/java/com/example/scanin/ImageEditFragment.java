@@ -49,9 +49,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
+import static com.example.scanin.ImageDataModule.ImageData.rotateBitmap;
 import static com.example.scanin.ImageDataModule.ImageEditUtil.convertArrayList2Map;
 import static com.example.scanin.ImageDataModule.ImageEditUtil.convertMap2ArrayList;
 import static com.example.scanin.ImageDataModule.ImageEditUtil.getDefaultPoints;
+import static com.example.scanin.ImageDataModule.ImageEditUtil.rotateCropPoints;
 import static com.example.scanin.ImageDataModule.ImageEditUtil.scalePoints;
 
 /**
@@ -104,16 +106,28 @@ public class ImageEditFragment extends Fragment {
 
                 Log.d("Dimension", "MainCrop: " + width + " - " + height);
 
-                Map<Integer, PointF> pointFs = null;
-
-                double scale = currentImg.getScale(width, height);
+                Map<Integer, PointF> pointFs = convertArrayList2Map(currentImg.getCropPosition());
+                if (pointFs == null) {
+                    Log.d("ImageEditFragment", "pointFs is null");
+                }
                 try {
-                    ArrayList<Point> points = currentImg.getBestPoints();
-                    currentImg.setCropPosition(points);
-                    pointFs = convertArrayList2Map(points);
+                    // if nothing in database
+                    if (pointFs == null) {
+                        ArrayList<Point> points = currentImg.getBestPoints();
+                        currentImg.setCropPosition(points);
+                        pointFs = convertArrayList2Map(points);
+                    // if database has cropPoints in orig config. Convert to the current rotation config.
+                    } else {
+                        int rotValue = 0;
+                        int rotationConfig = currentImg.getRotationConfig();
+                        while (rotValue != rotationConfig) {
+                            pointFs = rotateCropPoints(pointFs, currentImg.getWidth(), currentImg.getHeight(), rotValue);
+                            rotValue = (rotValue + 1) % 4;
+                        }
+                    }
+                    double scale = currentImg.getScale(width, height);
                     pointFs = scalePoints(pointFs, (float) scale);
 
-                    polygonView.setPoints(pointFs);
                     polygonView.setVisibility(View.VISIBLE);
 
                     int padding = (int) getResources().getDimension(R.dimen.scanPadding);
@@ -123,6 +137,8 @@ public class ImageEditFragment extends Fragment {
 
                     polygonView.setLayoutParams(layoutParams);
                     polygonView.setPointColor(getResources().getColor(R.color.colorPrimary));
+                    polygonView.setPoints(pointFs);
+                    polygonView.invalidate();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -141,14 +157,18 @@ public class ImageEditFragment extends Fragment {
             View currentView = pagerSnapHelper.findSnapView(layoutManager);
             if(currentView == null) return;
             adapterPosition = layoutManager.getPosition(currentView);
-            Uri uri = documentAndImageInfo.getImages().get(adapterPosition).getUri();
-            Log.d (getTag(), uri.toString());
+            ImageInfo imgInfo = documentAndImageInfo.getImages().get(adapterPosition);
+
+            Log.d (getTag(), imgInfo.getUri().toString());
 
             mainView.setVisibility(View.GONE);
             cropView.setVisibility(View.VISIBLE);
-            currentImg = new ImageData(uri);
+            currentImg = new ImageData(imgInfo);
+
             try {
                 currentImg.setOriginalBitmap(cropImageView.getContext());
+                currentImg.setOriginalBitmap(rotateBitmap(currentImg.getOriginalBitmap(),
+                        90.0f * imgInfo.getRotationConfig()));
                 selectedImage = currentImg.getSmallOriginalImage(cropImageView.getContext());
                 hideProgressBar();
                 cropImageView.setImageBitmap(selectedImage);
@@ -167,6 +187,18 @@ public class ImageEditFragment extends Fragment {
             int height = cropImageView.getMeasuredHeight();
             double scale = currentImg.getScale(width, height);
             points = scalePoints(points, (float) (1.0 / scale));
+
+            // Before storing the crop points must be converted for the original configuration.
+            // This is done because rotating in edit mode (not crop edit) mode will now not
+            // require rotating crop Points.
+            int rotationConfig = currentImg.getRotationConfig();
+            int origWidth = currentImg.getWidth();
+            int origHeight = currentImg.getHeight();
+
+            while (rotationConfig != 0) {
+                points = rotateCropPoints(points, origWidth, origHeight, rotationConfig);
+                rotationConfig = (rotationConfig + 1) % 4;
+            }
 
             // The crop position scale is according to the image that was loaded in ImageData.
             documentAndImageInfo.getImages().get(adapterPosition).setCropPositionMap(points);

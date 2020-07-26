@@ -62,6 +62,7 @@ public class ImageEditUtil {
     }
 
     public static Map<Integer, PointF> convertArrayList2Map (ArrayList<Point> pts) {
+        if (pts == null) return null;
         Map <Integer, PointF> res = new HashMap<>();
         res.put (0, new PointF((float) pts.get(0).x, (float) pts.get(0).y));
         res.put (1, new PointF((float) pts.get(1).x, (float) pts.get(1).y));
@@ -72,6 +73,7 @@ public class ImageEditUtil {
     }
 
     public static ArrayList <Point> convertMap2ArrayList (Map <Integer, PointF> pts) {
+        if (pts == null) return null;
         ArrayList <Point> res = new ArrayList<>();
         res.add (new Point(pts.get(0).x, pts.get(0).y));
         res.add (new Point(pts.get(1).x, pts.get(1).y));
@@ -95,6 +97,20 @@ public class ImageEditUtil {
         res.put (1, new PointF (width, 0.0f));
         res.put (3, new PointF (width, height));
         res.put (2, new PointF (0.0f, height));
+        return res;
+    }
+
+    public static Map <Integer, PointF> rotateCropPoints (Map <Integer, PointF> points, int width, int height, int rotationConfig) {
+        Map <Integer, PointF> res = new HashMap<>();
+        //  0 1     2 0
+        //  2 3     3 1
+        if (rotationConfig == 1 || rotationConfig == 3) {
+            height = width;
+        }
+        res.put (0, new PointF (height - points.get(2).y, points.get(2).x));
+        res.put (1, new PointF (height - points.get(0).y, points.get(0).x));
+        res.put (2, new PointF (height - points.get(3).y, points.get(3).x));
+        res.put (3, new PointF (height - points.get(1).y, points.get(1).x));
         return res;
     }
 
