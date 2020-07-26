@@ -28,8 +28,8 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
     private ProgressBar progressBar;
 
     private ScanActivity context;
-    public static final int MAX_WIDTH = 1024;
-    public static final int MAX_HEIGHT = 768;
+    public static final int MAX_WIDTH = 1400;
+    public static final int MAX_HEIGHT = 1400;
     public int imgPosition;
     public class EditViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;

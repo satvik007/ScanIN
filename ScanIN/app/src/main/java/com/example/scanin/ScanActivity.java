@@ -1,5 +1,6 @@
 package com.example.scanin;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Rational;
 import android.util.Size;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -165,6 +167,7 @@ public class ScanActivity extends AppCompatActivity
         }, ContextCompat.getMainExecutor((Context)this));
     }
 
+    @SuppressLint("RestrictedApi")
     public void bindPreview(@NonNull ProcessCameraProvider cameraProvider) {
 //        cameraProvider.unbindAll();
         Log.d("Camera-1", "bindPreview2");
@@ -177,12 +180,14 @@ public class ScanActivity extends AppCompatActivity
                 ", widthPx " + displayMetrics.widthPixels);
 
         preview = new Preview.Builder()
-                .setTargetResolution(new Size(768, 1024))
+//                .setTargetResolution(new Size(768, 1024))
+                .setTargetAspectRatioCustom(new Rational(3, 4))
                 .build();
 
         imageCapture = new ImageCapture.Builder()
                 .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
-                .setTargetResolution(new Size(768, 1024))
+//                .setTargetResolution(new Size(768, 1024))
+                .setTargetAspectRatioCustom(new Rational(3, 4))
                 .setTargetRotation(previewView.getDisplay().getRotation()).build();
 
         cameraSelector = new CameraSelector.Builder()

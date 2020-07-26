@@ -150,6 +150,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="@id/imgEditCropHorGuidelineBottom"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintLeft_toRightOf="parent"
+        android:gravity="center_vertical"
         android:background="#000"
         android:orientation="vertical"
         android:weightSum="10"
