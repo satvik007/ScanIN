@@ -238,7 +238,8 @@
             app:layout_constraintRight_toRightOf="@id/verticalGuidelineRight"
             app:layout_constraintLeft_toLeftOf="@id/verticalGuidelineLeft"
             android:elevation="5dp"
-            app:layout_constraintBottom_toTopOf="@id/image_edit_tools">
+            app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
+            android:visibility="gone">
             <SeekBar
                 android:max="100"
                 android:min="-100"

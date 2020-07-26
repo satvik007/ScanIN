@@ -6,12 +6,16 @@ import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
+
 import android.graphics.Paint;
+import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
+
+import com.example.scanin.DatabaseModule.ImageInfo;
 
 import org.opencv.android.Utils;
 import org.opencv.core.CvType;
@@ -34,6 +38,8 @@ public class ImageData {
     private int THUMBNAIL_SIZE = 64;
     private final double EPS = 1e-10;
     private int rotationConfig = 0;
+    private int origWidth;
+    private int origHeight;
 
     public ImageData(Uri uri) {
         this.originalBitmap = null;
@@ -43,6 +49,18 @@ public class ImageData {
         this.fileName = uri;
         this.cropPosition = null;
         this.rotationConfig = 0;
+    }
+
+    public ImageData(ImageInfo imgInfo) {
+        this.originalBitmap = null;
+        // not required
+        this.croppedBitmap = null;
+        this.currentBitmap = null;
+        this.filterName = ImageEditUtil.getFilterName(imgInfo.getFilterId());
+        //
+        this.fileName = imgInfo.getUri();
+        this.cropPosition = ImageEditUtil.convertMap2ArrayList(imgInfo.getCropPositionMap());
+        this.rotationConfig = imgInfo.getRotationConfig();
     }
 
     public Bitmap getOriginalBitmap() {
@@ -71,6 +89,7 @@ public class ImageData {
 
     public void setOriginalBitmap(Bitmap originalBitmap) {
         this.originalBitmap = originalBitmap;
+        // Intentionally not updating origWidth and origHeight.
     }
 
     public void setCroppedBitmap(Bitmap croppedBitmap) {
@@ -107,6 +126,8 @@ public class ImageData {
             this.originalBitmap = ImageData.rotateBitmap(this.originalBitmap);
             this.croppedBitmap = originalBitmap;
             this.currentBitmap = originalBitmap;
+            this.origHeight = this.originalBitmap.getHeight();
+            this.origWidth = this.originalBitmap.getWidth();
         } catch (Exception e){
             throw e;
         }
@@ -119,10 +140,24 @@ public class ImageData {
         return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 
+    public static Bitmap rotateBitmap (Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+    }
+
     public void rotateBitmap () {
         originalBitmap = rotateBitmap(originalBitmap);
         rotateCropPosition ();
         rotationConfig = (rotationConfig + 1) % 4;
+    }
+
+    public int getWidth() {
+        return origWidth;
+    }
+
+    public int getHeight() {
+        return origHeight;
     }
 
     public void rotateCropPosition () {

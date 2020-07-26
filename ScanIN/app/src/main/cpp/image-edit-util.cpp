@@ -62,10 +62,10 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_filterImage(JNIEnv *env, j
     cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
     // filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
     switch (filter_id) {
-        case 0: magic_filter(temp, dst, 1.5, -30); break;
+        case 0: magic_filter(temp, dst, 1.5, -20); break;
         case 1: sharpen_filter(temp, temp); gray_filter(temp, dst); break;
         case 2: dark_magic_filter(temp, dst); break;
-        case 3: lighten_filter(temp, dst); break;
+        case 3: sharpen_filter(temp, dst); break;
         default: std::cerr << "We should never reach here." << std::endl;
     }
     temp.release();
