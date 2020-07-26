@@ -560,7 +560,7 @@ public class ImageEditFragment extends Fragment {
             Target target = new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bmp1, Picasso.LoadedFrom from) {
-//                Bitmap newBitmap = ImageData.changeContrastAndBrightness(bitmap, 1.5, imageInfo.getBeta());
+//                Bitmap newBitmap = ImageData.changeContrastAndBrightness(bmp1, (float)beta, 0);
                     ContrastFilterTransformation1 t = new ContrastFilterTransformation1(Objects.requireNonNull(getActivity()), (float)beta);
 //                    Bitmap bmp2 = bmp1.copy(bmp1.getConfig(), true);
                     Bitmap newBitmap = t.transform(bmp1);

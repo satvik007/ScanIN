@@ -87,10 +87,14 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_changeContrastAndBrightnes
     Mat &src = *(Mat*) img_addr;
     Mat &dst = *(Mat*) output_img_addr;
 
+    __android_log_print(ANDROID_LOG_DEBUG, "SrcChannel", "%s",
+                        ("Filter  channel=" + std::to_string(src.channels()) + ", cols=" + std::to_string (src.cols)).c_str());
+
     Mat temp;
     cv::cvtColor(src, temp, cv::COLOR_RGBA2BGR);
 
-    src.convertTo(dst, -1, alpha, beta);
+    temp.convertTo(dst, -1, alpha, beta);
+    cv::cvtColor (dst, dst, cv::COLOR_BGR2RGBA);
 //    dst.convertTo (dst, CV_8UC3);
 }
 

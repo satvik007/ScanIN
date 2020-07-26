@@ -2,7 +2,11 @@ package com.example.scanin.ImageDataModule;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -150,17 +154,36 @@ public class ImageData {
     }
 
     //Change Brightness and contrast
-    public static Bitmap changeContrastAndBrightness(Bitmap source, double alpha, int beta) {
-        Bitmap bitmap;
-        Mat imgToProcess = new Mat();
-        Utils.bitmapToMat(source, imgToProcess);
-        Mat outMat = new Mat();
-        ImageEditUtil.changeContrastAndBrightness(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), alpha, beta);
-//        ImageEditUtil.filterImage(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), 1);
-        Bitmap currentBitmap = Bitmap.createBitmap(outMat.cols(),
-                              outMat.rows(), Bitmap.Config.ARGB_8888);
-        Utils.matToBitmap(outMat, currentBitmap);
-        return currentBitmap;
+    public static Bitmap changeContrastAndBrightness(Bitmap bitmap, float contrast, int beta) {
+//        Bitmap bitmap;
+//        Mat imgToProcess = new Mat();
+//        Utils.bitmapToMat(source, imgToProcess);
+//        Mat outMat = new Mat();
+//        ImageEditUtil.changeContrastAndBrightness(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), alpha, beta);
+////        ImageEditUtil.filterImage(imgToProcess.getNativeObjAddr(), outMat.getNativeObjAddr(), 1);
+//        Bitmap currentBitmap = Bitmap.createBitmap(outMat.cols(),
+//                              outMat.rows(), Bitmap.Config.ARGB_8888);
+//        Utils.matToBitmap(outMat, currentBitmap);
+        float[] colorTransform = new float[]{
+                contrast, 0, 0, 0, 0,
+                0, contrast, 0, 0, 0,
+                0, 0, contrast, 0, 0,
+                0, 0, 0, 1, 0};
+
+        ColorMatrix colorMatrix = new ColorMatrix();
+        colorMatrix.setSaturation(0f);
+        colorMatrix.set(colorTransform);
+
+        ColorMatrixColorFilter colorFilter = new ColorMatrixColorFilter(colorMatrix);
+        Paint paint = new Paint();
+        paint.setColorFilter(colorFilter);
+
+        Bitmap resultBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(resultBitmap);
+        canvas.drawBitmap(resultBitmap, 0, 0, paint);
+
+        return resultBitmap;
+//        return currentBitmap;
     }
 
     // cropped is applied on originalBitmap and saved in croppedBitmap
