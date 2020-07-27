@@ -19,7 +19,9 @@
             android:background="@color/black"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_constraintBottom_toTopOf="@id/camera_capture_button"/>
+            app:layout_constraintTop_toTopOf="@id/camera_capture_button"
+            app:scaleType="fitCenter"
+            android:gravity="center_vertical"/>
     </FrameLayout>
     <FrameLayout
         android:layout_width="match_parent"
