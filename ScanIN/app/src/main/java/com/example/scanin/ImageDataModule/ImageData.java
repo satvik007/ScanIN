@@ -40,6 +40,7 @@ public class ImageData {
     private int rotationConfig = 0;
     private int origWidth;
     private int origHeight;
+    public static int MAX_SIZE=1500;
 
     public ImageData(Uri uri) {
         this.originalBitmap = null;
@@ -120,10 +121,26 @@ public class ImageData {
         this.cropPosition = cropPosition;
     }
 
+    public static Bitmap getResizedBitmap(Bitmap image, int maxSize) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = maxSize;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = maxSize;
+            width = (int) (height * bitmapRatio);
+        }
+        return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
     public void setOriginalBitmap(Context context) throws IOException {
         try {
             this.originalBitmap =  MediaStore.Images.Media.getBitmap(context.getContentResolver() , fileName);
             this.originalBitmap = ImageData.rotateBitmap(this.originalBitmap);
+            this.originalBitmap = getResizedBitmap(this.originalBitmap, MAX_SIZE);
             this.croppedBitmap = originalBitmap;
             this.currentBitmap = originalBitmap;
             this.origHeight = this.originalBitmap.getHeight();
@@ -227,7 +244,7 @@ public class ImageData {
             Mat imgToProcess = new Mat();
             Utils.bitmapToMat(originalBitmap, imgToProcess);
             Mat outMat = new Mat();
-            Mat pts = new Mat(4, 2, 1);
+            Mat pts = new Mat(4, 2, CvType.CV_16U);
             for (int i = 0; i < 4; i++) {
                 pts.put(i, 0, cropPosition.get(i).x);
                 pts.put(i, 1, cropPosition.get(i).y);

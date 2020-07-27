@@ -22,14 +22,27 @@ Java_com_example_scanin_ImageDataModule_ImageEditUtil_cropImage(JNIEnv *env, jcl
     Mat& src = *(Mat*) img_addr;
     Mat& dst = *(Mat*) crop_img_addr;
     Mat& points = *(Mat*) pts;
-    std::vector <cv::Point> vec_pts (points);
+    std::vector <cv::Point> vec_pts (4);
+
+    for (int i = 0; i < 4; i++) {
+        vec_pts[i] = cv::Point(points.at<uint16_t> (i, 0), points.at<uint16_t> (i, 1));
+    }
+
+#ifdef DEBUG
+    String currentLog = "";
+    for (int i = 0; i < 4; i++) {
+        currentLog += std::to_string(i) + ". " + std::to_string (vec_pts[i].x) +
+                      " " + std::to_string (vec_pts[i].y) + "\n";
+    }
+    __android_log_print(ANDROID_LOG_DEBUG, "NativeCode", "%s", currentLog.c_str());
+#endif
 
     // changing cv::INTER_NEAREST to cv::INTER_LANCZOS4 should improve results
     // but degrade performance.
     // This can raise errors due to order problem.
     int ret = four_point_transform(src, dst, vec_pts, cv::INTER_NEAREST);
     if (ret) {
-        std::cerr << "transform failed due to order issue." << std::endl;
+        __android_log_print(ANDROID_LOG_ERROR, "NativeCode", "Order points function failed before warp");
     }
 }
 

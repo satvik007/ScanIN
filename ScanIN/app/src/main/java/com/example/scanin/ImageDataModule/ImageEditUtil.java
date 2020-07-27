@@ -16,6 +16,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class ImageEditUtil {
     public static String[] filterList = {"magic_filter", "gray_filter", "dark_magic_filter", "sharpen_filter"};
 
@@ -89,6 +92,35 @@ public class ImageEditUtil {
             res.put (i, new PointF(c.x * scale, c.y * scale));
         }
         return res;
+    }
+
+    public static float getScale (int width, int height) {
+        float fx = (float) width / ImageData.MAX_SIZE;;
+        float fy = (float) height / ImageData.MAX_SIZE;
+        float scale = max (fx, fy);
+        return scale;
+    }
+
+    // float operations can cause the crop to be slightly away from default_points.
+    // So we check just to avoid crop if we can.
+    public static boolean cropRequired (Map <Integer, PointF> pts, int width, int height) {
+        if (pts == null) return false;
+        float bitmapRatio = (float) width / (float) height;
+        if (bitmapRatio > 1) {
+            width = ImageData.MAX_SIZE;
+            height = (int) (width / bitmapRatio);
+        } else {
+            height = ImageData.MAX_SIZE;
+            width = (int) (height * bitmapRatio);
+        }
+        for (int i = 0; i < 4; i++) {
+            float x = pts.get(i).x;
+            float y = pts.get(i).y;
+            if ((x > 2 && x < width - 2) || (y > 2 && y < height - 2)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static Map <Integer, PointF> getDefaultPoints (int width, int height) {
