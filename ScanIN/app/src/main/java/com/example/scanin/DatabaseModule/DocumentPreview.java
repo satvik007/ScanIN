@@ -3,7 +3,7 @@ package com.example.scanin.DatabaseModule;
 import androidx.room.Embedded;
 import androidx.room.Relation;
 
-public class DocumentsAndFirstImage {
+public class DocumentPreview {
     @Embedded
     public Document document;
 

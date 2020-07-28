@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.scanin.DatabaseModule.DocumentsAndFirstImage;
+import com.example.scanin.DatabaseModule.DocumentPreview;
 import com.example.scanin.ImageDataModule.BitmapTransform;
 import com.example.scanin.R;
 import com.squareup.picasso.Picasso;
@@ -20,13 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDocAdapter.DocViewHolder> {
-    private ArrayList<DocumentsAndFirstImage> mDataset = new ArrayList<DocumentsAndFirstImage>();
+    private ArrayList<DocumentPreview> mDataset = new ArrayList<DocumentPreview>();
     private DocAdapterClickListener mListener;
     private static final int MAX_WIDTH = 1024;
     private static final int MAX_HEIGHT = 768;
 
-    public RecyclerViewDocAdapter(ArrayList<DocumentsAndFirstImage> mDataset, DocAdapterClickListener mListener){
-        this.mDataset = mDataset;
+    public RecyclerViewDocAdapter(DocAdapterClickListener mListener){
         this.mListener = mListener;
     }
 
@@ -42,7 +41,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mListener.onClick(view, getAdapterPosition());
+                    mListener.onClick(view, mDataset.get(getAdapterPosition()));
                 }
             });
             view.setOnLongClickListener(new View.OnLongClickListener() {
@@ -70,8 +69,8 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
 
     @Override
     public void onBindViewHolder(RecyclerViewDocAdapter.DocViewHolder holder, int position) {
-        DocumentsAndFirstImage documentsAndFirstImage = mDataset.get(position);
-        if(documentsAndFirstImage.getImageInfo() == null) {
+        DocumentPreview documentPreview = mDataset.get(position);
+        if(documentPreview.getImageInfo() == null) {
             return;
         }
 
@@ -83,8 +82,8 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         }
 
         int size = (int) Math.ceil(Math.sqrt(MAX_WIDTH * MAX_HEIGHT));
-        holder.textView.setText(documentsAndFirstImage.getDocument().getDocumentName());
-        Uri uri = documentsAndFirstImage.getImageInfo().getUri();
+        holder.textView.setText(documentPreview.getDocument().getDocumentName());
+        Uri uri = documentPreview.getImageInfo().getUri();
         Picasso.get().load(uri)
                 .transform(new BitmapTransform(MAX_WIDTH, MAX_HEIGHT))
                 .resize(0,200)
@@ -97,7 +96,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         return mDataset.size();
     }
 
-    public void setmDataset(ArrayList<DocumentsAndFirstImage> mDataset)
+    public void setmDataset(ArrayList<DocumentPreview> mDataset)
     {
         this.mDataset = mDataset;
         this.notifyDataSetChanged();

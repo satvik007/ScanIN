@@ -16,7 +16,7 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DocumentDao documentDao();
     public abstract ImageInfoDao imageInfoDao();
     public abstract DocumentAndImageDao documentAndImageDao();
-    public abstract DocAndFirstImageDao docAndFirstImageDao();
+    public abstract DocumentPreviewDao docAndFirstImageDao();
 
     public static AppDatabase getInstance(Context context){
         if(INSTANCE == null){

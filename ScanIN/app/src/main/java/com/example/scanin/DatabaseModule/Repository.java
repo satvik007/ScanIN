@@ -3,6 +3,10 @@ package com.example.scanin.DatabaseModule;
 import android.app.Application;
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
+
+import java.util.List;
+
 import io.reactivex.Completable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -18,8 +22,10 @@ public class Repository {
     }
 
     private DocumentAndImageDao documentAndImageDao;
+    private DocumentPreviewDao documentPreviewDao;
     private ImageInfoDao imageInfoDao;
     private DocumentDao documentDao;
+    private LiveData<List<DocumentPreview>> mDocPreview;
     private RepositoryCallback repositoryCallback;
     private Scheduler insert_thread = Schedulers.single();
     private Scheduler update_image_thread = Schedulers.single();
@@ -29,7 +35,16 @@ public class Repository {
         documentAndImageDao = appDatabase.documentAndImageDao();
         imageInfoDao = appDatabase.imageInfoDao();
         documentDao = appDatabase.documentDao();
-//        repositoryCallback = (RepositoryCallback)context;
+        documentPreviewDao = appDatabase.docAndFirstImageDao();
+    }
+
+    public Repository(Application application){
+        AppDatabase appDatabase = AppDatabase.getInstance(application);
+        documentAndImageDao = appDatabase.documentAndImageDao();
+        imageInfoDao = appDatabase.imageInfoDao();
+        documentDao = appDatabase.documentDao();
+        documentPreviewDao = appDatabase.docAndFirstImageDao();
+        mDocPreview = documentPreviewDao.loadAllDocumentPreview();
     }
 
     public void getDocumentImageInfo(long document_id, CompositeDisposable disposable){
@@ -90,5 +105,9 @@ public class Repository {
             s.onComplete();
         }).subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    public LiveData<List<DocumentPreview>> getDocsPreview(){
+        return mDocPreview;
     }
 }
