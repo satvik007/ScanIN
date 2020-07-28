@@ -44,8 +44,6 @@ public class ImageData {
 
     public ImageData(Uri uri) {
         this.originalBitmap = null;
-        this.croppedBitmap = null;
-        this.currentBitmap = null;
         this.filterName = null;
         this.fileName = uri;
         this.cropPosition = null;
@@ -54,11 +52,7 @@ public class ImageData {
 
     public ImageData(ImageInfo imgInfo) {
         this.originalBitmap = null;
-        // not required
-        this.croppedBitmap = null;
-        this.currentBitmap = null;
         this.filterName = ImageEditUtil.getFilterName(imgInfo.getFilterId());
-        //
         this.fileName = imgInfo.getUri();
         this.cropPosition = ImageEditUtil.convertMap2ArrayList(imgInfo.getCropPositionMap());
         this.rotationConfig = imgInfo.getRotationConfig();
@@ -66,14 +60,6 @@ public class ImageData {
 
     public Bitmap getOriginalBitmap() {
         return originalBitmap;
-    }
-
-    public Bitmap getCroppedBitmap() {
-        return croppedBitmap;
-    }
-
-    public Bitmap getCurrentBitmap() {
-        return currentBitmap;
     }
 
     public Uri getFileName() {
@@ -91,14 +77,6 @@ public class ImageData {
     public void setOriginalBitmap(Bitmap originalBitmap) {
         this.originalBitmap = originalBitmap;
         // Intentionally not updating origWidth and origHeight.
-    }
-
-    public void setCroppedBitmap(Bitmap croppedBitmap) {
-        this.croppedBitmap = croppedBitmap;
-    }
-
-    public void setCurrentBitmap(Bitmap currentBitmap) {
-        this.currentBitmap = currentBitmap;
     }
 
     public void setFilterName(String filterName) {
@@ -297,31 +275,7 @@ public class ImageData {
         return res;
     }
 
-    private Bitmap getSmallImage (Context context, Bitmap bitmap) {
-        Log.d("onCreateEdit", "getSmallImage");
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        int context_width = displayMetrics.widthPixels;
-        int context_height = displayMetrics.heightPixels;
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        double fx = (double) context_width / width;
-        double fy = (double) context_height / height;
-        double scale = min (fx, fy);
-        // adjusting for floating point errors.
-        int new_width = (int) (width * scale - EPS);
-        int new_height = (int) (height * scale - EPS);
-        return ThumbnailUtils.extractThumbnail(bitmap, new_width, new_height);
-    }
-
     public Bitmap getSmallOriginalImage(Context context) {
-        return getSmallImage(context, originalBitmap);
-    }
-
-    public Bitmap getSmallCroppedImage(Context context) {
-        return getSmallImage(context, croppedBitmap);
-    }
-
-    public Bitmap getSmallCurrentImage(Context context) {
-        return getSmallImage(context, currentBitmap);
+        return this.originalBitmap;
     }
 }
