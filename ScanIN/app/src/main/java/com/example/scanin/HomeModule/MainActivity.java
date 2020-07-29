@@ -1,15 +1,19 @@
 package com.example.scanin.HomeModule;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
@@ -17,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scanin.DatabaseModule.Document;
 import com.example.scanin.DatabaseModule.DocumentPreview;
 import com.example.scanin.R;
 import com.example.scanin.ScanActivity;
@@ -106,7 +111,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void renameDoc(View view, DocumentPreview documentPreview) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
 
+        final EditText edittext = new EditText(this);
+        edittext.setTextColor(getResources().getColor(R.color.black));
+        edittext.setText(documentPreview.getDocument().getDocumentName());
+
+        TextView textView = new TextView(this);
+        textView.setText("Rename Doc");
+        textView.setPadding(20, 30, 20, 30);
+        textView.setTextSize(20F);
+        textView.setTextColor(Color.BLACK);
+        alert.setCustomTitle(textView);
+
+        alert.setMessage("Enter New Name");
+        alert.setView(edittext);
+
+        alert.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String new_name = edittext.getText().toString();
+                Document document = documentPreview.getDocument();
+                document.setDocumentName(new_name);
+                homeViewModel.updateDoc(document);
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // what ever you want to do with No option.
+            }
+        });
+
+        alert.show();
     }
 
     @Override

@@ -84,6 +84,15 @@ public class Repository {
         }));
     }
 
+    public void updateDocument(Document document, CompositeDisposable disposable){
+        disposable.add(Completable.create(s->{
+            documentDao.updateDocument(document);
+        }).subscribeOn(insert_thread)
+        .subscribe(()->{
+
+        }));
+    }
+
     public void updateImage(ImageInfo imageInfo){
         Completable.create(s->{
             imageInfoDao.insertImageInfo(imageInfo);
