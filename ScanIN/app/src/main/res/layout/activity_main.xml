@@ -29,6 +29,7 @@
         android:paddingBottom="0dp"
         android:paddingRight="20dp"
         android:paddingLeft="20dp"
+        android:layout_marginTop="10dp"
         android:id="@+id/recyclerview_doc"
         app:layout_constraintTop_toBottomOf="@id/main_heading"
         app:layout_constraintBottom_toBottomOf="parent"/>

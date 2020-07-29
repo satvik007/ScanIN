@@ -23,4 +23,12 @@ public class HomeViewModel extends AndroidViewModel {
     LiveData<List<DocumentPreview>> getmDocPreview(){
         return mDocPreview;
     }
+
+//    void deleteDocument()
+
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+    }
 }
