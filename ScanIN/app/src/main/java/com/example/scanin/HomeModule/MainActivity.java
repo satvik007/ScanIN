@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final int REQUEST_CODE_PERMISSIONS = 10;
     private static final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA"};
 
+    private HomeViewModel homeViewModel;
+
     public static final int CAMERA_ACTIVITY_REQUEST_CODE = 0;
     public static final int CAMERA_IMAGE_REQUEST_CODE = 1000;
     public static final int WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 2000;
@@ -57,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         RecyclerViewDocAdapter mAdapter = new RecyclerViewDocAdapter(this);
         recyclerView.setAdapter(mAdapter);
 
-        HomeViewModel homeViewModel;
         homeViewModel = new ViewModelProvider(this, new ViewModelProvider.AndroidViewModelFactory(getApplication()))
                             .get(HomeViewModel.class);
         homeViewModel.getmDocPreview().observe(this, new Observer<List<DocumentPreview>>() {
@@ -94,6 +96,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         intent.putExtra("STATE", MachineStates.HOME);
         intent.putExtra("ACTION", MachineActions.HOME_OPEN_DOC);
         startActivity(intent);
+    }
+
+    @Override
+    public void deleteDoc(View view, DocumentPreview documentPreview) {
+        Toast.makeText(this, "Delete Doc", Toast.LENGTH_SHORT).show();
+        homeViewModel.deleteDoc(documentPreview);
+    }
+
+    @Override
+    public void renameDoc(View view, DocumentPreview documentPreview) {
+
     }
 
     @Override

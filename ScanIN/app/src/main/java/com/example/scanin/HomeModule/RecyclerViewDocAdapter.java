@@ -29,7 +29,7 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
         this.mListener = mListener;
     }
 
-    public class DocViewHolder extends RecyclerView.ViewHolder{
+    public class DocViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView imageView;
         TextView textView;
         DocAdapterClickListener listener;
@@ -38,12 +38,10 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
             super(view);
             imageView =view.findViewById(R.id.doc_image);
             textView = view.findViewById(R.id.doc_name);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mListener.onClick(view, mDataset.get(getAdapterPosition()));
-                }
-            });
+            view.findViewById(R.id.delete_doc).setOnClickListener(this);
+            view.findViewById(R.id.rename_doc).setOnClickListener(this);
+            view.setOnClickListener(this);
+
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View view) {
@@ -51,6 +49,17 @@ public class RecyclerViewDocAdapter extends RecyclerView.Adapter<RecyclerViewDoc
                     return true;
                 }
             });
+        }
+
+        @Override
+        public void onClick(View view) {
+            if(view.getId() == R.id.delete_doc){
+                mListener.deleteDoc(view, mDataset.get(getAdapterPosition()));
+            }else if(view.getId() == R.id.rename_doc){
+                mListener.renameDoc(view, mDataset.get(getAdapterPosition()));
+            }else{
+                mListener.onClick(view, mDataset.get(getAdapterPosition()));
+            }
         }
     }
 

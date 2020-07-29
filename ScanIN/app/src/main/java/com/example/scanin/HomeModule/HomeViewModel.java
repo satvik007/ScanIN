@@ -24,8 +24,9 @@ public class HomeViewModel extends AndroidViewModel {
         return mDocPreview;
     }
 
-//    void deleteDocument()
-
+    void deleteDoc(DocumentPreview documentPreview){
+        mRepository.deleteDocument(documentPreview.getDocument());
+    }
 
     @Override
     protected void onCleared() {
