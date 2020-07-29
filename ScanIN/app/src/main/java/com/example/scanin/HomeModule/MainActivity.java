@@ -105,8 +105,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void deleteDoc(View view, DocumentPreview documentPreview) {
-        Toast.makeText(this, "Delete Doc", Toast.LENGTH_SHORT).show();
-        homeViewModel.deleteDoc(documentPreview);
+        AlertDialog.Builder alert = new AlertDialog.Builder(this, R.style.AlertDialogCustom);
+
+        TextView textView = new TextView(this);
+        textView.setText("Are You Sure");
+        textView.setPadding(20, 30, 20, 30);
+        textView.setTextSize(20F);
+        textView.setTextColor(Color.BLACK);
+        alert.setCustomTitle(textView);
+
+        alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                homeViewModel.deleteDoc(documentPreview);
+                Toast.makeText(MainActivity.this, "Doc Deleted", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                // what ever you want to do with No option.
+            }
+        });
+
+        alert.show();
     }
 
     @Override
@@ -118,13 +139,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         edittext.setText(documentPreview.getDocument().getDocumentName());
 
         TextView textView = new TextView(this);
-        textView.setText("Rename Doc");
+        textView.setText("Enter Name");
         textView.setPadding(20, 30, 20, 30);
         textView.setTextSize(20F);
         textView.setTextColor(Color.BLACK);
         alert.setCustomTitle(textView);
 
-        alert.setMessage("Enter New Name");
         alert.setView(edittext);
 
         alert.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
