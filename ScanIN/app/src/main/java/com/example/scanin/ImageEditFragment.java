@@ -2,7 +2,9 @@ package com.example.scanin;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -21,8 +23,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
@@ -30,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
+import com.example.scanin.HomeModule.MainActivity;
 import com.example.scanin.ImageDataModule.ContrastFilterTransformation1;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageData;
@@ -434,7 +440,29 @@ public class ImageEditFragment extends Fragment {
                     View currentView = pagerSnapHelper.findSnapView(layoutManager);
                     if(currentView == null) return;
                     adapterPosition = layoutManager.getPosition(currentView);
-                    imageEditFragmentCallback.editDeleteImageCallback(adapterPosition);
+
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext(), R.style.AlertDialogCustom);
+
+                    TextView textView = new TextView(getContext());
+                    textView.setText("Delete current image");
+                    textView.setPadding(20, 30, 20, 30);
+                    textView.setTextSize(20F);
+                    textView.setTextColor(Color.BLACK);
+                    alert.setCustomTitle(textView);
+
+                    alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            imageEditFragmentCallback.editDeleteImageCallback(adapterPosition);
+                        }
+                    });
+
+                    alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            // what ever you want to do with No option.
+                        }
+                    });
+
+                    alert.show();
                 }
             }
         });
