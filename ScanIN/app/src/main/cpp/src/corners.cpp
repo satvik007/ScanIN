@@ -12,60 +12,64 @@
 #include <opencv2/highgui.hpp>
 
 // Declaring parameters globally, found after experiments.
-const int MORPH = 7;
-const int CANNY_LOW = 3;
-const int CANNY_HI = 20;
+const int MORPH = 11;
+const int CANNY_LOW = 20;
+const int CANNY_HI = 60;
 const int HOUGH = 30;
 const int PI = acos (-1);
-const int MIN_ANGLE = 60;
-const int MAX_ANGLE = 120;
+const int MIN_ANGLE = 70;
+const int MAX_ANGLE = 110;
 
 /**This function mainly does preprocessing on the image.
- * Applies Gaussian blur, median blur and dilates the image with a kernel based on 
+ * Applies bilateral Filter, median blur and dilates and erodes the image with a kernel based on
  * MORPH_RECT on the image which is supposed to help with white on white detection.
- * 
+ *
  * @param img
  * The input image of type cv::Mat
- * 
+ *
  * @param dst
  * The output image of type cv::Mat
- * 
- * @param gauss_kernel
- * Size of the kernel for gaussian Blur, of type int (default=5)
- * 
+ *
+ * @param bilateral_kernel
+ * Size of the kernel for Bilateral filter, of type int (default=5)
+ *
  * @param median_kernel
  * Size of the kernel for median blur, of type int (default=9)
- * 
+ *
  * @param iterations
  * Number of times to apply the dilation operation, of type int (default=1)
 */
-void _image_preprocessing (cv::Mat &img, cv::Mat &dst, const int gauss_kernel=5, const int median_kernel=9, const int iterations=1) {
-    img.copyTo (dst);
-    cv::GaussianBlur (dst, dst, cv::Size(gauss_kernel, gauss_kernel), 0);
+void _image_preprocessing (cv::Mat &img, cv::Mat &dst, const int bilateral_kernel=5, const int median_kernel=9, const int iterations=1) {
+
+    cv::Mat temp;
+    cv::cvtColor (img, temp, cv::COLOR_BGR2Lab);
+    cv::bilateralFilter (temp, dst, bilateral_kernel, 10, 75);
+    cv::cvtColor (dst, dst, cv::COLOR_Lab2BGR);
     cv::medianBlur (dst, dst, median_kernel);
-    // This helps in detection of white on white.
     cv::Mat kernel = cv::getStructuringElement (cv::MORPH_RECT, cv::Size(MORPH, MORPH));
     cv::dilate (dst, dst, kernel, cv::Point(-1, -1), iterations);
+    cv::erode (dst, dst, kernel, cv::Point(-1, -1), iterations);
+    cv::copyMakeBorder(dst, dst, 5, 5, 5, 5, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
 }
 
 /**This function finds out the edges in the preprocessed image with the Canny Edge
  * Detector.
- * 
+ *
  * @param img
  * The input image of type cv::Mat
- * 
+ *
  * @param edges
  * Outputs image of type cv::Mat
- * 
+ *
 */
 void _generate_edges (cv::Mat &img, cv::Mat &edges) {
     cv::Canny (img, edges, CANNY_LOW, CANNY_HI);
     std::vector <cv::Vec4i> lines;
-    // Finding hough lines using the probablistic algorithm. This is mainly done so 
+    // Finding hough lines using the probablistic algorithm. This is mainly done so
     // that we can extend lines if there are gaps in between.
     cv::HoughLinesP (edges, lines, 1, CV_PI/180, HOUGH);
     std::vector <cv::Vec4i>::iterator it = lines.begin();
-#ifdef DEBUG        
+#ifdef DEBUG
     cv::Mat eg;
     img.copyTo (eg);
 #endif
@@ -73,27 +77,27 @@ void _generate_edges (cv::Mat &img, cv::Mat &edges) {
     for (; it != lines.end(); ++it) {
         cv::Vec4i l = *it;
         cv::line (edges, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(255, 0, 0), 2, 8);
-#ifdef DEBUG        
+#ifdef DEBUG
         cv::line (eg, cv::Point(l[0], l[1]), cv::Point(l[2], l[3]), cv::Scalar(255, 0, 0), 2, 8);
 #endif
     }
     // Will close more gaps by dilating on MORPH_RECT based kernel.
-    cv::Mat kernel = cv::getStructuringElement (cv::MORPH_RECT, cv::Size(MORPH, MORPH));
+    cv::Mat kernel = cv::getStructuringElement (cv::MORPH_RECT, cv::Size(7, 7));
     cv::dilate (edges, edges, kernel, cv::Point(-1, -1), 1);
-#ifdef DEBUG       
+#ifdef DEBUG
     cv::dilate (eg, eg, kernel, cv::Point(-1, -1), 1);
     cv::namedWindow ("eg", cv::WINDOW_AUTOSIZE);
     cv::imshow ("eg", eg);
     cv::waitKey(0);
-    cv::destroyAllWindows();    
+    cv::destroyAllWindows();
 #endif
 }
 
 /**This function mainly removes 1 of the 2 points that are very close (< 100 pixels)
- * 
+ *
  * @param contour
  * Input contour of type std::vector < cv::Point >
- * 
+ *
  * @param res
  * Output contour of type std::vector < cv::Point >
 */
@@ -118,17 +122,17 @@ void _process_contours (std::vector < cv::Point > &contour, std::vector < cv::Po
 }
 
 /**This function finds out the angles A-O-B gives the three points and returns in degrees.
- * 
+ *
  * @param a
  * Input point of type cv::Point
- * 
+ *
  * @param b
  * Input point of type cv::Point
- * 
+ *
  * @param c
  * Input point of type cv::Point
- * 
- * @return theta 
+ *
+ * @return theta
  * Output angles in degrees of type double.
 */
 double _angle (cv::Point a, cv::Point o, cv::Point b) {
@@ -142,10 +146,10 @@ double _angle (cv::Point a, cv::Point o, cv::Point b) {
 
 /**This function does a check on the contour see if all the angles are between
  * MIN_ANGLE and MAX_ANGLE, this weeds out some unnecessary contours.
- * 
+ *
  * @param a
  * Input contour of type std::vector < cv::Point >
- * 
+ *
  * @return bool
  * Whether the angle check succeeded or not.
 */
@@ -169,35 +173,35 @@ bool _angle_check (std::vector < cv::Point > &contour) {
 /**This function finds out contours from the edges created by the Canny.
  * Then we weed out contours on the basis of arclength, area, angles
  * Returns the filtered contours in descending order sorted on basis of area.
- * 
+ *
  * @param edges
  * Input image with edges on black background of type cv::Mat
- * 
+ *
  * @param contours
  * Output contours found in the image of type std::vector< std::vector< cv::Point > >
- * 
+ *
  * @param cnt_method
  * The method to find contours. type int (default=cv::RETR_LIST)
- * 
+ *
  * – CV_RETR_EXTERNAL retrieves only the extreme outer contours.
  * It sets hierarchy[i][2]=hierarchy[i][3]=-1 for all the contours.
- * 
+ *
  * – CV_RETR_LIST retrieves all of the contours without establishing any hierarchical rela-
  * tionships.
- * 
+ *
  * – CV_RETR_CCOMP retrieves all of the contours and organizes them into a two-level
  * hierarchy. At the top level, there are external boundaries of the components. At the
- * second level, there are boundaries of the holes. If there is another contour inside a  
+ * second level, there are boundaries of the holes. If there is another contour inside a
  * hole of a connected component, it is still put at the top level.
- * 
+ *
  * – CV_RETR_TREE retrieves all of the contours and reconstructs a full hierarchy of nested
  * contours. This full hierarchy is built and shown in the OpenCV contours.c demo.
  * method – Contour approximation method
- * 
+ *
  * – CV_CHAIN_APPROX_NONE stores absolutely all the contour points. That is, any 2
  * subsequent points (x1,y1) and (x2,y2) of the contour will be either horizontal, vertical
  * or diagonal neighbors, that is, max(abs(x1-x2),abs(y2-y1))==1 .
- * 
+ *
  * – CV_CHAIN_APPROX_SIMPLE compresses horizontal, vertical, and diagonal seg-
  * ments and leaves only their end points. For example, an up-right rectangular contour
  * is encoded with 4 points.
@@ -209,15 +213,16 @@ bool _angle_check (std::vector < cv::Point > &contour) {
 void _find_contours (cv::Mat edges, std::vector< std::vector< cv::Point > > &contours, const int cnt_method=cv::RETR_LIST) {
 
     std::vector< std::vector< cv::Point> > contoursCleaned;
+    const int MAX_AREA = (edges.cols - 10) * (edges.rows - 10);
 
     cv::findContours(edges, contours, cnt_method, cv::CHAIN_APPROX_TC89_KCOS);
     // clean up according to arclength and area.
     for (int i = 0; i < contours.size(); ++i) {
-        if (cv::arcLength(contours[i], false) > 800 and cv::contourArea(contours[i]) > 20000) {
+        if (cv::arcLength(contours[i], false) > 800 and cv::contourArea(contours[i]) > 20000 and cv::contourArea(contours[i]) < MAX_AREA) {
             contoursCleaned.push_back(contours[i]);
         }
     }
-    
+
     contours.clear();
     for (int i = 0; i < contoursCleaned.size(); ++i) {
         std::vector< cv::Point> temp;
@@ -238,17 +243,17 @@ void _find_contours (cv::Mat edges, std::vector< std::vector< cv::Point > > &con
         return cv::contourArea (a) > cv::contourArea (b);
     });
 }
- 
+
 /**This function ensures that the contour lies fully inside the image.
- * 
+ *
  * @param rect
  * Input contour of type std::vector < cv::Point >
- * 
+ *
  * @param size
  * Width and Height of image. of type cv::Size
 */
 void _sanitize_rect (std::vector< cv::Point > &rect, cv::Size size) {
-    if (rect.empty())  
+    if (rect.empty())
         return;
     assert (rect.size() == 4);
     for (int i = 0; i < 4; i++) {
@@ -258,15 +263,15 @@ void _sanitize_rect (std::vector< cv::Point > &rect, cv::Size size) {
 }
 
 /**This function returns the 4 corners of what the algorithm considers as the document.
- * 
+ *
  * @param inupt
- * Input image of type cv::Mat 
+ * Input image of type cv::Mat
  * can be GRAY or BGR
- * 
+ *
  * @param rect
  * Output 4 points of the best shape found, type std::vector < cv::Point >
- * 
- * @return 
+ *
+ * @return
  * 0 if successful
  * -1 if default_rect is returned
 */
@@ -279,18 +284,19 @@ int find_best_corners (cv::Mat &input, std::vector < cv::Point > &rect) {
     default_rect.emplace_back (input.cols, input.rows);
     default_rect.emplace_back (0, input.rows);
 
-    // convert to gray or check if already gray.
+    //convert to bgr
     if (input.type() == CV_8UC3) {
-        cv::cvtColor (input, img, cv::COLOR_BGR2GRAY);
-    } else if (input.type() == CV_8UC1) {
         input.copyTo (img);
+    } else if (input.type() == CV_8UC1) {
+        cv::cvtColor (input, img, cv::COLOR_GRAY2BGR);
     } else {
         // input is neither gray nor BGR
         rect = default_rect;
         return -1;
     }
 
-    _image_preprocessing (img, img, 5, 51, 2);
+    _image_preprocessing (img, img, 31, 23, 1);
+
 
 #ifdef DEBUG
     cv::namedWindow ("blur", cv::WINDOW_AUTOSIZE);
@@ -311,8 +317,8 @@ int find_best_corners (cv::Mat &input, std::vector < cv::Point > &rect) {
 
     std::vector< std::vector< cv::Point > > contours;
     _find_contours (edges, contours);
-    
- #ifdef DEBUG
+
+#ifdef DEBUG
     cv::Mat boxes;
     input.copyTo (boxes);
     cv::polylines (boxes, contours, true, cv::Scalar(0, 0, 255), 3);
@@ -320,7 +326,7 @@ int find_best_corners (cv::Mat &input, std::vector < cv::Point > &rect) {
     cv::imshow ("boxes", boxes);
     cv::waitKey(0);
     cv::destroyAllWindows();
-#endif   
+#endif
 
     for (int i = 0; i < contours.size(); i++) {
         if (contours[i].size() == 4) {
@@ -340,14 +346,14 @@ int find_best_corners (cv::Mat &input, std::vector < cv::Point > &rect) {
 }
 
 /**This function reorders the points in clockwise with top left first.
- * 
+ *
  * @param pts
  * Input 4 points before reordering, type std::vector < cv::Point >
- * 
+ *
  * @param rect
  * Output 4 points after reordering, type std::vector < cv::Point >
- * 
- * @return 
+ *
+ * @return
  * 0 if successful
  * -1 if order_points failed.
 */
