@@ -83,7 +83,7 @@
                 android:src="@drawable/ic_rotate" />
 
             <ImageButton
-                android:id="@+id/brightness"
+                android:id="@+id/brightness_and_contrast"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="25"
@@ -230,24 +230,152 @@
             </LinearLayout>
 
         </android.widget.HorizontalScrollView>
-        <LinearLayout
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:background="@color/white"
+            android:layout_gravity="center_horizontal"
             app:layout_constraintRight_toRightOf="@id/verticalGuidelineRight"
             app:layout_constraintLeft_toLeftOf="@id/verticalGuidelineLeft"
-            android:elevation="5dp"
             app:layout_constraintBottom_toTopOf="@id/image_edit_tools"
-            android:visibility="gone">
-            <SeekBar
-                android:max="100"
-                android:min="-100"
-                android:progress="0"
+            android:gravity="center_horizontal"
+            android:elevation="5dp"
+            android:visibility="gone"
+            android:id="@+id/imageEffects"
+            android:background="#404040"
+            >
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center_horizontal"
+                android:visibility="visible"
+                android:id="@+id/imageEffectsBtns"
+                >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:id="@+id/brightness_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="25"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_baseline_brightness_6_24" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Brightness"
+                        android:textSize="10dp"
+                        android:textColor="@color/icons"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:orientation="vertical">
+                    <ImageButton
+                        android:id="@+id/contrast_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="0dp"
+                        android:layout_weight="25"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_baseline_filter_hdr_24" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:text="Contrast"
+                        android:textSize="10dp"
+                        android:textColor="@color/icons"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/brightness_bar" />
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:id="@+id/barContainer"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                >
+                <SeekBar
+                    android:max="100"
+                    android:min="-100"
+                    android:progress="0"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/brightness_bar"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:layout_weight="5"
+                    />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    >
+
+                    <ImageButton
+                        android:id="@+id/imageEffectReset"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:background="#404040"
+                        android:src="@drawable/ic_baseline_restore_24"
+                        android:padding="2dp"
+                        android:contentDescription="imageEffectReset"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/imageEffectCheck"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:scaleType="fitXY"
+                        android:background="#404040"
+                        android:src="@drawable/ic_check"
+                        android:padding="2dp"
+                        android:contentDescription="imageEffectCheck"
+                        />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+        </FrameLayout>
+
+
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="20dp"-->
+<!--            android:background="@color/white"-->
+<!--            app:layout_constraintRight_toRightOf="@id/verticalGuidelineRight"-->
+<!--            app:layout_constraintLeft_toLeftOf="@id/verticalGuidelineLeft"-->
+<!--            android:elevation="5dp"-->
+<!--            app:layout_constraintBottom_toTopOf="@id/image_edit_tools"-->
+<!--            android:visibility="gone">-->
+<!--            <SeekBar-->
+<!--                android:max="100"-->
+<!--                android:min="-100"-->
+<!--                android:progress="0"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/brightness_bar" />-->
+<!--        </LinearLayout>-->
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/horizontalGuidelineBottom"

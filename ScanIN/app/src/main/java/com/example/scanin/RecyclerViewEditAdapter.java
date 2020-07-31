@@ -16,6 +16,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
+import com.example.scanin.ImageDataModule.BrightnessFilterTransformation1;
+import com.example.scanin.ImageDataModule.ContrastAndBrightnessTransformation;
+import com.example.scanin.ImageDataModule.ContrastFilterTransformation1;
 import com.example.scanin.ImageDataModule.CropTransformation;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
@@ -133,7 +136,9 @@ public class RecyclerViewEditAdapter extends RecyclerView.Adapter<RecyclerViewEd
         Picasso.get().load(uri)
                 .transform(new CropTransformation(imageInfo.getCropPositionMap()))
                 .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
-                .transform(new BrightnessFilterTransformation(context, (float)imageInfo.getBeta()))
+//                .transform(new BrightnessFilterTransformation(context, (float)imageInfo.getBeta()))
+//                .transform(new ContrastFilterTransformation1(context, (float)imageInfo.getAlpha()))
+                .transform(new ContrastAndBrightnessTransformation(imageInfo.getAlpha(), (int) imageInfo.getBeta()))
                 .resize(size, size)
                 .centerInside()
                 .into(target);

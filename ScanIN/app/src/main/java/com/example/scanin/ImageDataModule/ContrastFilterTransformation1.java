@@ -17,4 +17,8 @@ public class ContrastFilterTransformation1 extends GPUFilterTransformation1 {
         GPUImageContrastFilter filter = getFilter();
         filter.setContrast(mContrast);
     }
+
+    @Override public String key() {
+        return "ContrastFilterTransformation(contrast=" + mContrast + ")";
+    }
 }

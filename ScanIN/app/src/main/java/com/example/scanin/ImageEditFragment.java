@@ -21,6 +21,7 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -36,7 +37,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.scanin.DatabaseModule.DocumentAndImageInfo;
 import com.example.scanin.DatabaseModule.ImageInfo;
 import com.example.scanin.HomeModule.MainActivity;
+import com.example.scanin.ImageDataModule.BrightnessFilterTransformation1;
 import com.example.scanin.ImageDataModule.ContrastFilterTransformation1;
+import com.example.scanin.ImageDataModule.CropTransformation;
 import com.example.scanin.ImageDataModule.FilterTransformation;
 import com.example.scanin.ImageDataModule.ImageData;
 import com.example.scanin.ImageDataModule.ImageEditUtil;
@@ -54,6 +57,7 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import jp.wasabeef.picasso.transformations.gpu.BrightnessFilterTransformation;
 
 import static com.example.scanin.ImageDataModule.ImageData.rotateBitmap;
 import static com.example.scanin.ImageDataModule.ImageEditUtil.convertArrayList2Map;
@@ -100,6 +104,10 @@ public class ImageEditFragment extends Fragment {
     private int filterPreviewHeight = 100;
     private RecyclerView.LayoutManager layoutManager;
     boolean filterVisible = false;
+    boolean bacVisible = false;
+    private int imageEffectSelected = -1;
+    public final int BRIGHTNESS = 0;
+    public final int CONTRAST = 1;
 
     private void initializeCropping() {
         ViewTreeObserver vto = cropImageView.getViewTreeObserver();
@@ -473,12 +481,75 @@ public class ImageEditFragment extends Fragment {
         ImageView sharpen_filter_view = rootView.findViewById(R.id.sharpen_filter);
         ImageView gray_filter_view = rootView.findViewById(R.id.gray_filter);
         ImageView dark_magic_filter_view = rootView.findViewById(R.id.dark_magic_filter);
+        LinearLayout imageEffectsBtns = rootView.findViewById(R.id.imageEffectsBtns);
+        SeekBar brightnessBar = rootView.findViewById(R.id.brightness_bar);
+        LinearLayout barContainer = rootView.findViewById(R.id.barContainer);
+        FrameLayout imageEffectsView = rootView.findViewById(R.id.imageEffects);
+
+        rootView.findViewById(R.id.brightness_and_contrast).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (bacVisible) {
+                    bacVisible = false;
+                    imageEffectsView.setVisibility(View.GONE);
+                    barContainer.setVisibility(View.GONE);
+                } else {
+                    imageEffectsView.setVisibility(View.VISIBLE);
+                    imageEffectsBtns.setVisibility(View.VISIBLE);
+                    barContainer.setVisibility(View.GONE);
+                    bacVisible = true;
+                }
+            }
+        });
+
+        rootView.findViewById(R.id.brightness_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageEffectSelected = BRIGHTNESS;
+                imageEffectsBtns.setVisibility(View.GONE);
+                barContainer.setVisibility(View.VISIBLE);
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                int beta = (int) documentAndImageInfo.getImages().get(adapterPosition).getBeta();
+                brightnessBar.setProgress (beta);
+            }
+        });
+
+        rootView.findViewById(R.id.contrast_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                imageEffectSelected = CONTRAST;
+                imageEffectsBtns.setVisibility(View.GONE);
+                barContainer.setVisibility(View.VISIBLE);
+                View currentView = pagerSnapHelper.findSnapView(layoutManager);
+                if(currentView == null) return;
+                adapterPosition = layoutManager.getPosition(currentView);
+                float alpha = (float) documentAndImageInfo.getImages().get(adapterPosition).getAlpha();
+                brightnessBar.setProgress ((int) ((alpha - 1.0) * 100));
+            }
+        });
+
+        rootView.findViewById(R.id.imageEffectCheck).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                barContainer.setVisibility(View.GONE);
+                imageEffectsView.setVisibility(View.GONE);
+                bacVisible = false;
+            }
+        });
+
+        rootView.findViewById(R.id.imageEffectReset).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                brightnessBar.setProgress(0);
+            }
+        });
 
         filterContainer.setOnFocusChangeListener((view, b) -> {
             Log.d(TAG, "HEre foucus"+String.valueOf(b));
             if(!b) filterContainer.setVisibility(View.INVISIBLE);
         });
-
 
         rootView.findViewById(R.id.filters).setOnClickListener(new View.OnClickListener(){
             @Override
@@ -592,7 +663,6 @@ public class ImageEditFragment extends Fragment {
             }
         });
 
-        SeekBar brightnessBar = rootView.findViewById(R.id.brightness_bar);
         Observable.create(s->{
             brightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
@@ -613,39 +683,50 @@ public class ImageEditFragment extends Fragment {
             View currentView = pagerSnapHelper.findSnapView(layoutManager);
             if(currentView == null) return;
             adapterPosition = layoutManager.getPosition(currentView);
-            float beta = (float)(i+100)/100.0f;
-            documentAndImageInfo.getImages().get(adapterPosition).setBeta(beta);
-            ImageInfo imageInfo = documentAndImageInfo.getImages().get(adapterPosition);
-            ImageView temp = currentView.findViewById(R.id.image_edit_item);
-            Target target = new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bmp1, Picasso.LoadedFrom from) {
-//                Bitmap newBitmap = ImageData.changeContrastAndBrightness(bmp1, (float)beta, 0);
-                    ContrastFilterTransformation1 t = new ContrastFilterTransformation1(Objects.requireNonNull(getActivity()), (float)beta);
-//                    Bitmap bmp2 = bmp1.copy(bmp1.getConfig(), true);
-                    Bitmap newBitmap = t.transform(bmp1);
-                    temp.setImageBitmap(newBitmap);
-                    Log.d("Brightnsd", String.valueOf(i));
-                    Log.d("Brightns", String.valueOf(beta));
-                }
 
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+            if (imageEffectSelected == CONTRAST) {
+                float alpha = (float)(i+100)/100.0f;
+                documentAndImageInfo.getImages().get(adapterPosition).setAlpha(alpha);
+            } else if (imageEffectSelected == BRIGHTNESS) {
+                float beta = i;
+                documentAndImageInfo.getImages().get(adapterPosition).setBeta(beta);
+            }
 
-                }
+            mAdapter.notifyDataSetChanged();
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            };
-            temp.setTag(target);
-            int size = (int) Math.ceil(Math.sqrt(RecyclerViewEditAdapter.MAX_WIDTH * RecyclerViewEditAdapter.MAX_HEIGHT));
-            Picasso.get().load(imageInfo.getUri())
-                    .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
-                    .resize(size, size)
-                    .centerInside()
-                    .into(target);
+//            ImageInfo imageInfo = documentAndImageInfo.getImages().get(adapterPosition);
+//            ImageView temp = currentView.findViewById(R.id.image_edit_item);
+//            Target target = new Target() {
+//                @Override
+//                public void onBitmapLoaded(Bitmap bmp1, Picasso.LoadedFrom from) {
+//                    temp.setImageBitmap(bmp1);
+//                    Log.d("Brightnsd", String.valueOf(i));
+//                    Log.d("Brightns", String.valueOf(effectVal));
+//                }
+//
+//                @Override
+//                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+//
+//                }
+//
+//                @Override
+//                public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                }
+//            };
+//            temp.setTag(target);
+//            int size = (int) Math.ceil(Math.sqrt(RecyclerViewEditAdapter.MAX_WIDTH * RecyclerViewEditAdapter.MAX_HEIGHT));
+//
+//            Picasso.get().load(imageInfo.getUri())
+//                    .transform(new CropTransformation(imageInfo.getCropPositionMap()))
+//                    .transform(new FilterTransformation(ImageEditUtil.getFilterName(imageInfo.getFilterId())))
+//                    .transform(new BrightnessFilterTransformation(Objects.requireNonNull(getActivity()), (float)imageInfo.getBeta()))
+////                    .transform(new ContrastFilterTransformation1(Objects.requireNonNull(getActivity()), (float)imageInfo.getAlpha()))
+//                    .resize(size, size)
+//                    .centerInside()
+//                    .into(target);
+//
+//            mAdapter.notifyDataSetChanged();
         });
 //        Observable.create(s->{
 //            brightnessBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
